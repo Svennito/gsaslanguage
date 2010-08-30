@@ -1,0 +1,64 @@
+# 
+# gsas_change_atom - change atom parameter
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_change_atom <phase> <atom range> <parameter name> <value>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom parameters should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom range for which value should be changed!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without atom parameter which should be changed!"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without value to which parameter should be changed!"
+	exit 0
+fi
+
+# Change the value
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "c $2 $3 $4" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed value for phase $1, atom(s) $2, parameter $3 to \verb=$4=." >> temp.tex

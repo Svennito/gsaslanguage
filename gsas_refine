@@ -1,0 +1,122 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+let NOPLOT=0
+ 
+if [ "$1" != "" ]; then
+	if [ "$1" = "noplot" ]; then
+		let NOPLOT=1
+	else
+		# We have a parameter, let's assume it's the number of cycles
+		if [ "$1" -gt 0 ]; then
+			echo "k l l c" > temp.txt
+			echo $1 >> temp.txt
+			echo "x x x" >> temp.txt
+			expedt `cat GSAS_EXP`.EXP < temp.txt
+		fi
+	fi
+fi
+if [ "$2" = "noplot" ]; then
+	let NOPLOT=1
+fi
+
+if [ -f gsas_print.txt ]; then
+	# Flag file exists, no action needed
+	echo "Print options already set"
+else
+	echo "k l l p" > temp.txt
+	echo "c v" >> temp.txt
+	echo "x x x" >> temp.txt
+	expedt `cat GSAS_EXP` < temp.txt
+	echo "Y" > gsas_print.txt
+fi
+
+if [ -f gsas_step.txt ]; then
+	# file with number of refinement step exists, read it
+	STEP=`cat gsas_step.txt`
+	let STEP=STEP+1
+else
+	# file with number of refinement step does not exist, create it
+	STEP=1
+	echo "$STEP" > gsas_step.txt
+fi	
+
+echo "$STEP" > gsas_step.txt
+
+echo "\section{Refinement step $STEP}" >> `cat GSAS_EXP`.tex
+# add the stuff we did since the last refinement to the tex file
+cat temp.tex >> `cat GSAS_EXP`.tex
+# delete the temp.tex file so we know what we did since this refinement
+rm temp.tex
+
+nice powpref `cat GSAS_EXP`.EXP
+nice genles  `cat GSAS_EXP`.EXP
+
+# extract parameters
+grep "Reduced" `cat GSAS_EXP`.LST > chisq.txt
+grep "Final variable sum" `cat GSAS_EXP`.LST > shift.txt
+
+echo "Refined the data. `tail -1 chisq.txt`. `tail -1 shift.txt`." >> `cat GSAS_EXP`.tex
+echo " " >> `cat GSAS_EXP`.tex
+
+if [ "$NOPLOT" -eq "0" ]; then
+	echo "NOPLOT is $NOPLOT"
+	# plot the file data
+	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+	COUNTER=0
+	NHIST=`cat nhist.txt`
+	echo "We have $NHIST histograms in this refinement."
+	rm S`echo $STEP`H*.EPS
+	while [ $COUNTER -lt $NHIST ]; do
+		let COUNTER=COUNTER+1 
+	
+		echo "Plotting histogram $COUNTER of $NHIST..."
+		echo "Histogram $COUNTER of $NHIST:\newline" >> `cat GSAS_EXP`.tex
+	
+		echo "z" > temp.txt
+		echo "e" >> temp.txt
+		echo "b m d t" >> temp.txt
+		
+		echo "h $COUNTER p" >> temp.txt
+		if [ $COUNTER -lt 10 ]; then
+			echo "S`echo $STEP`H0$COUNTER" >> temp.txt
+			echo "S`echo $STEP`H0$COUNTER" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H0$COUNTER.EPS}" >> `cat GSAS_EXP`.tex
+		else
+			echo "S`echo $STEP`H$COUNTER" >> temp.txt
+			echo "S`echo $STEP`H$COUNTER" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H$COUNTER.EPS}" >> `cat GSAS_EXP`.tex
+		fi
+		echo " " >> temp.txt
+		echo "y" >> temp.txt
+		if [ $COUNTER -lt 10 ]; then
+			echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
+			echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+		else
+			echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
+			echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+		fi
+	
+		echo " " >> temp.txt
+		if [ $COUNTER -lt 10 ]; then
+			echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
+			echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
+		else
+			echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
+			echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
+			echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
+		fi
+		echo " " >> temp.txt
+		echo "/" >> temp.txt
+		echo "x" >> temp.txt
+	
+		nice powplot `cat GSAS_EXP`.EXP < temp.txt > out.txt
+		echo " " >> `cat GSAS_EXP`.tex
+		echo "For histogram $COUNTER, the slope and intercept of the normal probability plot are: `grep "normal probability" out.txt|tail --bytes 20`." >> `cat GSAS_EXP`.tex
+		echo " " >> `cat GSAS_EXP`.tex
+	
+	done
+fi

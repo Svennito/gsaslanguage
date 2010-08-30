@@ -1,0 +1,46 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without name for phase!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without space group for phase!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without lattice parameters for phase!"
+	exit 0
+fi
+
+# Add the phase
+echo "k p p i" > temp.txt
+echo $1 >> temp.txt
+echo $2 >> temp.txt
+echo $3 >> temp.txt
+echo "x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt
+
+# Test the EXP file
+grep "$2" `cat GSAS_EXP`.EXP
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	# grep did not find the spacegroup
+	echo "Space group is NOT in the EXP file"
+	exit 0
+fi
+
+grep "$3" `cat GSAS_EXP`.EXP
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	# grep did not find the lattice parameter
+	echo "Lattice parameter is NOT in the EXP file"
+	exit 0
+fi
+
+echo "Added phase named \verb=$1= with space group \verb=$2= and lattice parameter(s) \verb=$3= to EXP file.\newline" >> `cat GSAS_EXP`.tex

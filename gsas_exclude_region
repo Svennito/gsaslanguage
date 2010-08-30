@@ -1,0 +1,31 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which region should be excluded!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without lower limit of excluded region!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without upper limit of excluded region!"
+	exit 0
+fi
+
+# exclude the region 
+echo "k p h" > temp.txt
+echo "e $1" >> temp.txt
+echo "e" >> temp.txt
+echo "i $2 $3" >> temp.txt
+echo "x x x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Excluded from histogram $1 the region between $2 and $3 (in the natural units of the data, i.e. time-of-flight in ms or angle in $ 2\theta$).\newline" >> `cat GSAS_EXP`.tex
+

@@ -1,0 +1,52 @@
+#
+# Vary diffuse scattering
+#
+# Call with 
+#
+# gsas_vary_diffuse scattering <term> <Flag for amplitude> <flag for radius> <flag for Uiso>
+#
+# 
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without a term for the diffuse scattering!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without flag for amplitude for diffusce scattering of term $1!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without flag for radius for diffusce scattering of term $1!"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without flag for Uiso for diffusce scattering of term $1!"
+	exit 0
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without damping flag, assuming no damping!"
+fi
+
+
+# Add the atom
+echo "k l o d" > temp.txt
+echo "v" >> temp.txt
+echo "$1 $2 $3 $4" >> temp.txt
+echo "d $5" >> temp.txt
+echo "x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Varied diffuse scattering term $1, set to $2$3$4 with damping $5.\newline" >> `cat GSAS_EXP`.tex
+
+
+
