@@ -1,0 +1,30 @@
+#
+# Create an input file from a EXP file for single peak fits
+#
+# Call
+#
+# gsas_single_peak_fits_make_list <EXP file> <bank#> <phase#>
+#
+# (C) 2009 Sven Vogel
+#
+if [ "$1" = "" ]; then
+	head -n 9 $0
+	exit
+fi
+# use REFLIST to make a reflist file
+echo "$2" > temp.txt
+echo "r" >> temp.txt
+echo "$3" >> temp.txt
+echo "temp" >> temp.txt
+echo "0" >> temp.txt
+reflist $1 < temp.txt > out.txt
+
+# make a reflist file we can use
+cut -c 1-12 temp.RFL > temp_hkl.txt
+cut -c 31-40 temp.RFL > temp_tof.txt
+cut -c 41-50 temp.RFL > temp_fwhm.txt
+paste temp_hkl.txt temp_tof.txt temp_fwhm.txt > $1_B$2_P$3.txt
+
+echo "Created peak list file $1_B$2_P$3.txt, please edit."
+echo "Then call gsas_single_peak_fits with it."
+

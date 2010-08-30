@@ -1,0 +1,84 @@
+# gsas_single_peak_fits
+# (C) Sven Vogel 2009
+# Call
+# 
+# gsas_single_peak_fits <peak_list_file> <gda_file> <iparm_file> <bank>
+
+# Delete old plots
+rm B*.EPS
+
+#process each line
+counter=0
+cat $1 | while read -a line; do
+	let counter++
+	if [ $counter -eq 1 ]; then
+		continue
+	fi
+	#echo "(${line[0]} ${line[1]} ${line[2]}): TOF=${line[3]}, FWHM=${line[4]}"
+	# make the rawplot script for this peak
+	echo "z e" > temp.txt
+	echo "$2" >> temp.txt
+	echo "y" >> temp.txt
+	echo "$3" >> temp.txt
+	echo "$4" >> temp.txt
+	echo "r" >> temp.txt
+	echo "scale=4; (${line[3]}-3*${line[4]})/1000" > temp_calc.txt
+	min="`bc < temp_calc.txt`"
+	echo "scale=4; (${line[3]}+3*${line[4]})/1000" > temp_calc.txt
+	max="`bc < temp_calc.txt`"
+	echo "scale=4; ${line[3]}/1000" > temp_calc.txt
+	pos="`bc < temp_calc.txt`"
+	echo "m $min $max" >> temp.txt
+	echo "i $pos" >> temp.txt
+	echo "b" >> temp.txt
+	echo "2" >> temp.txt
+	echo "y" >> temp.txt
+	echo "r 10" >> temp.txt
+	echo "v 1 y y n n n" >> temp.txt
+	echo "r 10" >> temp.txt
+	echo "v 1 y y n n y" >> temp.txt
+	echo "r 10" >> temp.txt
+	echo "p" >> temp.txt
+	echo "temp" >> temp.txt
+	echo "temp" >> temp.txt
+	echo " " >> temp.txt
+	echo "o" >> temp.txt
+	echo "n" >> temp.txt
+	echo "B$4_${line[0]}_${line[1]}_${line[2]}.txt" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	rm temp.EPS 2>/dev/null
+	rm B$4_${line[0]}_${line[1]}_${line[2]}.txt 2>/dev/null
+	rawplot < temp.txt > out.txt
+	mv temp.EPS B$4_${line[0]}_${line[1]}_${line[2]}.EPS
+	echo "$2: `head -n 6 B$4_${line[0]}_${line[1]}_${line[2]}.txt | tail -n 1 | awk '{print $5,$7}'` `head -n 11 B$4_${line[0]}_${line[1]}_${line[2]}.txt | tail -n 1` `head -n 4 B$4_${line[0]}_${line[1]}_${line[2]}.txt | tail -n 1 | awk '{print $2,$3}'`" >> B$4_${line[0]}_${line[1]}_${line[2]}_all.txt
+	echo "Done with B$4_${line[0]}_${line[1]}_${line[2]}"
+done
+
+# Make LaTeX document
+echo "\documentclass{report}" > temp.tex
+echo "\usepackage{fullpage}" >> temp.tex
+echo "\usepackage{graphicx}" >> temp.tex
+echo "\begin{document}" >> temp.tex
+echo "Overview of plots in `pwd`" >> temp.tex
+echo "\newline" >> temp.tex
+
+let i=0
+ls *.EPS > temp.txt
+for file in `cat temp.txt`; do
+	echo "\includegraphics[width=75mm]{$file}" >> temp.tex
+	echo "\verb=$file=" >> temp.tex
+	let i++
+	if [ $i -eq 2 ]; then
+		echo "\newline" >> temp.tex
+		let i=0
+	fi
+done
+echo "\end{document}" >> temp.tex
+echo "Generating DVI file..."
+latex temp.tex
+echo "Generating PDF file..."
+dvipdf temp.dvi
+mv temp.pdf $2_single_peak_fit_overview.pdf
+echo "Plot overview generated in $2_single_peak_fit_overview.pdf!"
+

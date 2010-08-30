@@ -1,0 +1,28 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+# Make LaTeX document
+echo "\documentclass{report}" > temp.tex
+echo "\usepackage{fullpage}" >> temp.tex
+echo "\usepackage{graphicx}" >> temp.tex
+echo "\begin{document}" >> temp.tex
+echo "Overview of plots in \verb=`pwd`=" >> temp.tex
+echo "\newline" >> temp.tex
+
+let i=0
+ls *.eps -rt > temp.txt
+for file in `cat temp.txt`; do
+	echo "\includegraphics[width=75mm]{$file}" >> temp.tex
+	let i++
+	if [ $i -eq 2 ]; then
+		echo "\newline" >> temp.tex
+		let i=0
+	fi
+done
+echo "\end{document}" >> temp.tex
+echo "Generating DVI file..."
+latex temp.tex
+echo "Generating PDF file..."
+dvipdf temp.dvi
+mv temp.pdf overview.pdf
+echo "Plot overview generated in overview.pdf!"

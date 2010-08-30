@@ -1,0 +1,28 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase number!"
+	exit 0
+fi
+
+# Add the phase
+echo "k l o s" > temp.txt
+echo "k l" >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo "i" >> temp.txt
+echo "$1 all 1" >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo "l x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Constrained phase number $1 to have a constant weight fraction in all histograms.\newline" >> temp.tex

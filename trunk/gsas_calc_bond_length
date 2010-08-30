@@ -1,0 +1,44 @@
+#
+# Insert an atom
+#
+# Call with 
+#
+# gsas_add_atom <phase #> <atom string>
+#
+# where atom string is the information needed by GSAS to add an atom
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase for which to compute bondlength!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	max_dist=3.5
+	echo "$0 called without maximum distance, assuming $max_dist A!"
+	exit 0
+else
+	max_dist=$2
+fi
+
+# Setup the computation
+echo "k d" > temp.txt
+echo "d $1" >> temp.txt
+echo "c" >> temp.txt
+echo "y" >> temp.txt
+echo "n " >> temp.txt
+echo "y" >> temp.txt
+echo "n " >> temp.txt
+echo "x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+disagl `cat GSAS_EXP` > out.txt
+
+echo "computed bond length an angles for phase $1 and added them to the LST file.\newline" >> `cat GSAS_EXP`.tex
+
+
+

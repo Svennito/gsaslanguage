@@ -1,0 +1,64 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without name for source EXP file!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without name for new EXP file!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without title for new EXP file!"
+	exit 0
+fi
+
+# Define the experiment file in this shell
+echo `echo $2 | tr "[:lower:]" "[:upper:]"`>GSAS_EXP
+
+# Create the LaTeX document
+echo "\documentclass{report}" > `cat GSAS_EXP`.tex
+echo "\usepackage{fullpage}" >> `cat GSAS_EXP`.tex
+echo "\usepackage{graphicx}" >> `cat GSAS_EXP`.tex
+echo "\begin{document}" >> `cat GSAS_EXP`.tex
+echo "\begin{center}" >> `cat GSAS_EXP`.tex
+echo "\verb=$3=" >> `cat GSAS_EXP`.tex
+echo "\end{center}" >> `cat GSAS_EXP`.tex
+echo " " >> `cat GSAS_EXP`.tex
+echo "\section{Initialization}" >> `cat GSAS_EXP`.tex
+
+
+echo "GSAS EXP file is \verb=`cat GSAS_EXP`.EXP=.\newline" >> `cat GSAS_EXP`.tex
+
+# Delete old stuff
+rm `cat GSAS_EXP`.EXP 2>/dev/null
+rm `cat GSAS_EXP`.O*  2>/dev/null
+rm `cat GSAS_EXP`.R*  2>/dev/null
+rm `cat GSAS_EXP`.P*  2>/dev/null
+rm `cat GSAS_EXP`.LST 2>/dev/null
+rm `cat GSAS_EXP`.CMT 2>/dev/null
+rm `cat GSAS_EXP`.pdf 2>/dev/null
+rm `cat GSAS_EXP`.ps  2>/dev/null
+rm `cat GSAS_EXP`.log 2>/dev/null
+rm `cat GSAS_EXP`.dvi 2>/dev/null
+rm `cat GSAS_EXP`.aux 2>/dev/null
+rm gsas_step.txt      2>/dev/null
+rm temp.tex           2>/dev/null
+rm gsas_print.txt     2>/dev/null
+
+echo "Deleted older temporary files.\newline" >> `cat GSAS_EXP`.tex
+
+# Create the new file
+cp $1.EXP `cat GSAS_EXP`.EXP
+echo "k p t t" > temp.txt
+echo $3 >> temp.txt
+echo "x x x x" >> temp.txt
+expedt `cat GSAS_EXP` < temp.txt
+echo "Experiment title set to \verb=$3=.\newline" >> `cat GSAS_EXP`.tex
+
+# Leave the print options untouched
+echo "Y" > gsas_print.txt

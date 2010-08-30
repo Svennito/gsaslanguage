@@ -1,0 +1,111 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without file name for histogram!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without instrument parameter file for histogram!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without bank number for histogram!"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without minimum d-spacing for histogram!"
+	exit 0
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without maximum d-spacing for histogram, assuming no upper limit!"
+fi
+
+# Add the histogram
+echo "k p h i" > temp.txt
+echo $1 >> temp.txt
+echo "y" >> temp.txt
+grep "Instrument parameter file" $1
+if [ "$?" = "1" ]; then
+	echo "IPARM file is not stored in the data file!"
+else
+	echo "There is an IPARM file given in the data file, will overwrite with $2..."
+	echo "n" >> temp.txt
+fi
+echo $2 >> temp.txt
+echo $3 >> temp.txt
+echo "n" >> temp.txt
+echo "d" >> temp.txt
+if [ "$5" != "" ]; then
+	# We have a maximum d-spacing, let's convert it to TOF
+	echo $5 >> temp.txt
+fi
+echo $4 >> temp.txt
+echo "/" >> temp.txt
+echo "x" >> temp.txt
+echo "0" >> temp.txt
+echo "x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+grep "$1" `cat GSAS_EXP`.EXP
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	echo "Data file name is NOT in the EXP file"
+	read -p "Maybe you want to debug?"
+	exit 0
+fi
+
+grep "$2" `cat GSAS_EXP`.EXP
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	echo "Instrument parameter file name is NOT in the EXP file"
+	read -p "Maybe you want to debug?"
+	exit 0
+fi
+
+if [ $3 -lt 10 ]; then
+	grep "BANK     $3" `cat GSAS_EXP`.EXP 
+else 
+	grep "BANK    $3" `cat GSAS_EXP`.EXP 
+fi
+
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	echo "Entry with this bank is NOT in the EXP file"
+	exit 0
+fi
+
+# Which histogram in the EXP file did we add?
+grep "Histogram no." out.txt > temp.txt
+head -c 18 temp.txt > temp2.txt
+tail -c 2 temp2.txt > hist.txt
+
+if [ "$5" != "" ]; then
+	# We have a maximum d-spacing, let's enter it
+	if [ $5 -lt 10 ]; then
+		grep "d-minimum" out.txt | grep "minimum of  $5" > maxtof.txt
+	else
+		grep "d-minimum" out.txt | grep "minimum of $5" > maxtof.txt
+	fi
+	tail -c 15 maxtof.txt > maxtof2.txt
+	head -c 8 maxtof2.txt > maxtof.txt
+	rm maxtof2.txt
+
+	echo "k p h" > temp.txt
+	echo "e `cat hist.txt`" >> temp.txt
+	echo "e" >> temp.txt
+	echo "c 2" >> temp.txt
+	echo "`cat maxtof.txt` 1000" >> temp.txt
+	echo "x x x x x x " >> temp.txt
+	expedt `cat GSAS_EXP` < temp.txt > out.txt
+fi
+
+echo "Added histogram from \verb=$1= (bank $3, min. d-spacing $4A, max. d-spacing $5A) with instrument parameter file \verb=$2= as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex
+

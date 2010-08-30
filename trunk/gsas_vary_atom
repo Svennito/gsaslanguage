@@ -1,0 +1,40 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom parameter should be varied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of atom for which parameter should be varied!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without parameter that should be varied!"
+	exit 0
+fi
+
+# Change the flags
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "v $2 $3" >> temp.txt
+if [ "$4" = "" ]; then
+	# we are done, no damping
+	echo "No damping provided"
+else 
+	echo "d $2 $3 $4" >> temp.txt
+fi
+echo "x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt
+
+# Test the EXP file
+echo "Changed atom refinement flags for phase $1, atom $2 to $3" >> temp.tex
+if [ "$4" = "" ]; then
+	echo "(with damping unchanged).\newline" >> temp.tex
+else 
+	echo "(with damping set to $4).\newline" >> temp.tex
+fi

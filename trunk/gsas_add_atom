@@ -1,0 +1,37 @@
+#
+# Insert an atom
+#
+# Call with 
+#
+# gsas_add_atom <phase #> <atom string>
+#
+# where atom string is the information needed by GSAS to add an atom
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase number to which atom should be added!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without GSAS parameters for atom!"
+	exit 0
+fi
+
+# Add the atom
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "i n" >> temp.txt
+echo $2 >> temp.txt
+echo "x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Added atom with parameter string \verb=$2= to phase $1.\newline" >> `cat GSAS_EXP`.tex
+
+
+

@@ -1,0 +1,43 @@
+# Called when analysis is done
+
+
+# Produce PDF file with information
+echo "\section{Parameters}" >> `cat GSAS_EXP`.tex
+echo "The refined parameters and their values and esds are:" >> `cat GSAS_EXP`.tex
+echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
+cat `cat GSAS_EXP`.PVE >> `cat GSAS_EXP`.tex
+echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
+echo "\end{document}" >> `cat GSAS_EXP`.tex
+echo "Generating DVI file..."
+latex `cat GSAS_EXP`.tex
+echo "Generating PDF file..."
+dvipdf `cat GSAS_EXP`.dvi
+#acroread `cat GSAS_EXP`.pdf
+
+# clean up
+rm out.txt
+rm temp.txt
+rm temp2.txt
+rm maxtof.txt
+rm maxtof2.txt
+rm shift.txt
+rm chisq.txt
+rm *.EPS
+rm `cat GSAS_EXP`.dvi
+rm `cat GSAS_EXP`.log
+rm `cat GSAS_EXP`.aux
+rm `cat GSAS_EXP`.tex
+rm `cat GSAS_EXP`.CMT
+rm `cat GSAS_EXP`.O??
+rm `cat GSAS_EXP`.P[^VE]*
+rm `cat GSAS_EXP`.R??
+rm gsas_print.txt
+rm gsas_step.txt
+rm hist.txt
+rm nhist.txt
+rm powpref
+rm powplot
+rm genles
+rm expedt
+rm GSAS_EXP
+rm flag.txt

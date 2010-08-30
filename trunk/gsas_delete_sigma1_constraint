@@ -1,0 +1,36 @@
+#
+# Constrain peak width parameters of two phases together
+#
+# Call with 
+#
+# gsas_delete_sigma1_constraint  <constraint#>
+#
+# 
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without constraint number to be deleted!"
+	exit 0
+fi
+
+# Delete the constraint
+echo "k l o p" > temp.txt
+echo "k 6" >> temp.txt
+echo "l" >> temp.txt
+echo " " >> temp.txt
+echo "d $1" >> temp.txt
+echo "  " >> temp.txt
+echo "l " >> temp.txt
+echo "  " >> temp.txt
+echo "x x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Deleted constraint $1 for sigma1.\newline" >> `cat GSAS_EXP`.tex
+
+
+

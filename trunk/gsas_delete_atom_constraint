@@ -1,0 +1,42 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without constraint to be deleted!"
+	exit 0
+fi
+
+
+# Delete the constraint
+echo "k l a k" > temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "d $1" >> temp.txt
+echo "" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Deleted atom constraint(s) $1." >> temp.tex

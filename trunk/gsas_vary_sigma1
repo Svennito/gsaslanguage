@@ -1,0 +1,41 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which sigma1 should be varied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number phase for which sigma1 should be varied!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without flag for sigma1 - assuming y!"
+	flag="y"
+else 
+	flag="$3"
+fi
+
+# Change the flags
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "v" >> temp.txt
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "n $flag n" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt
+echo "l" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed sigma1 refinement flags for histogram $1 and phase $2 to "$flag".\newline" >> temp.tex

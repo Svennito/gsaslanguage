@@ -1,0 +1,52 @@
+#
+# Constrain peak width parameters of two phases together
+#
+# Call with 
+#
+# gsas_constrain_sigma1 <histogram #> <phase1> <phase2> <phase3> ...
+#
+# 
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without histogram number for which constraint should be added!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without first phase!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without 2nd phase!"
+	exit 0
+fi
+
+# Add the atom
+echo "k l o p" > temp.txt
+echo "k 6" >> temp.txt
+echo "l " >> temp.txt
+echo " " >> temp.txt
+echo "i" >> temp.txt
+let counter=0
+for arg in "$@"; do
+	let counter+=1
+	if [ $counter -lt 2 ]; then continue; fi
+	echo "$arg $1 1" >> temp.txt
+done
+echo "  " >> temp.txt
+echo "l " >> temp.txt
+echo "  " >> temp.txt
+echo "x x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Constrained sigma1 for histogram $1 and phases $1, $2, $3, $4.\newline" >> `cat GSAS_EXP`.tex
+
+
+

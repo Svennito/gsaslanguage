@@ -1,0 +1,67 @@
+# 
+# gsas_convert_atom_thermal - convert thermal motion parameters of atoms
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_convert_atom_thermal <phase> <atom range> <flag a/i>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom parameters should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom range for which thermal factors should be changed!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without flag for thermal factors!"
+	exit 0
+fi
+
+if [ "$3" != "i" ]; then
+	if [ "$3" != "a" ]; then
+		echo "$0 called with flag that is neither a(nisotropic) or i(sotropic) for thermal factors!"
+		exit 0
+	fi
+fi
+
+
+# Change the value
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "u $2 $3" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed thermal factors for phase $1, atom(s) $2, to $3." >> temp.tex

@@ -1,0 +1,99 @@
+#
+# Constrain atoms
+#
+# Call with 
+#
+# gsas_constrain_atom <phase #> <atom parameter> <atom number>
+#
+# or
+#
+# gsas_constrain_atom <multi> <constraint string>
+#
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom parameters should be constrained!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom parameter which should be constrained!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without first atom range of constrained set!"
+	exit 0
+fi
+
+# Insert the constraint
+echo "k l a k" > temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "i" >> temp.txt
+for arg in "$@"; do
+	if [ "$arg" = "$0" ]; then continue; fi
+	if [ "$arg" = "$1" ]; then continue; fi
+	if [ "$1" = "multi" ]; then
+		# we must be at $arg=$2 or greater, so output the constraint
+		echo "$arg" >> temp.txt
+		continue
+	fi
+	if [ "$arg" = "$2" ]; then continue; fi
+	echo "$1 $2 $arg 1" >> temp.txt
+	if [ "$2" = "FRAC" ]; then
+		echo "$1 $2 $4 -1" >> temp.txt
+		break
+	fi
+done
+echo "" >> temp.txt
+echo "l" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+if [ "$1" = "multi" ]; then
+	echo "Constrained atoms of multiple phases with GSAS constraints " >> temp.tex
+else
+	echo "Constrained for phase $1 the $2 parameter of atoms " >> temp.tex
+fi
+for arg in "$@"; do
+	if [ "$arg" = "$0" ]; then continue; fi
+	if [ "$arg" = "$1" ]; then continue; fi
+	if [ "$1" = "multi" ]; then
+		# we must be at $arg=$2 or greater, so output the constraint
+		echo "$arg." >> temp.tex
+		continue
+	fi
+	if [ "$arg" = "$2" ]; then continue; fi
+	echo "$arg " >> temp.tex
+	if [ "$2" = "FRAC" ]; then
+		echo "and, with -1, atom $4." >> temp.tex
+		break
+	fi
+done
