@@ -1,5 +1,46 @@
 # Called when analysis is done
 
+# Produce plot of CHISQ evolotion
+echo 'set xtics rotate by -15' > temp.plt
+echo 'set xrange [0:*]' >> temp.plt
+echo 'set logscale y' >> temp.plt
+echo 'set xlabel "Rietveld cycle"' >> temp.plt
+echo 'set ylabel "Reduced CHISQ"' >> temp.plt
+echo 'set y2label "Number of variables"' >> temp.plt
+echo 'set yrange [0.1:*]' >> temp.plt
+echo 'set y2range [0:*]' >> temp.plt
+echo 'set y2tics border' >> temp.plt
+echo 'set ytics nomirror' >> temp.plt
+echo 'set key outside below' >> temp.plt
+echo 'set output "Reduced.eps"' >> temp.plt
+echo 'set terminal postscript eps enhanced color 24' >> temp.plt
+echo 'plot \' >> temp.plt
+echo '   "< grep Reduced `cat GSAS_EXP`.LST" using 4  title "Reduced CHISQ",\' >> temp.plt
+echo '   "< grep Reduced `cat GSAS_EXP`.LST" using 6  axes x1y2 title "Number of variables"' >> temp.plt
+gnuplot temp.plt
+
+# generate plot with shift evolution
+echo 'set xtics rotate by -15' > temp.plt
+echo 'set xrange [0:*]' >> temp.plt
+echo 'set logscale y' >> temp.plt
+echo 'set xlabel "Rietveld cycle"' >> temp.plt
+echo 'set ylabel "Final variable sum((shift/esd)**2)"' >> temp.plt
+echo 'set y2label "CPU time/cycle [s]"' >> temp.plt
+echo 'set y2range [0:*]' >> temp.plt
+echo 'set y2tics border' >> temp.plt
+echo 'set key outside below' >> temp.plt
+echo 'set ytics nomirror' >> temp.plt
+echo 'set output "Shift.eps"' >> temp.plt
+echo 'set terminal postscript eps enhanced color 24' >> temp.plt
+echo 'plot \' >> temp.plt
+echo '   "< grep Final `cat GSAS_EXP`.LST" using 7  with lines title "Shift",\' >> temp.plt
+echo '   "< grep Final `cat GSAS_EXP`.LST" using 9  axes x1y2 title "CPU time"' >> temp.plt
+gnuplot temp.plt
+
+echo "\section{Reduced $\chi^2$ and variable shifts}" >> `cat GSAS_EXP`.tex
+echo "\includegraphics[width=150mm]{Reduced.eps}" >> `cat GSAS_EXP`.tex
+echo "\newline" >> `cat GSAS_EXP`.tex
+echo "\includegraphics[width=150mm]{Shift.eps}" >> `cat GSAS_EXP`.tex
 
 # Produce PDF file with information
 echo "\section{Parameters}" >> `cat GSAS_EXP`.tex
@@ -41,3 +82,6 @@ rm genles
 rm expedt
 rm GSAS_EXP
 rm flag.txt
+rm Reduced.eps
+rm Shift.eps
+rm temp.plt
