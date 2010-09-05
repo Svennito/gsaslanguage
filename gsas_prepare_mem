@@ -1,0 +1,141 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+if [ "$1" = "" ]; then
+    echo "No phase given, assuming phase 1"
+    let PHASE=1
+else
+    PHASE=$1
+fi
+
+echo "Preparing phase $PHASE for mem..."
+echo "\section{Preparation of phase $PHASE for MEM analysis}" >> `cat GSAS_EXP`.tex
+  
+# get spacegroup from EXP file
+grep "CRS$PHASE  SG SYM" `cat GSAS_EXP`.EXP | tail -c68 > temp.txt
+SGSYM="`cat temp.txt`"
+echo "Extracted space group $SGSYM from `cat GSAS_EXP`.EXP.">> `cat GSAS_EXP`.tex
+echo "Extracted space group $SGSYM"
+
+# clean out spaces
+SGSYM=${SGSYM:0:10}
+SGSYM=`echo ${SGSYM// /}`
+echo "Space group symbol without spaces is $SGSYM.">> `cat GSAS_EXP`.tex
+echo "Space group symbol without spaces is <$SGSYM>"
+
+# Extract spacegroup from sginfo.txt
+COMMAND="gsas_prepare_mem"
+COMMAND_FP=$0
+LEN_COMMAND=${#COMMAND}
+LEN_COMMAND_FP=${#COMMAND_FP}
+let LENGTH=LEN_COMMAND_FP-LEN_COMMAND
+SGFILE="${COMMAND_FP:0:LENGTH}sginfo.txt"
+if [ -e "$SGFILE" ]; then
+  echo "Will search for space group number of space group $SGSYM in file $SGFILE."
+else
+  echo "Cannot find $SGFILE!"
+  read -p "Hit Ctrl-C to break!"
+fi
+grep $SGSYM $SGFILE > temp.txt
+SGNO=`head -c10 temp.txt`
+SGNO=`echo ${SGNO// /}`
+echo "Space group number is $SGNO"
+echo "Determined space group of phase $1 in `cat GSAS_EXP`_MEM.EXP as $SGSYM (No. $SGNO)." >> `cat GSAS_EXP`.tex
+echo "Determined space group of phase $1 in `cat GSAS_EXP`_MEM.EXP as $SGSYM (No. $SGNO)."
+
+# See documentation on Alchemy
+# delete old stuff, make a copy of the project called EXPFILE_MEM.EXP
+rm `cat GSAS_EXP`_MEM.*
+cp `cat GSAS_EXP`.EXP `cat GSAS_EXP`_MEM.EXP
+echo "Copied `cat GSAS_EXP`.EXP to `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex
+
+# run a powpref and a single genles
+powpref `cat GSAS_EXP`_MEM
+echo "k l l c" > temp.txt
+echo "1" >> temp.txt
+echo "x x x" >> temp.txt
+expedt `cat GSAS_EXP`_MEM < temp.txt
+genles `cat GSAS_EXP`_MEM
+echo "Ran powpref and single genles cycle on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex
+
+# run reflist
+grep NHST `cat GSAS_EXP`_MEM.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+rm temp.txt
+COUNTER=0
+NHIST=`cat nhist.txt`
+echo "We have $NHIST histograms in this refinement."
+while [ $COUNTER -lt $NHIST ]; do
+	let COUNTER=COUNTER+1 
+	echo "$COUNTER" >> temp.txt
+	echo "l" >> temp.txt
+done
+echo "0" >> temp.txt
+
+reflist `cat GSAS_EXP`_MEM < temp.txt
+echo "Ran reflist for $NHIST histograms on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex
+
+# run hstdmp
+echo "l" > temp.txt
+COUNTER=0
+while [ $COUNTER -lt $NHIST ]; do
+	let COUNTER=COUNTER+1 
+	echo -e "$COUNTER\n" >> temp.txt
+done
+echo -e "0\n" >> temp.txt
+
+hstdmp `cat GSAS_EXP`_MEM < temp.txt
+echo "Ran hstdmp for $NHIST histograms on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex
+
+# Prepare input alchemy file for each histogram
+COUNTER=0
+cp `cat GSAS_EXP`_MEM.LST `cat GSAS_EXP`_MEM.lst
+while [ $COUNTER -lt $NHIST ]; do
+	let COUNTER=COUNTER+1 
+	echo -e "Preparing `cat GSAS_EXP`_MEM_$COUNTER.inp..."
+	rm `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "`cat GSAS_EXP`_MEM.lst  # Name of file *.lst" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# The next line, which is required only when using FullProf, should be commented out on the use of GSAS." >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "#quartz.fou  # Name of a reflection list file, *.hkl" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "`cat GSAS_EXP`_MEM_$COUNTER.MEM  # Name of *.mem (MEM data set file)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "`grep DESCR 100C.EXP | tail -c68 | head -c65` (bank $COUNTER)  # Title" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "A-$SGNO-1  # (International Tables, Vol.)-(space-group number)-(setting number)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "1.2  # A factor, E, to adjust sigma(|Fo|)'s" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "128  128  128  # Voxel numbers along a, b, and c axes" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# IAMP: type of scattering amplitudes" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "0 # 0: XRD or ND (only positive b_c values), 1: ND (positive & negative b_c values)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# If IAMP = 0, the next line is input" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "47.310  # Total number of electrons (XRD) or total of b_c values (ND) in the unit cell" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# If IAMP = 1, the next line is input" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "#408.595 -40.225  # Totals of positive and negative b_c values (ND) in the unit cell" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "0.1  # Lagrangian multiplier" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# The next line is input only in TOF ND" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "$COUNTER # Histogram number" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "$PHASE # phase number" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# The next line is input only in TOF ND" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "144.45 90.0 39.30 /  # 2-theta values of detector banks as well as '/'" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "#The next line is input only in XRD" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# 0.5 0.7998  # u and (cos(2*theta_M))^2 in Eq. (2.69) in RIETAN-FP_manual.pdf" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	echo "# The next line is input only in TOF ND" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	grep " $COUNTER ICONS" `cat GSAS_EXP`_MEM.EXP | tail -c68 | head -c30 > temp.txt
+	echo "`cat temp.txt`  # Three parameters, DIFC, DIFA, and ZERO, to calculate TOF from d (GSAS manual, p. 141)." >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+done
+
+echo "Prepared alchemy input files `cat GSAS_EXP`_MEM_x.inp for $NHIST histograms. THESE NEED TO BE MANUALLY MODIFIED BEFORE RUNNING ALCHEMY!!!!" >> `cat GSAS_EXP`.tex
+
+
+
