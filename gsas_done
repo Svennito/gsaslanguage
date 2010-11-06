@@ -1,8 +1,8 @@
 # Called when analysis is done
 
-# Produce plot of CHISQ evolotion
+# Produce plot of CHISQ evolution
 echo 'set xtics rotate by -15' > temp.plt
-echo 'set xrange [0:*]' >> temp.plt
+echo 'set xrange [*:*]' >> temp.plt
 echo 'set logscale y' >> temp.plt
 echo 'set xlabel "Rietveld cycle"' >> temp.plt
 echo 'set ylabel "Reduced CHISQ"' >> temp.plt
@@ -21,7 +21,7 @@ gnuplot temp.plt
 
 # generate plot with shift evolution
 echo 'set xtics rotate by -15' > temp.plt
-echo 'set xrange [0:*]' >> temp.plt
+echo 'set xrange [*:*]' >> temp.plt
 echo 'set logscale y' >> temp.plt
 echo 'set xlabel "Rietveld cycle"' >> temp.plt
 echo 'set ylabel "Final variable sum((shift/esd)**2)"' >> temp.plt
@@ -33,23 +33,59 @@ echo 'set ytics nomirror' >> temp.plt
 echo 'set output "Shift.eps"' >> temp.plt
 echo 'set terminal postscript eps enhanced color 24' >> temp.plt
 echo 'plot \' >> temp.plt
-echo '   "< grep Final `cat GSAS_EXP`.LST" using 7  with lines title "Shift",\' >> temp.plt
-echo '   "< grep Final `cat GSAS_EXP`.LST" using 9  axes x1y2 title "CPU time"' >> temp.plt
+# Insert a space after cycle with sed to make sure "cycle" is in column 6 - otherwise at cycles>1000 it becomes 1...
+echo '   "< grep Final `cat GSAS_EXP`.LST | sed \"s/cycle/cycle /g\" " using 7  with lines title "Shift",\' >> temp.plt
+echo '   "< grep Final `cat GSAS_EXP`.LST | sed \"s/cycle/cycle /g\" " using 9  axes x1y2 title "CPU time"' >> temp.plt
 gnuplot temp.plt
 
 echo "\section{Reduced $\chi^2$ and variable shifts}" >> `cat GSAS_EXP`.tex
+echo "In this graph, the reduced $\chi^2$ should get gradually smaller during the refinement." >> `cat GSAS_EXP`.tex
+echo "\newline" >> `cat GSAS_EXP`.tex
 echo "\includegraphics[width=150mm]{Reduced.eps}" >> `cat GSAS_EXP`.tex
 echo "\newline" >> `cat GSAS_EXP`.tex
+echo "In this graph, the shift should monotonically decrease to values $<0.1$ for each step." >> `cat GSAS_EXP`.tex
+echo "If a value substantially greater than 1 is achieved for a given step, the fit was not" >> `cat GSAS_EXP`.tex
+echo "converged and more refinement cycles are required (parameter of the gsas\_refine command)." >> `cat GSAS_EXP`.tex
+echo "If a sawtooth shaped pattern is observed, oscillations occured and parameters were likely too" >> `cat GSAS_EXP`.tex
+echo "highly correlated. If this occurs, check the correlation matrix for the parameters you" >> `cat GSAS_EXP`.tex
+echo "turned on during that step and turn off variation of parameters they are correlated with." >> `cat GSAS_EXP`.tex
+echo "\newline" >> `cat GSAS_EXP`.tex
 echo "\includegraphics[width=150mm]{Shift.eps}" >> `cat GSAS_EXP`.tex
+echo "\newline" >> `cat GSAS_EXP`.tex
 
-# Produce PDF file with information
+# Check of parameters that are zero within error bars and output the parameters with their values
 echo "\section{Parameters}" >> `cat GSAS_EXP`.tex
+awk -v FIELDWIDTHS="13 16 16" '{if (NR>1 && $2!=0) {if ($3*$3/$2/$2>1) print $1};}' `cat GSAS_EXP`.PVE > out.txt
+if [ -s out.txt ]; then
+  echo "The following parameters have values that are zero within their error bars. " >> `cat GSAS_EXP`.tex
+  echo "Unless they are atomic positions, you should consider removing these " >> `cat GSAS_EXP`.tex
+  echo "parameters from the refinement." >> `cat GSAS_EXP`.tex
+  echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
+  cat out.txt >> `cat GSAS_EXP`.tex
+  echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
+else
+  echo "No parameters have values that are zero within their error bars. " >> `cat GSAS_EXP`.tex
+fi
+
+# Check of thermal motion parameters that are smaller than zero
+grep UISO `cat GSAS_EXP`.PVE | awk -v FIELDWIDTHS="13 16 16" '{if ($2<0) print $1}'  > out.txt
+if [ -s out.txt ]; then
+  echo "The following isotropic thermal motion parameters have un-physical negative values:" >> `cat GSAS_EXP`.tex
+  echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
+  cat out.txt >> `cat GSAS_EXP`.tex
+  echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
+else
+  echo "No isotropic thermal motion parameters have un-physical negative values." >> `cat GSAS_EXP`.tex
+fi
+
 echo "The refined parameters and their values and esds are:" >> `cat GSAS_EXP`.tex
 echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
 cat `cat GSAS_EXP`.PVE >> `cat GSAS_EXP`.tex
 echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
 echo "\end{document}" >> `cat GSAS_EXP`.tex
 echo "Generating DVI file..."
+
+# Produce PDF file with information
 latex `cat GSAS_EXP`.tex
 echo "Generating PDF file..."
 dvipdf `cat GSAS_EXP`.dvi

@@ -30,6 +30,12 @@ echo "n $flag n" >> temp.txt
 echo "/" >> temp.txt 
 echo "/" >> temp.txt
 echo "l" >> temp.txt
+
+if [ "$4" != "" ]; then
+	echo "Damping flag given, setting to $4"
+	echo "d $4" >> temp.txt
+fi
+
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt

@@ -52,7 +52,6 @@ echo "0" >> temp.txt
 echo "x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
-
 # Test the EXP file
 grep "$1" `cat GSAS_EXP`.EXP
 #echo "grep returned $?"
