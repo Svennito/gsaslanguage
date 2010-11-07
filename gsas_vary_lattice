@@ -21,6 +21,12 @@ echo "x x x x" >> temp.txt
 
 # find out what the current flag is
 grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c36 | head -c1 > flag.txt
+echo "The refinement flag is <`cat flag.txt`>"
+if [ "`cat flag.txt`" = " " ]; then
+	echo "Could not determine refinement flag for lattice parameter of phase $1, trying again."
+	grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c35 | head -c1 > flag.txt
+	echo "The refinement flag is <`cat flag.txt`>"
+fi
 
 if [ "`cat flag.txt`" = "Y" ]; then
 	# the refinement flag is turned on
@@ -29,12 +35,14 @@ if [ "`cat flag.txt`" = "Y" ]; then
 		echo "Lattice for phase $1 is already varying!"
 	else
 		# it is on, but we want it off, let's toggle it
+		echo "Lattice for phase $1 is fixed, will toggle!"
 		expedt `cat GSAS_EXP` < temp.txt
 	fi
 else
 	# flag is either not set (off) or set to "N"
 	if [ "$2" = "y" ]; then
 		# it is off, but we want it on, let's toggle it
+		echo "Lattice for phase $1 is varying, let's toggle!"
 		expedt `cat GSAS_EXP` < temp.txt
 	else
 		# which is what we want, no action
@@ -44,12 +52,18 @@ fi
 
 # Test the EXP file
 grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c36 | head -c1 > flag.txt
+echo "The refinement flag is <`cat flag.txt`>"
+if [ "`cat flag.txt`" = " " ]; then
+	echo "Could not determine refinement flag for lattice parameter of phase $1, trying again."
+	grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c35 | head -c1 > flag.txt
+	echo "The refinement flag is <`cat flag.txt`>"
+fi
 
 if [ "`cat flag.txt`" = "Y" ]; then
 	# the refinement flag is turned on
 	if [ "$2" = "y" ]; then
 		# which is what we want, no action
-		echo "Lattice for phase $1 is varying as inteded!"
+		echo "Lattice for phase $1 is varying as intended!"
 	else
 		# it is on, but we want it off, let's toggle it
 		echo "Problem! The flag is not set to what was desired!"

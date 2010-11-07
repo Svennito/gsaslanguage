@@ -1,0 +1,106 @@
+# 
+# gsas_plot - use GnuPLOT to plot refinement results
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_plot <nodelete> <"String1"> <"String2"> <"String3"> <"String4">
+#
+# nodelete - do not delete the data files so they can be used for further plotting
+# StringN - The string in the PVE files which will be searched and plotted
+#           multiple entries will cause multiple datasets in the same run
+#
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without a parameter to be plotted!"
+	exit 0
+fi
+
+
+dataset=1
+nodelete=0
+filename=0
+n_datasets=$#
+counter=0
+args=("$@")
+for arg in "$@"; do
+	let "counter+=1"
+	echo "working with argument $counter..."
+	if [ "$arg" = "nodelete" ]; then
+		# Do not delete the data and gnuplot files
+		echo "nodelete - will not delete the data and gnuplot files!"
+		let nodelete++
+		let n_datasets--
+		echo "$n_datasets" 
+		continue
+	fi		
+
+	echo $arg>temp.txt
+	sed -i "s/ /_/g" temp.txt
+	if [ "$filename" = "0" ]; then
+		# Make the filename
+		filename=`cat temp.txt`
+	fi		
+
+	sed -i "s/_/\\\\\_/g" temp.txt
+	label=`cat temp.txt`
+
+	# Let's output the values of the parameter
+	#grep "$arg" *.PVE > temp.txt
+	# Are we looking for a bond length or angle?
+	if [ `expr index "$arg" "_" ` -gt 1 ]; then
+		# It's a bond length, like Ti1_Ti2
+		echo "extracting a bond parameter..."
+		grep " $arg " `ls *.LST -rt` -m 1 > temp.txt
+		
+		# reformat the grep output to something similar to PVE: Parameter name, value, error bar
+	else
+		# It's a normal variable in a PVE file
+		echo "extracting a Rietveld parameter..."
+		grep "$arg" `ls *.PVE -rt` > temp.txt
+	fi
+	
+	# Reformat the output
+	nl temp.txt > temp1.txt
+	sed -i "s/:  /\t/g" temp1.txt
+	sed -i "s/     /\t/g" temp1.txt
+	sed -i "s/_/\\\\\\\\_/g" temp1.txt
+	sed -i "s/.PVE//g" temp1.txt
+	mv temp1.txt temp_$dataset.txt
+
+	if [ $dataset -eq 1 ]; then
+		# Make the gnuplot script
+		lines=`cat temp.txt | wc -l`
+		let lines++
+		echo "set xtics rotate by -15" > plot.tmp
+		echo "set xrange [0:$lines]" >> plot.tmp
+		#echo "set xlabel noenhanced rotate by -15" >> plot.tmp 
+		echo "set output '$filename.eps'" >> plot.tmp
+		echo "set terminal postscript eps enhanced color 24" >> plot.tmp
+		echo "plot \\" >> plot.tmp
+	fi
+	echo "$dataset = $n_datasets" 
+	if [ "$dataset" = "$n_datasets" ]; then
+		echo "   'temp_$dataset.txt' using 1:4:5:xticlabels(2) with yerrorbars title '$label'" >> plot.tmp
+	else
+		echo "   'temp_$dataset.txt' using 1:4:5:xticlabels(2) with yerrorbars title '$label', \\" >> plot.tmp
+	fi
+ 
+	if [ $nodelete -gt 0 ]; then
+		echo "Copying dataset..."
+		cp temp_$dataset.txt $filename.$dataset.txt	
+		cp plot.tmp $filename.plt
+	fi
+	let dataset++
+done
+gnuplot plot.tmp
+
+rm temp_{0,1,2,3,4,5,6,7,8,9}.txt 2>/dev/null
+rm plot.tmp
+
+
+
+

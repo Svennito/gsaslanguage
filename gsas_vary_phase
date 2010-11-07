@@ -12,22 +12,33 @@ if [ "$2" = "" ]; then
 	exit 0
 fi
 
+if [ "$3" = "" ]; then
+	echo "$0 called without damping flag!"
+fi
+
+grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+NHIST=`cat nhist.txt`
+echo "We have $NHIST histograms in this refinement."
+
 # vary the phase in all histograms
 echo "k l o s" > temp.txt
 echo "g" >> temp.txt
 echo "1 99" >> temp.txt
 echo "$1 $1" >> temp.txt
 echo "$2" >> temp.txt
-if [ "$3" != "" ]; then
-	echo "Damping flag given, set for all histograms"
-	echo "p $1" >> temp.txt
-	for ((count=0;count<`cat nhist.txt`; count++))
-	do
-		echo "Setting damping for histogram $count"
+if [ "$3" = "" ]; then
+	echo "No damping flag set"
+else
+	echo "Damping flag is $3, changing all histograms..."
+	# set the damping in all histograms
+	COUNTER=0
+	while [ $COUNTER -lt $NHIST ]; do
+		let COUNTER=COUNTER+1 
 		echo "d $3" >> temp.txt
 		echo "n" >> temp.txt
 	done
 fi
+
 echo "x x x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt

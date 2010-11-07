@@ -1,0 +1,33 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of bank for which DIFC should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without code for diffractometer parameters"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without value for new DIFC parameters"
+	exit 0
+fi
+
+echo "k l o c" > temp.txt
+echo "h $1" >> temp.txt
+echo "c" >> temp.txt
+echo "$2" >> temp.txt
+echo $3>> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Changed lattice parameter values for phase $1 to $2 $3 $4 $5 $6 $7." >> temp.tex
+

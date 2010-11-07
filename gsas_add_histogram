@@ -7,9 +7,25 @@ if [ "$1" = "" ]; then
 	exit 0
 fi
 
+if [ -e $1 ]; then
+	echo "Your data file $1 was found!"
+else
+	echo "Your data file $1 was NOT found!"
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+fi
+
 if [ "$2" = "" ]; then
 	echo "$0 called without instrument parameter file for histogram!"
 	exit 0
+fi
+
+if [ -e $2 ]; then
+	echo "Your instrument parameter file $2 was found!"
+else
+	echo "Your instrument parameter file $2 was NOT found!"
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
 fi
 
 if [ "$3" = "" ]; then
@@ -52,6 +68,7 @@ echo "0" >> temp.txt
 echo "x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
+
 # Test the EXP file
 grep "$1" `cat GSAS_EXP`.EXP
 #echo "grep returned $?"

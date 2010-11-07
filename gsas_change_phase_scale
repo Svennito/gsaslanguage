@@ -18,6 +18,7 @@ histograms=`cat temp.txt`
 # change the phase in all histograms
 echo "k l o s" > temp.txt
 while [ $histograms -gt 0 ]; do
+	echo "p $1" >> temp.txt
 	echo "c $2" >> temp.txt
 	echo "n" >> temp.txt
 	let histograms--

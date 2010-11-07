@@ -3,24 +3,24 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without number of histogram for which sigma1 should be varied!"
+	echo "$0 called without number of histogram for which UVW should be varied!"
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
-	echo "$0 called without number phase for which sigma1 should be varied!"
+	echo "$0 called without number phase for which UVW should be varied!"
 	exit 0
 fi
 
 if [ "$3" = "" ]; then
-	echo "$0 called without flag for sigma1 - assuming y!"
-	flag="y"
+	echo "$0 called without flags for UVW - assuming y!"
+	flag="y y y"
 else 
 	flag="$3"
 fi
 
 if [ "$4" = "" ]; then
-	echo "$0 called without flag for sigma1 damping - leaving untouched!"
+	echo "$0 called without flag for profile parameter damping - leaving untouched!"
 fi
 
 # Change the flags
@@ -28,9 +28,12 @@ echo "k l o p" > temp.txt
 echo "h $1" >> temp.txt
 echo "p $2" >> temp.txt
 echo "v" >> temp.txt
+echo $flag >> temp.txt 
 echo "/" >> temp.txt 
 echo "/" >> temp.txt 
-echo "n $flag n" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
 echo "/" >> temp.txt 
 echo "/" >> temp.txt
 echo "l" >> temp.txt

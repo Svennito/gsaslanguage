@@ -1,0 +1,100 @@
+# 
+# gsas_waterfall_add - prepare a dataset for addition to a waterfall plot
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_waterfall_add <runno> <bank> <offset> <scale>
+#
+# (expects data files to have the IPARM file in the 2nd line and in the same folder as the data file
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without a runno to be plotted!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without a bank number to be plotted!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without an offset, assuming 0!"
+	offset=0
+else
+	offset=$3
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without a scale, assuming 1!"
+	scale=1
+else
+	scale=$4
+fi
+
+# extract DIFC
+iparm=`grep "Instrument parameter file:" $1`
+iparm=${iparm:26}
+if [ -e $iparm ]; then
+	echo "Found instrument parameter file $iparm!"
+else
+	echo "Cannot find instrument parameter file $iparm"
+	exit
+fi
+difc=`grep -h "INS  $2 ICONS" $iparm`
+difc=${difc:13:10}
+
+if [ $difc = "" ]; then
+	read -p "Instrument parameter file not found!"
+	exit
+fi
+
+if [ -f $1_$2.tmp ]; then
+	rm $1_$2.tmp
+fi
+
+# Make the input file for rawplot
+echo "a" > temp.txt
+echo "n" >> temp.txt
+echo "$1" >> temp.txt
+echo "y" >> temp.txt
+echo "y" >> temp.txt
+echo "$2" >> temp.txt
+echo "o" >> temp.txt
+echo "$1_$2.tmp" >> temp.txt
+echo "x" >> temp.txt
+rawplot < temp.txt > out.txt
+
+# Post process
+echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000,  ( \044 2 / \044 3 ) * $scale + $offset }" > temp.txt
+awk -f temp.txt $1_$2.tmp > $1_$2.txt
+
+# Add to the gnuplot script 
+echo "   '$1_$2.txt' using 1:2, \\" >> plot.tmp
+
+# Add to the surface file
+echo -e "/[0-9]+\.[0-9]*/ { print ( \044 2 / \044 3 ) * $scale }" > temp.txt
+awk -f temp.txt $1_$2.tmp > temp_int.txt
+
+if [ -f surface.txt ]; then
+	# not the first file, append
+	echo "surface file exists, appending"
+else
+	# first file, add the d-spacing also
+	echo "creating new surface file"
+	echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000 }" > temp.txt
+	awk -f temp.txt $1_$2.tmp > surface.txt
+fi
+
+paste surface.txt temp_int.txt > temp.txt
+mv temp.txt surface.txt
+
+# add to the file for paraview
+echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000,  $1, ( \044 2 / \044 3 ) * $scale + $offset }" > temp.txt
+awk -f temp.txt $1_$2.tmp >> paraview_input.txt
+
