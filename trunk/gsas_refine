@@ -65,7 +65,12 @@ if [ "$NOPLOT" -eq "0" ]; then
 	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
 	COUNTER=0
 	NHIST=`cat nhist.txt`
-	echo "We have $NHIST histograms in this refinement."
+	if [ "$NHIST" = "  " ]; then
+		grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 3 > nhist.txt
+		COUNTER=0
+		NHIST=`cat nhist.txt`
+	fi
+	echo "We have <$NHIST> histograms in this refinement."
 	rm S`echo $STEP`H*.EPS
 	while [ $COUNTER -lt $NHIST ]; do
 		let COUNTER=COUNTER+1 

@@ -23,6 +23,13 @@ echo "\end{document}" >> temp.tex
 echo "Generating DVI file..."
 latex temp.tex
 echo "Generating PDF file..."
-dvipdf temp.dvi
+if [ "$OS" = "Windows_NT" ]; then
+	echo "I think I am running on a Windows box..."
+	dvips temp
+	ps2pdf temp.ps
+else
+	echo "I think I am running on a UNIX box..."
+	dvipdf temp.dvi
+fi
 mv temp.pdf overview.pdf
 echo "Plot overview generated in overview.pdf!"

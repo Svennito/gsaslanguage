@@ -1,0 +1,77 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+
+if [ "$1" = "" ]; then
+	echo "$0 called without instrument parameter file for histogram!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without bank number for histogram!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without minimum d-spacing for histogram!"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without maximum d-spacing for histogram, assuming no upper limit!"
+fi
+
+if [ "$5" = ""]; then
+	echo "$0 called without histogram scale, assuming scale of 1.0!
+fi
+
+# Add the dummy histogram
+echo "k p h j" > temp.txt
+echo "$1" >> temp.txt
+echo "$1" >> temp.txt
+echo "$2" >> temp.txt
+echo "l" >> temp.txt
+echo "/" >> temp.txt
+echo "$3 $4" >> temp.txt
+echo "x" >> temp.txt
+echo "0" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+	if [ "$5" != "" ]; then
+	echo "l o h c" >> temp.txt
+	echo "$5" >> temp.txt
+	echo "x x x" >> temp.txt
+fi
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+
+grep "$1" `cat GSAS_EXP`.EXP
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	echo "Instrument parameter file name is NOT in the EXP file"
+	exit 0
+fi
+
+if [ $2 -lt 10 ]; then
+	grep "BANK     $2" `cat GSAS_EXP`.EXP 
+else 
+	grep "BANK    $2" `cat GSAS_EXP`.EXP 
+fi
+
+#echo "grep returned $?"
+if [ "$?" = "1" ]; then
+	echo "Entry with this bank is NOT in the EXP file"
+	exit 0
+fi
+
+# Which histogram in the EXP file did we add?
+grep "Histogram no." out.txt > temp.txt
+head -c 18 temp.txt > temp2.txt
+tail -c 2 temp2.txt > hist.txt
+
+echo "Added dummy histogram with instrument parameter file \verb=$2= (bank $2, min. d-spacing $3A, max. d-spacing $4A) as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex
+

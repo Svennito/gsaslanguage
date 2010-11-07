@@ -1,0 +1,23 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without histogram number!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without refinement flag!"
+	exit 0
+fi
+
+# change the histogram refinement flag
+echo "k l o h" > temp.txt
+echo "g $1 $1" >> temp.txt
+echo "$2" >> temp.txt
+echo "x x x x x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt
+
+echo "Set refinement flag for histogram scale of histogram $1 to $2.\newline" >> temp.tex

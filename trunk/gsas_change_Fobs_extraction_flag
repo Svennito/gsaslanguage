@@ -1,0 +1,25 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without histogram number!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without new extraction flags!"
+	exit 0
+fi
+
+# change the phase flags
+echo "k l l e $1" > temp.txt
+echo "c $2" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Changed Fobs extraction flags for histogram $1 to $2.\newline" >> temp.tex

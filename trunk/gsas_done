@@ -87,9 +87,16 @@ echo "Generating DVI file..."
 
 # Produce PDF file with information
 latex `cat GSAS_EXP`.tex
-echo "Generating PDF file..."
-dvipdf `cat GSAS_EXP`.dvi
-#acroread `cat GSAS_EXP`.pdf
+if [ "$OS" = "Windows_NT" ]; then
+	echo "I think I run on a Windows box..."
+	dvips `cat GSAS_EXP`
+	ps2pdf `cat GSAS_EXP`.ps
+else
+	echo "I think I run on a Unix box..."
+	echo "Generating PDF file..."
+	dvipdf `cat GSAS_EXP`.dvi
+	#acroread `cat GSAS_EXP`.pdf
+fi
 
 # clean up
 rm out.txt
