@@ -1,0 +1,9 @@
+#summary Links that are useful for this project
+
+= Links that might be handy =
+
+This article has a few links to software that we find useful...
+
+*GSAS* can be downloaded from https://subversion.xor.aps.anl.gov/trac/EXPGUI.
+
+*VESTA* can be used to visualize GSAS generated Fourier maps. It can be found at http://www.geocities.jp/kmo_mma/ (either check the news for latest versions or go to the software section).
