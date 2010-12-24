@@ -36,21 +36,35 @@ while [ $COUNTER -lt $NHIST ]; do
 	echo $COUNTER >> temp.txt
 done
 echo "0" >> temp.txt
+# add all other maps
+echo "a FOBS" >> temp.txt
+echo "a FCLC" >> temp.txt
+echo "a NFDF" >> temp.txt
+echo "2" >> temp.txt
 echo "x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 fourier `cat GSAS_EXP`
-
+read -p "pause..."
 # make input for forplot to convert for VESTA
 echo "z e" > temp.txt
+echo "DELF" >> temp.txt
+echo "e" >> temp.txt
+echo "f FOBS" >> temp.txt
+echo "e" >> temp.txt
+echo "f FCLC" >> temp.txt
+echo "e" >> temp.txt
+echo "f 2FDF" >> temp.txt
 echo "e" >> temp.txt
 echo "q" >> temp.txt
+echo "Creating .grd files for VESTA..."
 forplot `cat GSAS_EXP` < temp.txt > out.txt
+echo "Done."
 
 # Output stuff to the Latex document.
-echo "Generated difference Fourier map and converted it to a file `cat GSAS_EXP`_DELF.grd." >> `cat GSAS_EXP`.tex
-echo "The Koichi Momma's software VESTA can read this file, so you can view the difference " >> `cat GSAS_EXP`.tex
-echo "Fourier map in 3D. You may download VESTA from"  >> `cat GSAS_EXP`.tex
+echo "Generated difference Fourier maps and converted them to a files `cat GSAS_EXP`_DELF.grd, `cat GSAS_EXP`_FOBS.grd, `cat GSAS_EXP`_FCLC.grd, `cat GSAS_EXP`_2FDF.grd." >> `cat GSAS_EXP`.tex
+echo "Koichi Momma's software VESTA can read those files, so you can view the " >> `cat GSAS_EXP`.tex
+echo "Fourier maps in 3D. You may download VESTA from"  >> `cat GSAS_EXP`.tex
 echo "\verb=http://www.geocities.jp/kmo_mma/crystal/en/vesta.html=. Open the grd file in VESTA."  >> `cat GSAS_EXP`.tex
-echo "To modify the contour levels, go to Objects – Properties – Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list."  >> `cat GSAS_EXP`.tex
-echo "In order to also plot the atoms, go to Edit Data – Structure Parameters and click on import (bottom right).\newline" >> `cat GSAS_EXP`.tex
+echo "To modify the contour levels in VESTA, go to Objects – Properties – Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list."  >> `cat GSAS_EXP`.tex
+echo "In order to also plot the atoms, go to Edit Data – Structure Parameters and click on import (bottom right) and read the EXP file `cat GSAS_EXP`.EXP with the current crystal structure.\newline" >> `cat GSAS_EXP`.tex
