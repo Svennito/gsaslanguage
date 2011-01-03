@@ -7,7 +7,7 @@ echo 'set logscale y' >> temp.plt
 echo 'set xlabel "Rietveld cycle"' >> temp.plt
 echo 'set ylabel "Reduced CHISQ"' >> temp.plt
 echo 'set y2label "Number of variables"' >> temp.plt
-echo 'set yrange [0.1:*]' >> temp.plt
+echo 'set yrange [0.1:100]' >> temp.plt
 echo 'set y2range [0:*]' >> temp.plt
 echo 'set y2tics border' >> temp.plt
 echo 'set ytics nomirror' >> temp.plt
@@ -26,6 +26,7 @@ echo 'set logscale y' >> temp.plt
 echo 'set xlabel "Rietveld cycle"' >> temp.plt
 echo 'set ylabel "Final variable sum((shift/esd)**2)"' >> temp.plt
 echo 'set y2label "CPU time/cycle [s]"' >> temp.plt
+echo 'set yrange [0.01:*]' >> temp.plt
 echo 'set y2range [0:*]' >> temp.plt
 echo 'set y2tics border' >> temp.plt
 echo 'set key outside below' >> temp.plt

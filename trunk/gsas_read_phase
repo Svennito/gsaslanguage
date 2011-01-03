@@ -30,21 +30,4 @@ echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-# Test the EXP file
-#grep "$2" `cat GSAS_EXP`.EXP
-#echo "grep returned $?"
-#if [ "$?" = "1" ]; then
-	# grep did not find the spacegroup
-	#echo "Space group is NOT in the EXP file"
-	#exit 0
-#fi
-
-#grep "$3" `cat GSAS_EXP`.EXP
-#echo "grep returned $?"
-#if [ "$?" = "1" ]; then
-	# grep did not find the lattice parameter
-	#echo "Lattice parameter is NOT in the EXP file"
-	#exit 0
-#fi
-
 echo "Added phase number \verb=$2= from file \verb=$1= to EXP file.\newline" >> `cat GSAS_EXP`.tex
