@@ -45,7 +45,6 @@ echo "x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 fourier `cat GSAS_EXP`
-read -p "pause..."
 # make input for forplot to convert for VESTA
 echo "z e" > temp.txt
 echo "DELF" >> temp.txt
@@ -62,9 +61,16 @@ forplot `cat GSAS_EXP` < temp.txt > out.txt
 echo "Done."
 
 # Output stuff to the Latex document.
-echo "Generated difference Fourier maps and converted them to a files `cat GSAS_EXP`_DELF.grd, `cat GSAS_EXP`_FOBS.grd, `cat GSAS_EXP`_FCLC.grd, `cat GSAS_EXP`_2FDF.grd." >> `cat GSAS_EXP`.tex
+echo "Generated Fourier maps and converted them to files readable by VESTA.\begin{itemize}"  >> `cat GSAS_EXP`.tex
+echo " \item\verb=`cat GSAS_EXP`_FOBS.grd= (the observed Fourier map), "  >> `cat GSAS_EXP`.tex
+echo " \item\verb=`cat GSAS_EXP`_FCLC.grd= (the calculated Fourier map), "   >> `cat GSAS_EXP`.tex
+echo " \item\verb=`cat GSAS_EXP`_DELF.grd= (the difference Fourier map \$F_o-F_c\$ ), and "  >> `cat GSAS_EXP`.tex
+echo " \item\verb=`cat GSAS_EXP`\_2FDF.grd= (the Fourier map \$2F_o-F_c\$ ).\end{itemize} " >> `cat GSAS_EXP`.tex
 echo "Koichi Momma's software VESTA can read those files, so you can view the " >> `cat GSAS_EXP`.tex
-echo "Fourier maps in 3D. You may download VESTA from"  >> `cat GSAS_EXP`.tex
-echo "\verb=http://www.geocities.jp/kmo_mma/crystal/en/vesta.html=. Open the grd file in VESTA."  >> `cat GSAS_EXP`.tex
-echo "To modify the contour levels in VESTA, go to Objects – Properties – Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list."  >> `cat GSAS_EXP`.tex
-echo "In order to also plot the atoms, go to Edit Data – Structure Parameters and click on import (bottom right) and read the EXP file `cat GSAS_EXP`.EXP with the current crystal structure.\newline" >> `cat GSAS_EXP`.tex
+echo "Fourier maps in 3D and compare them with the current crystal structure. You may download VESTA from"  >> `cat GSAS_EXP`.tex
+echo " "  >> `cat GSAS_EXP`.tex
+echo "\begin{center}\verb=http://www.geocities.jp/kmo_mma/crystal/en/vesta.html=  \end{center}"  >> `cat GSAS_EXP`.tex
+echo "Open the grd file in VESTA."  >> `cat GSAS_EXP`.tex
+echo "To modify the contour levels in VESTA, go to Objects -- Properties -– Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list."  >> `cat GSAS_EXP`.tex
+echo "In order to also plot the atoms, go to Edit Data -– Structure Parameters and click on import (bottom right) and read the EXP file \verb=`cat GSAS_EXP`.EXP= with the current crystal structure." >> `cat GSAS_EXP`.tex
+echo "If you save a VESTA file with a .grd and your current imprted EXP file, you may just re-open the VESTA file to obtain updated structure plots.\newline" >> `cat GSAS_EXP`.tex
