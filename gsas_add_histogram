@@ -58,7 +58,7 @@ echo $3 >> temp.txt
 echo "n" >> temp.txt
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
-	# We have a maximum d-spacing, let's convert it to TOF
+	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
 	echo $5 >> temp.txt
 fi
 echo $4 >> temp.txt
@@ -106,9 +106,9 @@ tail -c 2 temp2.txt > hist.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's enter it
 	if [ $5 -lt 10 ]; then
-		grep "d-minimum" out.txt | grep "minimum of  $5" > maxtof.txt
+		grep "d-minimum" out.txt | grep " of  $5" > maxtof.txt
 	else
-		grep "d-minimum" out.txt | grep "minimum of $5" > maxtof.txt
+		grep "d-minimum" out.txt | grep " of $5" > maxtof.txt
 	fi
 	tail -c 15 maxtof.txt > maxtof2.txt
 	head -c 8 maxtof2.txt > maxtof.txt
@@ -117,8 +117,22 @@ if [ "$5" != "" ]; then
 	echo "k p h" > temp.txt
 	echo "e `cat hist.txt`" >> temp.txt
 	echo "e" >> temp.txt
-	echo "c 2" >> temp.txt
-	echo "`cat maxtof.txt` 1000" >> temp.txt
+	# now we need to know if we are dealing with CW or TOF to find out which region to modify...
+	grep HTYPE $2 | head -c 17 > htype.txt
+	if [ "`tail -c 1 htype.txt`" == "C" ]; then
+	    echo "We have a constant wavelength instrument, need to modify excluded region 1 for maximum d-spacing"
+	    echo "c 1" >> temp.txt
+	    echo "0 `cat maxtof.txt` " >> temp.txt
+	else
+	    if [ "`tail -c 1 htype.txt`" == "T" ]; then
+		echo "We have a time-of-flight instrument, need to modify excluded region 2 for maximum d-spacing"
+		echo "c 2" >> temp.txt
+		echo "`cat maxtof.txt` 1000" >> temp.txt
+	    else
+		echo "We have a unknown type of instrument - need debugging!"
+		read -p "Break here with Ctrl-c and debug!"
+	    fi
+	fi
 	echo "x x x x x x " >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
 fi
