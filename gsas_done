@@ -7,7 +7,7 @@ echo 'set logscale y' >> temp.plt
 echo 'set xlabel "Rietveld cycle"' >> temp.plt
 echo 'set ylabel "Reduced CHISQ"' >> temp.plt
 echo 'set y2label "Number of variables"' >> temp.plt
-echo 'set yrange [0.1:100]' >> temp.plt
+echo 'set yrange [*:100]' >> temp.plt
 echo 'set y2range [0:*]' >> temp.plt
 echo 'set y2tics border' >> temp.plt
 echo 'set ytics nomirror' >> temp.plt
@@ -77,6 +77,17 @@ if [ -s out.txt ]; then
   echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
 else
   echo "No isotropic thermal motion parameters have un-physical negative values." >> `cat GSAS_EXP`.tex
+fi
+
+# Check of site occupation parameters that are smaller than zero
+grep FRAC `cat GSAS_EXP`.PVE | awk -v FIELDWIDTHS="13 16 16" '{if ($2<0) print $1}'  > out.txt
+if [ -s out.txt ]; then
+  echo "The following site occupation parameters have un-physical negative values:" >> `cat GSAS_EXP`.tex
+  echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
+  cat out.txt >> `cat GSAS_EXP`.tex
+  echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
+else
+  echo "No site occupation parameters have un-physical negative values." >> `cat GSAS_EXP`.tex
 fi
 
 echo "The refined parameters and their values and esds are:" >> `cat GSAS_EXP`.tex
