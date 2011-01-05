@@ -135,6 +135,7 @@ if [ "$5" != "" ]; then
 	fi
 	echo "x x x x x x " >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
+	rm htype.txt
 fi
 
 echo "Added histogram from \verb=$1= (bank $3, min. d-spacing $4A, max. d-spacing $5A) with instrument parameter file \verb=$2= as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex

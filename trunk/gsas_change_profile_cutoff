@@ -1,0 +1,41 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which profile cut-off should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of phase for which profile cut-off should be changed!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without new cut-off, assuming 0.1%"
+	flag="0.1"
+else 
+	flag="$3"
+fi
+
+# Change the cut-off
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "w" >> temp.txt
+echo $flag >> temp.txt 
+echo "l" >> temp.txt
+if [ "$4" != "" ]; then
+	echo "d $4" >> temp.txt
+fi
+ 
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed profile cut-off value for histogram $1 and phase $2 to "$flag".\newline" >> temp.tex

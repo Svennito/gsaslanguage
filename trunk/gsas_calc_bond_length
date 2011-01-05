@@ -38,7 +38,7 @@ echo "x x x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 disagl `cat GSAS_EXP` > out.txt
 
-echo "computed bond length an angles for phase $1 and added them to the LST file.\newline" >> `cat GSAS_EXP`.tex
+echo "Computed bond length and angles for phase $1 and added them to the `cat GSAS_EXP`.LST file.\newline" >> `cat GSAS_EXP`.tex
 
 
 

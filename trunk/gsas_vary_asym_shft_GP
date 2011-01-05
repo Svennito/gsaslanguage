@@ -1,0 +1,55 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which asym, shft and GP should be varied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number phase for which asym, shft and GP should be varied!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without flags for asym, shft and GP !"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without flag for profile parameter damping - leaving untouched!"
+fi
+
+# Change the flags
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "v" >> temp.txt
+# leave UVW untouched
+echo "/" >> temp.txt 
+# leave LX, LY and trns untouched
+echo "/" >> temp.txt 
+# change asym, shft and GP  flag
+echo $3 >> temp.txt 
+# leave rest untouched
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt
+echo "l" >> temp.txt
+if [ "$4" != "" ]; then
+	echo "d $4" >> temp.txt
+fi
+ 
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed refinement flag of asym, shft and GP for histogram $1 and phase $2 to "$flag".\newline" >> temp.tex
