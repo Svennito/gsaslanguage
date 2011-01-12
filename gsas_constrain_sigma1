@@ -13,7 +13,7 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without histogram number for which constraint should be added!"
+	echo "$0 called without first histogram number for which constraint should be added!"
 	exit 0
 fi
 
@@ -23,7 +23,22 @@ if [ "$2" = "" ]; then
 fi
 
 if [ "$3" = "" ]; then
-	echo "$0 called without 2nd phase!"
+	echo "$0 called without first multiplier!"
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without second histogram!"
+	exit 0
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without second phase!"
+	exit 0
+fi
+
+if [ "$6" = "" ]; then
+	echo "$0 called without second multiplier!"
 	exit 0
 fi
 
@@ -33,11 +48,17 @@ echo "k 6" >> temp.txt
 echo "l " >> temp.txt
 echo " " >> temp.txt
 echo "i" >> temp.txt
-let counter=0
+
+# copy the arguments into an array so we can fiddle with it
 for arg in "$@"; do
-	let counter+=1
-	if [ $counter -lt 2 ]; then continue; fi
-	echo "$arg $1 1" >> temp.txt
+	arguments=("${arguments[@]}" "$arg")
+done
+let counter=0
+echo "Constrained sigma1 for " >> `cat GSAS_EXP`.tex
+while [ $counter -lt ${#arguments[@]} ]; do
+	echo "${arguments[$counter]} ${arguments[$counter+1]} ${arguments[$counter+2]} ">> temp.txt
+	echo "phase ${arguments[$counter]}, histogram ${arguments[$counter+1]} with multiplier ${arguments[$counter+2]}, " >> `cat GSAS_EXP`.tex
+	let counter+=3
 done
 echo "  " >> temp.txt
 echo "l " >> temp.txt
@@ -46,7 +67,7 @@ echo "x x x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-echo "Constrained sigma1 for histogram $1 and phases $1, $2, $3, $4.\newline" >> `cat GSAS_EXP`.tex
+echo ".\newline" >> `cat GSAS_EXP`.tex
 
 
 

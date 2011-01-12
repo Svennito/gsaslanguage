@@ -90,6 +90,17 @@ else
   echo "No site occupation parameters have un-physical negative values." >> `cat GSAS_EXP`.tex
 fi
 
+# Check of site occupation parameters that are greater than one
+grep FRAC `cat GSAS_EXP`.PVE | awk -v FIELDWIDTHS="13 16 16" '{if ($2>1) print $1}'  > out.txt
+if [ -s out.txt ]; then
+  echo "The following site occupation parameters have un-physical values greater than 1:" >> `cat GSAS_EXP`.tex
+  echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
+  cat out.txt >> `cat GSAS_EXP`.tex
+  echo "\end{verbatim}" >> `cat GSAS_EXP`.tex
+else
+  echo "No site occupation parameters have un-physical values greater than 1." >> `cat GSAS_EXP`.tex
+fi
+
 echo "The refined parameters and their values and esds are:" >> `cat GSAS_EXP`.tex
 echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
 cat `cat GSAS_EXP`.PVE >> `cat GSAS_EXP`.tex

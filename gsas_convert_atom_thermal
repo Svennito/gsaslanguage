@@ -64,4 +64,4 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
-echo "Changed thermal factors for phase $1, atom(s) $2, to $3." >> temp.tex
+echo "Converted thermal factors for phase $1, atom(s) $2, to $3." >> temp.tex
