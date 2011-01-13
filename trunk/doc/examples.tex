@@ -1,0 +1,17 @@
+\chapter{Examples}
+
+In this chapter we try to familiarize new users with the concepts of the \gl.
+\section{Ready to roll?}
+
+\subsection{Running the demo}
+A good start is probably running the nickel demo. This is based on the first tutorial in the GSAS manual; it basically does the same steps described there -- except it takes a few seconds to run rather than the 2 hours for the average GSAS newbie or 5 minutes for the experienced GSAS user. And it produces a few graphs.\\ \\
+Ok, here we go. We assume you installed everything properly. Open a bash shell and change to the directory demo, which is a subfolder of the gsas\_language folder. In there, start the script Unix-style with
+
+\verb=./gsas_analyze=
+
+You can look at this file with the editor of your choice (if that choice is wordpad or any other Windows editor and you save the file, make sure to run dos2unix on it before executing it again). 
+
+\subsection{Output Files: Results and Overview}
+If really everything is installed nicely (GSAS, gnuplot, latex, ghostscript), you should get four Acrobat PDF files. Three are the results of the three refinements (NICKELxxx.pdf) and one is an overview of the parameters (overview.pdf). The script gsas\_analyze is documented with comments (starting with \# in bash scripts), so not much help needed there. Some more information on the commands is provided in the GSAS Refinement Commands section below. \\ \\
+The result PDF files for the refinements show  the data, what was changed, and refinement progress indicators (reduced CHISQ, final variable sum shift) for each refinement step. The data is shown as the usual (non normalized) measured data with fit as well as the plots that are generated if you answer ``yes'' when POWPLOT asks whether you want to see the error analysis. That allows to get a feeling of what the variation of a certain parameter does to the refinement. At the end of the document, you find a list of the refined parameters with errors, which is exactly the PVE file. The PVE file is a good place to collect the parameters of interest for parameter studies etc., which is why it is not deleted at the end of the refinement. The refinement overview files allow you to document a refinement strategy, and they can also tell whether a parameter helps (i.e. the CHISQ goes down substantially) or not. The plot overview in overview.pdf is just meant as an example to show how results of parametric studies can be quickly visualized -- not very meaningful here, but it hopefully gives you an idea how to use it.
+
