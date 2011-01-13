@@ -1,0 +1,208 @@
+% Define a new command to make the command descriptions uniform
+\newcommand{\glcommand}[6]{
+
+\subsection{#1}
+\leftskip2em #2\\
+\\
+\leftskip2em \textbf{Syntax:}\\
+\\
+\leftskip2em \texttt{#3}\\
+\\
+\leftskip2em \textbf{Parameters:}
+\begin{itemize}
+\leftskip2em #4
+\end{itemize}
+\leftskip2em \textbf{Example:}\\
+\\
+\leftskip2em \texttt{#5}\\
+\\
+\leftskip2em #6\\
+}
+
+
+\chapter{The commands}
+The following sections describe the commands of the gsas\_language. They are arranged by topic, an alphabetic list is also provided.
+
+\section{Complete list of commands}
+
+\begin{verbatim}
+gsas_add_atom
+gsas_add_diffuse_scattering
+gsas_add_histogram
+gsas_add_phase
+gsas_calc_bond_length
+gsas_change_atom
+gsas_change_background
+gsas_change_DIFC
+gsas_change_Fobs_extraction_flag
+gsas_change_lattice
+gsas_change_phase_flag
+gsas_change_phase_scale
+gsas_change_sigma1
+gsas_change_sigmas
+gsas_constrain_atom
+gsas_constrain_phase
+gsas_constrain_sigma1
+gsas_convert_atom_thermal
+gsas_copy_expfile
+gsas_delete_atom_constraint
+gsas_delete_sigma1_constraint
+gsas_done
+gsas_exclude_region
+gsas_fourier_maps
+gsas_initialize
+gsas_plot
+gsas_plot_bond
+gsas_plot_overview
+gsas_prepare_mem
+gsas_read_phase
+gsas_refine
+gsas_replace_histogram
+gsas_simulate_histogram
+gsas_single_peak_fits
+gsas_single_peak_fits_make_list
+gsas_vary_absorption
+gsas_vary_atom
+gsas_vary_background
+gsas_vary_DIFC
+gsas_vary_diffuse_scattering
+gsas_vary_histogram_scale
+gsas_vary_lattice
+gsas_vary_phase
+gsas_vary_sigma1
+gsas_vary_UVW
+gsas_waterfall_add
+gsas_waterfall_plot
+\end{verbatim}
+
+\section{Beginning and end of refinement}
+
+%\glcommand{1}{2}{3}{\item 4}{5}{6}
+
+\glcommand{gsas\_initialize}
+{
+This command initializes a new refinement by generating a new GSAS EXP file. It deletes temporary files of possible previous refinements and initializes the documentation file of this refinement.
+}{
+gsas\_initialize <EXP filename> <title>
+}{
+\item \texttt{<EXP filename>}: The filename for the GSAS EXP file and assorted files produced by POWPREF, GENLES, etc. Filename must not have an extension. Filename will be automatically converted to capital letters since GSAS expects capital letters on UNIX platforms.
+\item \texttt{<title>}: An arbitrary title to be displayed in the POWPLOT plots etc.
+}{
+gsas\_initialize SIO2\_FURNACE\_\$1C "SiO2, furnace, \$1C"
+}{
+When a script with this line is called with a parameter 100, e.g. the GSAS data file for a run at  100C, 
+named 100C.gda, the \$1 occurences will be replaced with "100" by bash, generating a EXP filename 
+SIO2\_FURNACE\_100C.EXP with a run title label "SiO2, furnace, 100C".
+}
+
+\glcommand{gsas\_done}
+{
+This command finishes a refinement. Plots of $\chi^2$, normalized shifts, time per iteration and number of variables are generated using gnuplot and included in the final Acrobat PDF file describing the refinement. Several checks (negative thermal motion, parameters that are zero within their error bars) are performed and added to the refinement report. Temporary files are deleted. If a refinement is aborted and the user wishes to see the overview PDF file, gsas\_done can be issued from the command line.
+}{
+gsas\_done
+}{
+\item None.
+}{
+gsas\_done
+}{
+This would finish a refinement.
+}
+
+\section{Adding histograms and phases}
+
+\glcommand{gsas\_add\_atom}
+{
+Adds an atom to an existing phase of the refinement. The phase can be either added using the gsas\_read\_phase or gsas\_add\_phase commands.
+}{
+gsas\_add\_atom <phase number> "<GSAS atom parameter sequence>"
+}{
+\item \texttt{<phase number>}: The number of the phase in the main EXP file to which this atom is to be added.
+\item GSAS atom parameter sequence: Space-separated sequence of element symbol, x, y, z coordinates, site occupation factor, atom label (or forward slash for default), thermal motion flag and value of thermal motion parameter(s). This is the same sequence a user would provide following a "i n" command in the atoms menu in EXPEDT.
+}{
+gsas\_add\_atom 1 "NI 0 0 0 1 / i 0.004"
+}{
+This would add a nickel atom to phase 1 on position x=0, y=0, z=0 that is fully occuped (FRAC=1) with the default name that GSAS assigns (the element symbol plus the number of the atom in the sequence). The atom would have isotropic thermal motion with a starting value of $U_{iso}=0.004$.
+}
+
+\glcommand{gsas\_add\_histogram}
+{
+Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information. Existence of the data and the instrument parameter file are checked before the insertion of the histogram data is attempted. Existence of the histogram data filename in the EXP file is checked after the insertion. This command may be used multiple times if multiple histograms are required for a refinement.
+}{
+gsas\_add\_histogram <data\_file> <par\_file> <bank> <min\_d> <max\_d>
+}{
+\item \texttt{<datafile>}: Filename of the data file with the histogram data to be loaded (GSAS data file format).
+\item \texttt{<par\_file>}: Filename of the instrument parameter file required to interpret the histogram data.
+\item \texttt{<bank>}: Bank number of the histogram to be read.
+\item \texttt{<min\_d>, <max\_d>}: Minimum and maximum d-spacing to be used for this histogram.
+}{
+gsas\_add\_histogram nickel.raw inst\_tof.prm 2 0.25 3
+}{
+This would add histogram number 2 from the GSAS data file nickel.raw, using the GSAS instrument parameter file inst\_tof.prm. The minimum d-spacing for this histogram would be set to 0.25\AA\ and the upper d-spacing limit would be 3\AA.
+}
+
+\subsection{gsas\_add\_phase}
+Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information.
+\newline
+\textbf{Syntax:}
+\newline
+\newline
+\verb=gsas_add_phase "<phase name>" "<space group>" "lattice parameters=" 
+\newline
+\newline
+\textbf{Parameters:}
+\begin{itemize}
+\item phase name: The identifier for the phase in GSAS.
+\item space group: The space group of the crystal structure.
+\item lattice parameters: The lattice parameters for the crystal structure.
+\end{itemize}
+\textbf{Example:}
+\newline
+\newline
+\verb=gsas_add_phase "Nickel" "f m -3 m" "3.5234"=
+\newline
+\newline
+
+\subsection{gsas\_read\_phase}
+Adds a phase to the refinement by loading a crystal structure from a file. The file with the crystal structure information has to be in GSAS format, CIF files are currently not supported. The existence of the phase file is checked before loading is attempted. The number of the phase during the refinement is determined by the sequence by which the phases are added to the refinement.
+\newline
+\textbf{Syntax:}
+\newline
+\newline
+\verb=gsas_read_phase <filename> <phase number>=
+\newline
+\newline
+\textbf{Parameters:}
+\begin{itemize}
+\item filename: The name of the file (with extension, e.g. .exp) from which the crystal structure information is to be read.
+\item phase number: The number of the phase in the GSAS EXP file, typically 1.
+\end{itemize}
+\textbf{Example:}
+\newline
+\newline
+\verb=gsas_read_phase "Boron_beta_68106.exp" 1=
+\newline
+\newline
+
+\section{Crystal structure refinement}
+
+\subsection{gsas\_refine}
+Performs the actual refinement by calling POWPREF and GENLES for a given number of refinement cycles. Each call to this command adds a section to the refinement protocol generated at the very end of the refinement.
+\newline
+\textbf{Syntax:}
+\newline
+\newline
+\verb=gsas_refine <cycles> [noplot]=
+\newline
+\newline
+\textbf{Parameters:}
+\begin{itemize}
+\item cycles: The number of refinement cycles in GENLES to be performed.
+\item noplot: If the word "noplot" is added after the number of cycles, the time-consuming generation of plots using POWPLOT is skipped.
+\end{itemize}
+\textbf{Example:}
+\newline
+\newline
+\verb=gsas_refine 2 noplot=
+\newline
+\newline
+\section{Neutron time-of-flight specific}
