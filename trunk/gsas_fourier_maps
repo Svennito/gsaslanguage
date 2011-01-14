@@ -73,4 +73,4 @@ echo "\begin{center}\verb=http://www.geocities.jp/kmo_mma/crystal/en/vesta.html=
 echo "Open the grd file in VESTA."  >> `cat GSAS_EXP`.tex
 echo "To modify the contour levels in VESTA, go to Objects -- Properties -– Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list."  >> `cat GSAS_EXP`.tex
 echo "In order to also plot the atoms, go to Edit Data -– Structure Parameters and click on import (bottom right) and read the EXP file \verb=`cat GSAS_EXP`.EXP= with the current crystal structure." >> `cat GSAS_EXP`.tex
-echo "If you save a VESTA file with a .grd and your current imprted EXP file, you may just re-open the VESTA file to obtain updated structure plots.\newline" >> `cat GSAS_EXP`.tex
+echo "If you save a VESTA file with a .grd and your current imported EXP file, you may just re-open the VESTA file to obtain updated structure plots.\newline" >> `cat GSAS_EXP`.tex
