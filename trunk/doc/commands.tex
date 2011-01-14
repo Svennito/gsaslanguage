@@ -20,6 +20,22 @@
 }
 
 
+% template for a commands copy, paste, use editor's Uncomment command to remove % characters, then replace placeholders
+% if you get a missing $ error message, you likely forgot to use \_ instead of _...
+%\glcommand{COMMAND_NAME}
+%{
+% DESCRIPTION
+% }{
+% SYNTAX
+% }{
+% \item LATEX \item LIST WITH PARAMETERS
+% }{
+% EXAMPLE
+% }{
+% COMMENTS FOR EXAMPLE
+% }
+
+
 \chapter{The commands}
 The following sections describe the commands of the gsas\_language. They are arranged by topic, an alphabetic list is also provided.
 
@@ -140,69 +156,50 @@ gsas\_add\_histogram nickel.raw inst\_tof.prm 2 0.25 3
 This would add histogram number 2 from the GSAS data file nickel.raw, using the GSAS instrument parameter file inst\_tof.prm. The minimum d-spacing for this histogram would be set to 0.25\AA\ and the upper d-spacing limit would be 3\AA.
 }
 
-\subsection{gsas\_add\_phase}
-Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information.
-\newline
-\textbf{Syntax:}
-\newline
-\newline
-\verb=gsas_add_phase "<phase name>" "<space group>" "lattice parameters=" 
-\newline
-\newline
-\textbf{Parameters:}
-\begin{itemize}
-\item phase name: The identifier for the phase in GSAS.
-\item space group: The space group of the crystal structure.
-\item lattice parameters: The lattice parameters for the crystal structure.
-\end{itemize}
-\textbf{Example:}
-\newline
-\newline
-\verb=gsas_add_phase "Nickel" "f m -3 m" "3.5234"=
-\newline
-\newline
 
-\subsection{gsas\_read\_phase}
+\glcommand{gsas\_add\_phase}
+{
+Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information.
+}{
+gsas\_add\_phase "<phase name>" "<space group>" "lattice parameters"
+}{
+\item \texttt{phase name}: The identifier for the phase in GSAS.
+\item \texttt{space group}: The space group of the crystal structure.
+\item \texttt{lattice parameters}: The lattice parameters for the crystal structure.
+}{
+gsas\_add\_phase "Nickel" "f m -3 m" "3.5234"
+}{
+This will add a phase with the label \texttt{Nickel} that has the cubic space group $Fm\bar{3}m$ and a lattice parameter of 3.5234\AA.
+}
+
+\glcommand{gsas\_read\_phase}
+{
 Adds a phase to the refinement by loading a crystal structure from a file. The file with the crystal structure information has to be in GSAS format, CIF files are currently not supported. The existence of the phase file is checked before loading is attempted. The number of the phase during the refinement is determined by the sequence by which the phases are added to the refinement.
-\newline
-\textbf{Syntax:}
-\newline
-\newline
-\verb=gsas_read_phase <filename> <phase number>=
-\newline
-\newline
-\textbf{Parameters:}
-\begin{itemize}
-\item filename: The name of the file (with extension, e.g. .exp) from which the crystal structure information is to be read.
-\item phase number: The number of the phase in the GSAS EXP file, typically 1.
-\end{itemize}
-\textbf{Example:}
-\newline
-\newline
-\verb=gsas_read_phase "Boron_beta_68106.exp" 1=
-\newline
-\newline
+}{
+gsas\_read\_phase <filename> <phase number>
+}{
+\item \texttt{filename}: The name of the file (with extension, e.g. \texttt{.exp}) from which the crystal structure information is to be read.
+\item \texttt{phase number}: The number of the phase in the GSAS EXP file, typically 1.
+}{
+gsas\_read\_phase "Boron\_beta\_68106.exp" 1
+}{
+This would read phase information (lattice parameters, space group, atom parameters such as positions and thermal motion parameters) from a file name \texttt{Boron\_beta\_68106.exp} (case sensitive!). In that file, phase number 1 would be read.
+}
 
 \section{Crystal structure refinement}
 
-\subsection{gsas\_refine}
+\glcommand{gsas\_refine}
+{
 Performs the actual refinement by calling POWPREF and GENLES for a given number of refinement cycles. Each call to this command adds a section to the refinement protocol generated at the very end of the refinement.
-\newline
-\textbf{Syntax:}
-\newline
-\newline
-\verb=gsas_refine <cycles> [noplot]=
-\newline
-\newline
-\textbf{Parameters:}
-\begin{itemize}
-\item cycles: The number of refinement cycles in GENLES to be performed.
-\item noplot: If the word "noplot" is added after the number of cycles, the time-consuming generation of plots using POWPLOT is skipped.
-\end{itemize}
-\textbf{Example:}
-\newline
-\newline
-\verb=gsas_refine 2 noplot=
-\newline
-\newline
+}{
+gsas\_refine <cycles> [noplot]
+}{
+\item \texttt{cycles}: The number of refinement cycles in GENLES to be performed.
+\item \texttt{noplot}: If the word "noplot" is added after the number of cycles, the time-consuming generation of plots using POWPLOT is skipped.
+}{
+gsas\_refine 2 noplot
+}{
+Performs a least-squares cycle by calling POWPREF, then changing the number of refinement cycles to 2 and calling GENLES. Plots of the fit will not be generated for the overview file.
+}
+
 \section{Neutron time-of-flight specific}
