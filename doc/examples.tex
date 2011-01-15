@@ -1,17 +1,187 @@
 \chapter{Examples}
 
-In this chapter we try to familiarize new users with the concepts of the \gl.
+In this chapter we try to familiarize new users with the concepts of the \gl. This section is neither intended as a tutorial for Rietveld refinements nor as a GSAS tutorial. There are several excellent sources out there to help with that, some of them are
+\begin{itemize}
+\item The tutorials in the GSAS manual
+\item GSAS/EXPGUI Alumina example \url{http://www.ncnr.nist.gov/xtal/software/expgui/tutorial3/}
+\item Argonne Powder Diffraction Crystallography Resources \url{http://www.aps.anl.gov/Xray_Science_Division/Powder_Diffraction_Crystallography/index.html}
+\item Armel Le Bail's website \url{http://www.cristal.org/}
+\item Advanced Certificate in Powder Diffraction on the Web \url{http://pd.chem.ucl.ac.uk/pdnn/pdindex.htm}
+\item Robert Dinnebier's Rietveld course \url{http://www.fkf.mpg.de/xray/html/rietveld_refinement.html}
+\end{itemize}
+This section is also not a introduction to usage of the bash shell. There are plenty of resources on the web, but maybe a few commands can get you started in case you are new to this:
+\begin{itemize}
+\item Command line completion with the tab key is your friend, e.g. if you type \texttt{rawp} and then hit the tab key, on most systems it will complete the word to \texttt{rawplot}. If there are more than one possibilities to complete, nothing will happen, but hitting tab twice will give a list of possible completions such that you can type one more letter and try again.
+\item \texttt{cd}: Changes the directory/folder, e.g. \texttt{cd mydata/nickel}. 
+\item \texttt{cp}: Copies files, e.g. \texttt{cp fila1.txt fileb.txt} makes a copy of filea1.txt that is named fileb.txt. 
+\item \texttt{ls}: Lists files, e.g. \texttt{ls -lrt} lists all files in the current folder in the long version (with time stamps, size etc.), sorted by time in reverse order - so you get the latest files last and can see what has happened during e.g. execution of a script. 
+\item \texttt{man}: The Unix help system, provides information for a command, e.g. \texttt{man ls} lists the options and explanations for the \texttt{ls} command. 
+\end{itemize}
+
 \section{Ready to roll?}
+To check if you are readty to go, follow these steps.
+\begin{itemize}
+\item Open a shell (either bash on Unix/Mac or cygwin bash on Windows).
+\item Type \texttt{expedt} and hit enter. If you are prompted for a filename, you are good to go. If a file not found message occurs, GSAS is either not installed or not in the search path. Go back to installation.
+\item Change to a folder with GSAS data (using the \texttt{cd} command, you can use the tab key to complete command lines), type \texttt{rawplot} and try to plot a data set. If you do not see the data and labels etc. the \texttt{PGPLOT\_FONT} variable is not set. Go back to installation.
+\item Type \texttt{latex}. If a file not found message occurs, go back to installation, otherwise type \texttt{q} to get out of \LaTeX.
+\item Type \texttt{gnuplot}. If a file not found message occurs, go back to installation, otherwise type \texttt{quit} to get out of gnuplot.
+\end{itemize}
+If all of the above work, you are ready to roll.
 
-\subsection{Running the demo}
-A good start is probably running the nickel demo. This is based on the first tutorial in the GSAS manual; it basically does the same steps described there -- except it takes a few seconds to run rather than the 2 hours for the average GSAS newbie or 5 minutes for the experienced GSAS user. And it produces a few graphs.\\ \\
-Ok, here we go. We assume you installed everything properly. Open a bash shell and change to the directory demo, which is a subfolder of the gsas\_language folder. In there, start the script Unix-style with
+\section{Neutron time-of-flight data: The nickel demo}
+A good start is probably running the nickel demo. This demo also serves as the skeleton of a refinement strategy for neutron time-of-flight data. It is based on the first tutorial in the GSAS manual; it basically does the same steps described there -- except it takes a few seconds to run rather than the 2 hours for the average GSAS newbie or 5 minutes for the experienced GSAS user. And it produces a few graphs. We highly recommend you go through that example as described in the GSAS manual - without knowing GSAS the \gl\hspace{0.5em} software is of limited use.
 
-\verb=./gsas_analyze=
+Ok, here we go. We assume you installed everything properly. Download the nickel tutorial zip file from the \gl\hspace{0.5em} website and unzip it into a location of your choice. For your reading convenience, here is the listing of the main script \texttt{gsas\_analyze}.
 
-You can look at this file with the editor of your choice (if that choice is wordpad or any other Windows editor and you save the file, make sure to run dos2unix on it before executing it again). 
+\begin{verbatim} 
+# initialize the EXP file with the file name of this project
+gsas_initialize nickel "Nickel Powder Data Example"
 
-\subsection{Output Files: Results and Overview}
-If really everything is installed nicely (GSAS, gnuplot, latex, ghostscript), you should get four Acrobat PDF files. Three are the results of the three refinements (NICKELxxx.pdf) and one is an overview of the parameters (overview.pdf). The script gsas\_analyze is documented with comments (starting with \# in bash scripts), so not much help needed there. Some more information on the commands is provided in the GSAS Refinement Commands section below. \\ \\
-The result PDF files for the refinements show  the data, what was changed, and refinement progress indicators (reduced CHISQ, final variable sum shift) for each refinement step. The data is shown as the usual (non normalized) measured data with fit as well as the plots that are generated if you answer ``yes'' when POWPLOT asks whether you want to see the error analysis. That allows to get a feeling of what the variation of a certain parameter does to the refinement. At the end of the document, you find a list of the refined parameters with errors, which is exactly the PVE file. The PVE file is a good place to collect the parameters of interest for parameter studies etc., which is why it is not deleted at the end of the refinement. The refinement overview files allow you to document a refinement strategy, and they can also tell whether a parameter helps (i.e. the CHISQ goes down substantially) or not. The plot overview in overview.pdf is just meant as an example to show how results of parametric studies can be quickly visualized -- not very meaningful here, but it hopefully gives you an idea how to use it.
+# add a phase named Nickel with a space group and lattice parameter
+gsas_add_phase "Nickel" "f m -3 m" "3.5234"
 
+# add two histograms to the refinement which are banks 2 and 3 of the dataset
+# and have a d-spacing range from 0.25 to 3 Angstrom
+gsas_add_histogram nickel.raw inst_tof.prm 2 0.25 3
+gsas_add_histogram nickel.raw inst_tof.prm 3 0.25 3
+
+# add an atom to phase #1 (parameter are same as during EXPEDT atom addition)
+gsas_add_atom 1 "NI 0 0 0 1 / i 0.004"
+
+# do 2 refinement cycles
+gsas_refine 2
+
+# change the background for histograms 1 2 to function #1 with 16 coefficients
+gsas_change_background 1 1 16
+gsas_change_background 2 1 16
+gsas_refine 5
+
+# vary the diffractometer constant DIFC
+gsas_vary_DIFC 1 C
+gsas_vary_DIFC 2 C
+gsas_refine 9
+
+# vary the peak profile parameter sigma1 (peak width in TOF experiment)
+gsas_vary_sigma1 1 1
+gsas_vary_sigma1 2 1
+gsas_refine 9
+
+# vary the thermal motion parameter Uiso of phase 1, atom 1, with a damping of 5
+gsas_vary_atom 1 1 u 5
+gsas_refine 9
+
+# fix the thermal motion parameter of phase 1's atom 1
+gsas_vary_atom 1 1 -u
+
+# vary the absorption (function #1 is used) for histogram 1 and 2 with damping 5
+gsas_vary_absorption 1 1 y 5
+gsas_vary_absorption 2 1 y 5
+gsas_refine 9
+
+# clean up and generate the overview file
+gsas_done
+
+# Make a copy to generate some dummy data for a graph
+gsas_copy_expfile NICKEL NICKEL_LATTICE_TOO_BIG "same data, just messed up a little"
+
+# change the lattice parameter - this now works in the new file!
+gsas_change_lattice 1 3.53
+gsas_refine 9
+
+# clean up and generate the overview file
+gsas_done
+
+# Make another copy to generate more dummy data for a graph
+gsas_copy_expfile NICKEL NICKEL_LATTICE_TOO_SMALL "same data, just messed up a little"
+
+# change the lattice parameter - this now works in the new file!
+gsas_change_lattice 1 3.52
+gsas_refine 9
+
+# clean up and generate the overview file
+gsas_done
+
+# make some graphs, just for the heck of it (if this analysis would have more runs, there would be more data points)
+gsas_plot "   1HSCL" "   2HSCL"
+gsas_plot "   1ABS1" "   2ABS1"
+gsas_plot "DIFC  1 " 
+gsas_plot "DIFC  2 "
+gsas_plot "Rwp     "
+gsas_plot "Rp      "
+gsas_plot "1  1PF 6" "1  2PF 6"
+gsas_plot_overview
+\end{verbatim}
+
+To run this, open a bash shell and change to that location. In there, start the script Unix-style with
+
+\texttt{./gsas\_analyze}
+
+You can look at this file with the editor of your choice (if that choice is wordpad or any other Windows editor and you save the file, make sure to run \texttt{dos2unix} on it before executing it again). 
+If really everything is installed nicely (GSAS, gnuplot, \LaTeX, ghostscript), you should get four Acrobat PDF files. Three are the results of the three refinements (NICKELxxx.pdf) and one is an overview of the parameters (overview.pdf). The script gsas\_analyze is documented with comments (starting with \# in bash scripts), so not much help needed there. Some more information on the commands is provided in the GSAS Refinement Commands section below. 
+
+The result PDF files for the refinements show  the data, what was changed, and refinement progress indicators (reduced CHISQ, final variable sum shift) for each refinement step. The data is shown as the usual (non normalized) measured data with fit as well as the plots that are generated if you answer "yes" when POWPLOT asks whether you want to see the error analysis. That allows to get a feeling of what the variation of a certain parameter does to the refinement. At the end of the document, you find a list of the refined parameters with uncertainties, which is exactly the PVE file. The PVE file is a good place to collect the parameters of interest for parameter studies etc., which is why it is not deleted at the end of the refinement. The refinement overview files allow you to document a refinement strategy, and they can also tell whether a parameter helps (i.e. the CHISQ goes down substantially) or not. The plot overview in overview.pdf is just meant as an example to show how results of parametric studies can be quickly visualized -- not very meaningful here, but it hopefully gives you an idea how to use it.
+
+\section{X-ray data: The fluorapatite demo}
+As a similar skeleton for the refinement of laboratory X-ray data, we show the script that corresponds to the GSAS tutorial on fluorapatite, which you can also download from the \gl\hspace{0.5em} website.
+\begin{verbatim}
+# initialize the EXP file named FAP with a meaningful title
+gsas_initialize FAP "GSAS demo for X-ray data, flourapatite"
+
+# add a phase with name, space group and lattice parameters
+gsas_add_phase "Flourapatite" "P 63/m" "9.37 6.88"
+#read -p "wait after adding phase..."
+
+# add the histogram
+gsas_add_histogram fap.xra inst_xry.prm 1 0.8 6
+#read -p "wait after adding histograms..."
+
+# add the atoms
+gsas_add_atom 1 "CA 1/3   2/3   0     1 CA1 i 0.005"
+gsas_add_atom 1 "CA 0.242 0.992 1/4   1 CA2 i 0.005"
+gsas_add_atom 1 "P  0.397 0.367 1/4   1 P3  i 0.005"
+gsas_add_atom 1 "F  0     0     1/4   1 F4  i 0.010"
+gsas_add_atom 1 "O  0.325 0.485 1/4   1 O5  i 0.005"
+gsas_add_atom 1 "O  0.591 0.469 1/4   1 O6  i 0.005"
+gsas_add_atom 1 "O  0.340 0.258 0.070 1 O7  i 0.005"
+#read -p "wait after adding atoms..."
+
+# change the background for histogram 1 to function 5 with 3 coefficients
+gsas_change_background 1 5 3
+gsas_refine 5 #noplot
+#read -p "pause after background..."
+
+# vary the lattice parameter
+gsas_vary_lattice 1 y
+gsas_refine 5 #noplot
+gsas_refine 5 #noplot
+#read -p "pause after lattice..."
+
+# vary profile parameters
+gsas_vary_LX_LY_trns 1 1 "y y n"
+gsas_vary_asym_shft_GP 1 1 "n y n"
+gsas_refine 5 #noplot
+#read -p "pause after LX, LY and shft..."
+
+gsas_vary_asym_shft_GP 1 1 "y y n"
+gsas_refine 5 #noplot
+#read -p "pause after asym..."
+
+gsas_change_profile_cutoff 1 1 0.5
+gsas_refine 5 #noplot
+#read -p "pause after profile cut-off..."
+
+gsas_vary_stec_ptec_sfec 1 1 "y y n"
+gsas_refine 5 #noplot
+#read -p "pause after stec and ptec..."
+
+gsas_vary_atom 1 1:7 u 
+gsas_vary_atom 1 1:7 x 
+gsas_refine 5 #noplot
+#read -p "pause after atomic positions and thermal parameters..."
+
+gsas_fourier_maps
+gsas_calc_bond_length 1 3
+gsas_done
+\end{verbatim}
+In this example you see several lines starting with \texttt{\#read -p...}. This is some kind of low-level debugging. When the \# is removed, the line is not treated as a comment any more and the script will stop there, display the message in the parentheses and continue when the enter key is hit. If one sees a problem, either with the fit such as divergence, or with the script, such as file not found or so, the user can abort the script using \texttt{Ctrl-C}. It is good practice to check that things are running as intended upon the first execution of each command - watch the reduced $\chi^2$ and the sum of the shifts to check for oscillations and convergence, make sure filenames are read etc. Once a step is successful, comment out the \texttt{read} command.
