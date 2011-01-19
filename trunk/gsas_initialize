@@ -1,6 +1,35 @@
 # echo the call so we can see what's going on
 echo "$0 $1 $2 $3 $4 $5 $6"
 
+# test the GSAS installation
+if [ "$gsas" = "" ]; then
+	echo "Your environment variable <gsas> is not set!"
+	echo "GSAS will not be able to find atom parameters etc."
+	echo "You need to set it to point to the path with your GSAS installation, e.g. GSAS=C:\GSAS or so."
+	echo "See the GSAS readme.txt file for more details."
+	read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+	exit 0
+fi
+
+if [ "$PGPLOT_FONT" = "" ]; then
+	echo "Your environment variable <PGPLOT_FONT> is not set!"
+	echo "GSAS will not be able to find fonts for the plotting routines."
+	echo "You need to set it to point to the path with the grfont.dat file in your GSAS installation, e.g. PGPLOT_FONT=C:\GSAS\PGL\GRFONT.DAT or so."
+	echo "See the GSAS readme.txt file for more details."
+	read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+	exit 0
+fi
+
+gsas_path=`which expedt`
+if [ "$gsas_path" = "" ]; then
+	echo "Your environment variable <PATH> is not set to include the GSAS programs!"
+	echo "GSAS will not be able to work at all!"
+	echo "You need to set it to point to the path with the executable files in your GSAS installation, e.g. PATH=...;C:\GSAS\EXE or so."
+	echo "See the GSAS readme.txt file for more details."
+	read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+	exit 0
+fi
+
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "initialize called without name for EXP file!"
@@ -11,6 +40,7 @@ if [ "$2" = "" ]; then
 	echo "initialize called without title for EXP file!"
 	exit 0
 fi
+
 
 # Define the experiment file in this shell
 echo `echo $1 | tr "[:lower:]" "[:upper:]"`>GSAS_EXP
