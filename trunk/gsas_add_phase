@@ -39,7 +39,7 @@ grep "$3" `cat GSAS_EXP`.EXP
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	# grep did not find the lattice parameter
-	echo "Lattice parameter is NOT in the EXP file"
+	echo "Lattice parameter is NOT in the EXP file (this check works only for cubic phases, not for lower symmetries)"
 	exit 0
 fi
 

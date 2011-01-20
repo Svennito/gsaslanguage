@@ -1,0 +1,73 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which profile should be reset!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of profile function to reset to!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without values for initial profile parameters - if they are not stored in the IPARM file, this will result in chaos!"
+	read -p "Hit Enter to continue, Ctrl-C to abort."
+fi
+
+# Change the profile function
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "r $2" >> temp.txt
+# say yes no matter what, if we do have values in the IPARM the y won't harm
+echo "y" >> temp.txt
+if [ "$3" != "" ]; then
+  # say change no matter what, if we don't have values in the IPARM the c won't harm
+  echo "c" >> temp.txt
+  echo $3 >> temp.txt
+  
+  if [ "$4" != "" ]; then
+    echo $4 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+
+  if [ "$5" != "" ]; then
+    echo $5 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+
+  if [ "$6" != "" ]; then
+    echo $6 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+  if [ "$7" != "" ]; then
+    echo $7 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+  if [ "$8" != "" ]; then
+    echo $8 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+  if [ "$9" != "" ]; then
+    echo $9 >> temp.txt
+  else 
+    echo "/" >> temp.txt
+  fi
+fi
+
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Reset peak profile function for histogram $1 and to profile function number $2.\newline" >> temp.tex
