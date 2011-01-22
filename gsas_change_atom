@@ -1,3 +1,4 @@
+#!/bin/bash
 # 
 # gsas_change_atom - change atom parameter
 # (C) Sven Vogel, sven@lanl.gov

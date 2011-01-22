@@ -1,3 +1,4 @@
+#!/bin/bash
 # 
 # gsas_plot - use GnuPLOT to plot refinement results
 # (C) Sven Vogel, sven@lanl.gov

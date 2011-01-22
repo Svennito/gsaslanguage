@@ -1,0 +1,43 @@
+#!/bin/bash
+# 
+# gsas_fix_atom - fix atom parameter
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_fix_atom <phase> <atom range> <parameter name>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom parameter should be fixed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom range for which value should be fixed!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without atom parameter which should be fixed!"
+	exit 0
+fi
+
+# Change the value
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "f l " >> temp.txt
+echo "i $2 $3" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Fixed value for atom parameter(s) of phase $1, atom(s) $2, parameter $3." >> temp.tex

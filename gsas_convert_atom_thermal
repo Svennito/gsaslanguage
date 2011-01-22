@@ -1,3 +1,4 @@
+#!/bin/bash
 # 
 # gsas_convert_atom_thermal - convert thermal motion parameters of atoms
 # (C) Sven Vogel, sven@lanl.gov
