@@ -1,3 +1,4 @@
+#!/bin/bash
 # 
 # gsas_waterfall_add - prepare a dataset for addition to a waterfall plot
 # (C) Sven Vogel, sven@lanl.gov

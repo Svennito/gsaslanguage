@@ -1,0 +1,56 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which profile parameters should be varied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of phase for which profile parameters should be varied!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without flags for first set of parameters - assuming </>!"
+	flag="/"
+else 
+	flag="$3"
+fi
+
+# Change the flags
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "v" >> temp.txt
+counter=0
+echo "Changed refinement flag of profile parameters for histogram $1 and phase $2 to " >> temp.tex
+for arg in "$@"; do
+  let counter+=1
+  # skip over first few parameters
+  if [ "$arg" = "$0" ]; then continue; fi
+  if [ "$arg" = "$1" ]; then continue; fi
+  if [ "$arg" = "$2" ]; then continue; fi
+  # now we deal with the real parameters
+  echo "$arg" >> temp.txt
+  echo "<$arg> " >> temp.tex
+done
+
+# do we have 7 entries (maximum of profile function parameters)
+while [ $counter -lt 9 ]; do
+  let counter+=1
+  echo "/" >> temp.txt
+  echo "<$arg>" >> temp.tex
+done
+
+echo ". \newline" >> temp.tex
+
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+

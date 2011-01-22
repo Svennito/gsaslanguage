@@ -1,3 +1,4 @@
+#!/bin/bash
 # Called when analysis is done
 
 # Produce plot of CHISQ evolution
