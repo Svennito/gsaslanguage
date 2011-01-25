@@ -47,8 +47,6 @@ echo "x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-read -p "wait..."
-
 fourier `cat GSAS_EXP`
 # make input for forplot to convert for VESTA
 echo "z e" > temp.txt
