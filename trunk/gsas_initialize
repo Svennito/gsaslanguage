@@ -4,12 +4,14 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # test the GSAS installation
 if [ "$gsas" = "" ]; then
-	echo "Your environment variable <gsas> is not set!"
-	echo "GSAS will not be able to find atom parameters etc."
-	echo "You need to set it to point to the path with your GSAS installation, e.g. GSAS=C:\GSAS or so."
-	echo "See the GSAS readme.txt file for more details."
-	read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
-	exit 0
+	if [ "$GSAS" = "" ]; then
+		echo "Your environment variable <gsas> is not set!"
+		echo "GSAS will not be able to find atom parameters etc."
+		echo "You need to set it to point to the path with your GSAS installation, e.g. GSAS=C:\GSAS or so."
+		echo "See the GSAS readme.txt file for more details."
+		read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+		exit 0
+	fi
 fi
 
 if [ "$PGPLOT_FONT" = "" ]; then
