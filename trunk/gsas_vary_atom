@@ -22,11 +22,36 @@ fi
 echo "k l a" > temp.txt
 echo "p $1" >> temp.txt
 echo "v $2 $3" >> temp.txt
+# Give a bunch of empty lines to deal with the listing of the new flags
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+
 if [ "$4" = "" ]; then
 	# we are done, no damping
 	echo "No damping provided"
 else 
 	echo "d $2 $3 $4" >> temp.txt
+	# Give a bunch of empty lines to deal with the listing of the new flags
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo " " >> temp.txt
 fi
 echo "x x x x" >> temp.txt
 

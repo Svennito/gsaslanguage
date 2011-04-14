@@ -91,6 +91,47 @@ gsas_waterfall_add
 gsas_waterfall_plot
 \end{verbatim}
 
+%
+% Commands that need documenting
+%
+% gsas_add_diffuse_scattering
+% gsas_calc_bond_length
+% gsas_change_DIFC
+% gsas_change_Fobs_extraction_flag
+% gsas_change_lattice
+% gsas_change_phase_flag
+% gsas_change_phase_scale
+% gsas_change_sigma1
+% gsas_change_sigmas
+% gsas_constrain_atom
+% gsas_constrain_phase
+% gsas_constrain_sigma1
+% gsas_convert_atom_thermal
+% gsas_copy_expfile
+% gsas_delete_atom_constraint
+% gsas_delete_sigma1_constraint
+% gsas_exclude_region
+% gsas_fourier_maps
+% gsas_plot
+% gsas_plot_bond
+% gsas_plot_overview
+% gsas_prepare_mem
+% gsas_replace_histogram
+% gsas_simulate_histogram
+% gsas_single_peak_fits
+% gsas_single_peak_fits_make_list
+% gsas_vary_absorption
+% gsas_vary_atom
+% gsas_vary_background
+% gsas_vary_DIFC
+% gsas_vary_diffuse_scattering
+% gsas_vary_histogram_scale
+% gsas_vary_lattice
+% gsas_vary_phase
+% gsas_vary_UVW
+% gsas_waterfall_add
+% gsas_waterfall_plot
+
 \section{Beginning and end of refinement}
 
 %\glcommand{1}{2}{3}{\item 4}{5}{6}
@@ -188,18 +229,79 @@ This would read phase information (lattice parameters, space group, atom paramet
 
 \section{Crystal structure refinement}
 
+\glcommand{gsas\_change\_atom}
+{
+This command is used to change values of atom parameters, such as position or thermal motion, but also the atom type to change the element/isotope for a given atom or atom sequence. Using the EXPEDT convention to address several atoms at once, e.g. in the sequence of atoms within a phase or by their element type, multiple atoms can be affected at once.
+}{
+gsas\_change\_atom <phase> <atom range> <parameter name> <value>
+}{
+\item \texttt{phase}: The number of the phase to which the atoms belong that need to be changed.
+\item \texttt{atom range}: An atom range, e.g. the number of a single atom, a sequence in the GSAS atom list of the phase, or a specific type (element or isotope). This parameter can be anything EXPEDT understands.
+\item \texttt{parameter name}: The parameter name, one of \texttt{X, Y, Z, UISO, FRAC, U11, U22, U33, U12, U13, U23, TYPE, NAME}.
+\item \texttt{value}: The new value for the parameter of the atoms addressed with the previous parameters. 
+}{
+gsas\_change\_atom 1 NI UISO 0.004
+}{
+This would change the isotropic thermal motion parameter \texttt{UISO} of all atoms of the type \texttt{NI} in phase 1 to 0.004\AA$^2$.
+}
+
+\glcommand{gsas\_change\_background}
+{
+This command changes the type of the background function used for a given histogram and the number of parameters for that function.
+}{
+gsas\_change\_background <histogram> <background function> <number of parameters>
+}{
+\item \texttt{histogram}: The number of the histogram for which the background will be changed.
+\item \texttt{background function}: The number of the function to be used to describe the background in this histogram. Currently, valid numbers are 1, 2, 4, 5, 6, 7, and 8 (see page 129 in the 2004 or 'modern' GSAS manual).
+\item \texttt{number of parameters}: The number of parameters or coefficients to be used for the selected background function. GSAS supports up to 36 parameters, typically much less are sufficient.
+}{
+gsas\_change\_background 2 1 16
+}{
+Changes the background of histogram 2 to GSAS background function number 1 with 16 parameters.
+}
+
 \glcommand{gsas\_refine}
 {
 Performs the actual refinement by calling POWPREF and GENLES for a given number of refinement cycles. Each call to this command adds a section to the refinement protocol generated at the very end of the refinement.
 }{
-gsas\_refine <cycles> [noplot]
+gsas\_refine <cycles> [noplot] [nopowpref]
 }{
 \item \texttt{cycles}: The number of refinement cycles in GENLES to be performed.
 \item \texttt{noplot}: If the word "noplot" is added after the number of cycles, the time-consuming generation of plots using POWPLOT is skipped.
+\item \texttt{noplot}: If the word "nopowpref" is added after the number of cycles, running of \texttt{powpref} will be skipped. This is useful during Le Bail fits during which re-setting the peak intensities by \texttt{powpref} may lead to divergence.
 }{
 gsas\_refine 2 noplot
 }{
 Performs a least-squares cycle by calling POWPREF, then changing the number of refinement cycles to 2 and calling GENLES. Plots of the fit will not be generated for the overview file.
 }
 
+\glcommand{gsas\_vary\_DIFC}
+{
+Changes the refinement flags for the diffractometer constants (DIFCs) for a given histogram. This is needed to e.g. calibrate an instrument or sample environment or to accomodate sample misalignment.
+}{
+gsas\_vary\_DIFC <histogram> <code>
+}{
+\item \texttt{histogram}: The number of the histogram for which the new refinement flags are given.
+\item \texttt{code}: The code(s) of the diffractometer constants that should be varied. These depend on the instrument type, e.g. for neutron time-of-flight they are \texttt{C} for \texttt{DIFC}, \texttt{A} for \texttt{DIFA}, and \texttt{Z} for \texttt{ZERO}. The codes for other instrument types can be queried with \texttt{expedt}, options \texttt{k l o c v}. Combinations are possible, e.g. \texttt{CA} would vary \texttt{DIFC} and \texttt{DIFA} in the above example. To fix diffractometer constants use \texttt{" "} (double quotes with space inbetween) as code.
+}{
+gsas\_vary\_DIFC 1 C
+\newline
+gsas\_vary\_DIFC 2 " "
+}{
+Turns on variation of \texttt{DIFC} for histogram number 1 and fixes all diffractometer constants for histogram 2.
+}
+
 \section{Neutron time-of-flight specific}
+
+\glcommand{gsa\_vary\_sigma1}
+{
+Variation of the $\sigma_1$ peak-width parameter for neutron time-of-flight data using profile function number 1.
+}{
+gsas\_vary\_sigma1 <histogram> <phase> <flag> <damping>
+}{
+\item LATEX \item LIST WITH PARAMETERS
+}{
+gsas\_vary\_sigma1 2 1
+}{
+COMMENTS FOR EXAMPLE
+}

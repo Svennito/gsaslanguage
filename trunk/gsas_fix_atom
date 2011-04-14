@@ -30,8 +30,10 @@ fi
 # Change the value
 echo "k l a" > temp.txt
 echo "p $1" >> temp.txt
-echo "f l " >> temp.txt
+echo "f" >> temp.txt
+echo "l" >> temp.txt
 echo "i $2 $3" >> temp.txt
+echo "l" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
