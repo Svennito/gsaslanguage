@@ -4,7 +4,7 @@
 #
 # Call with 
 #
-# gsas_constrain_sigma1 <histogram #> <phase1> <phase2> <phase3> ...
+# gsas_constrain_sigma1 <phase1> <histogram #> <multiplier 1> <phase2> <histogram #> <multiplier 2> ...
 #
 # 
 #
@@ -14,12 +14,12 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without first histogram number for which constraint should be added!"
+	echo "$0 called without first phase!"
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
-	echo "$0 called without first phase!"
+	echo "$0 called without first histogram number for which constraint should be added!"
 	exit 0
 fi
 
