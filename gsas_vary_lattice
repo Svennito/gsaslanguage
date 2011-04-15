@@ -37,14 +37,14 @@ if [ "`cat flag.txt`" = "Y" ]; then
 	else
 		# it is on, but we want it off, let's toggle it
 		echo "Lattice for phase $1 is fixed, will toggle!"
-		expedt `cat GSAS_EXP` < temp.txt
+		expedt `cat GSAS_EXP` < temp.txt > out.txt
 	fi
 else
 	# flag is either not set (off) or set to "N"
 	if [ "$2" = "y" ]; then
 		# it is off, but we want it on, let's toggle it
 		echo "Lattice for phase $1 is varying, let's toggle!"
-		expedt `cat GSAS_EXP` < temp.txt
+		expedt `cat GSAS_EXP` < temp.txt > out.txt
 	else
 		# which is what we want, no action
 		echo "Lattice for phase $1 is already fixed!"
@@ -68,17 +68,33 @@ if [ "`cat flag.txt`" = "Y" ]; then
 	else
 		# it is on, but we want it off, let's toggle it
 		echo "Problem! The flag is not set to what was desired!"
+		read -p "Maybe you want to debug?"
 	fi
 else
 	# flag is either not set (off) or set to "N"
 	if [ "$2" = "y" ]; then
 		# it is off, but we want it on, let's toggle it
 		echo "Problem! The flag is not set to what was desired!"
+		read -p "Maybe you want to debug?"
 	else
 		# which is what we want, no action
 		echo "Lattice for phase $1 is now fixed!"
 	fi
 fi
 
-echo "Changed lattice parameter refinement flag for phase $1 to $2." >> temp.tex
+if [ "$3" != " " ]; then
+	# we have a damping flag, set it
+	echo "k l o l" > temp.txt
+	echo "p $1" >> temp.txt
+	echo "d $3" >> temp.txt
+	echo "x x x x" >> temp.txt
+	expedt `cat GSAS_EXP` < temp.txt > out.txt
+fi
+
+echo "Changed lattice parameter refinement flag for phase $1 to $2" >> temp.tex
+if [ "$3" != " " ]; then
+	echo "(damping set to $3)" >> temp.tex
+fi
+echo "." >> temp.tex
+
 
