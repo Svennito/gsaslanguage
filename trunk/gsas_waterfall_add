@@ -53,6 +53,8 @@ difc=${difc:13:10}
 if [ $difc = "" ]; then
 	read -p "Instrument parameter file not found!"
 	exit
+else
+	echo "DIFC for bank $2: <$difc>"
 fi
 
 if [ -f $1_$2.tmp ]; then
@@ -74,6 +76,7 @@ rawplot < temp.txt > out.txt
 # Post process
 echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000,  ( \044 2 / \044 3 ) * $scale + $offset }" > temp.txt
 awk -f temp.txt $1_$2.tmp > $1_$2.txt
+echo "done converting TOF to d-spacing in gnuplot file"
 
 # Add to the gnuplot script 
 echo "   '$1_$2.txt' using 1:2, \\" >> plot.tmp
@@ -81,6 +84,7 @@ echo "   '$1_$2.txt' using 1:2, \\" >> plot.tmp
 # Add to the surface file
 echo -e "/[0-9]+\.[0-9]*/ { print ( \044 2 / \044 3 ) * $scale }" > temp.txt
 awk -f temp.txt $1_$2.tmp > temp_int.txt
+echo "done converting TOF to d-spacing in surface file"
 
 if [ -f surface.txt ]; then
 	# not the first file, append
@@ -90,12 +94,13 @@ else
 	echo "creating new surface file"
 	echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000 }" > temp.txt
 	awk -f temp.txt $1_$2.tmp > surface.txt
+	echo "done converting TOF to d-spacing in surface file"
 fi
 
 paste surface.txt temp_int.txt > temp.txt
 mv temp.txt surface.txt
 
 # add to the file for paraview
-echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000,  $1, ( \044 2 / \044 3 ) * $scale + $offset }" > temp.txt
+echo -e "/[0-9]+\.[0-9]*/ { print \044 1 / $difc * 1000,  \042 $1 \042 , ( \044 2 / \044 3 ) * $scale + $offset }" > temp.txt
 awk -f temp.txt $1_$2.tmp >> paraview_input.txt
 
