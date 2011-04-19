@@ -10,43 +10,103 @@ if [ "$1" = "" ]; then
 fi
 
 if [ "$2" = "" ]; then
-	echo "$0 called without bank number for histogram!"
-	exit 0
+	echo "$0 called without bank number for histogram, assuming bank 1."
+	bank=1
+else
+	bank=$2
 fi
 
 if [ "$3" = "" ]; then
-	echo "$0 called without minimum d-spacing for histogram!"
-	exit 0
+	echo "$0 called without minimum d-spacing for histogram, assuming 1 Angstrom!"
+	min_d=1
+else
+	min_d=$3
 fi
 
 if [ "$4" = "" ]; then
-	echo "$0 called without maximum d-spacing for histogram, assuming no upper limit!"
+	echo "$0 called without maximum d-spacing for histogram, assuming 5 Angstrom!"
+	max_d=5
+else
+	max_d=$4
 fi
 
-if [ "$5" = ""]; then
-	echo "$0 called without histogram scale, assuming scale of 1.0!
+if [ "$5" = "" ]; then
+	echo "$0 called without histogram scale, assuming scale of 1000!"
+	scale=1000
+else
+	scale=$5
 fi
 
 # Add the dummy histogram
 echo "k p h j" > temp.txt
 echo "$1" >> temp.txt
-echo "$1" >> temp.txt
-echo "$2" >> temp.txt
+echo "$bank" >> temp.txt
 echo "l" >> temp.txt
 echo "/" >> temp.txt
-echo "$3 $4" >> temp.txt
+echo "/" >> temp.txt
+echo "d" >> temp.txt
+echo "$max_d" >> temp.txt
+echo "$min_d" >> temp.txt
+echo "/" >> temp.txt
 echo "x" >> temp.txt
 echo "0" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
-	if [ "$5" != "" ]; then
+	if [ "$scale" != "" ]; then
 	echo "l o h c" >> temp.txt
-	echo "$5" >> temp.txt
+	echo "$scale" >> temp.txt
 	echo "x x x" >> temp.txt
 fi
 echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# read the TOF/2theta values from the otherwise meaningless d-exercise
+if [ $max_d -lt 10 ]; then
+	grep "d-minimum" out.txt | grep " of  $max_d" > maxtof.txt
+else
+	grep "d-minimum" out.txt | grep " of $max_d" > maxtof.txt
+fi
+tail -c 15 maxtof.txt > maxtof2.txt
+head -c 8 maxtof2.txt > maxtof.txt
+rm maxtof2.txt
+
+if [ $min_d -lt 10 ]; then
+	grep "d-minimum" out.txt | grep " of  $min_d" > mintof.txt
+else
+	grep "d-minimum" out.txt | grep " of $min_d" > mintof.txt
+fi
+tail -c 15 mintof.txt > mintof2.txt
+head -c 8 mintof2.txt > mintof.txt
+rm mintof2.txt
+
+echo "k p h" > temp.txt
+echo "e 1" >> temp.txt
+echo "l" >> temp.txt
+echo "/" >> temp.txt
+# now we need to know if we are dealing with CW or TOF to find out which region to modify...
+grep HTYPE $1 | head -c 17 > htype.txt
+if [ "`tail -c 1 htype.txt`" == "C" ]; then
+    echo "We have a constant wavelength instrument, need to swap range limits"
+    cat maxtof.txt >> temp.txt
+    echo " " >> temp.txt
+    cat mintof.txt >> temp.txt
+    echo " " >> temp.txt
+else
+    if [ "`tail -c 1 htype.txt`" == "T" ]; then
+	echo "We have a time-of-flight instrument, give min and max range same as in d-spacing."
+	cat mintof.txt >> temp.txt
+	echo " " >> temp.txt
+	cat maxtof.txt >> temp.txt
+	echo " " >> temp.txt
+    else
+	echo "We have a unknown type of instrument - need debugging!"
+	read -p "Break here with Ctrl-c and debug!"
+    fi
+fi
+echo "x x x x x x " >> temp.txt
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+rm htype.txt
 
 # Test the EXP file
 
@@ -57,7 +117,7 @@ if [ "$?" = "1" ]; then
 	exit 0
 fi
 
-if [ $2 -lt 10 ]; then
+if [ $bank -lt 10 ]; then
 	grep "BANK     $2" `cat GSAS_EXP`.EXP 
 else 
 	grep "BANK    $2" `cat GSAS_EXP`.EXP 

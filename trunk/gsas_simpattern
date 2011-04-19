@@ -1,0 +1,33 @@
+#!/bin/bash
+if [ -e "$1.EXP" ]; then
+	echo "Your Phase file $1.EXP was found!"
+	file=$1.EXP
+else
+	# try small letters for EXP file extension
+	if [ -e "$1.exp" ]; then
+		echo "Your Phase file $1.exp was found!"
+		file=$1.exp
+	else
+		# didn't find it - complain and exit
+		echo "gsas_simpattern - simulates diffraction patterns. Call with"
+		echo ""
+		echo "gsas_simpattern <exp file with phase information> <phase number in file> <iparm file> <bank number> <min_d> <max_d>"
+		echo ""
+		echo "Defaults are"
+		echo "<bank number=1>"
+		echo "<min_d=1>"
+		echo "<max_d=5>"
+		
+		echo "Found neither $1.EXP nor $1.exp - please check!"
+		exit 0
+	fi
+fi
+	
+gsas_initialize $1_sim "simulated pattern for $1_Phase_$2"
+gsas_read_phase $file $2
+gsas_simulate_histogram $3 $4 $5 $6 $7
+gsas_refine 0
+gsas_simulate_histogram_plot
+echo " "
+echo " "
+echo "The output was written to `cat GSAS_EXP`.pdf."
