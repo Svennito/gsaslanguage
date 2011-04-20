@@ -92,17 +92,14 @@ gsas_waterfall_plot
 \end{verbatim}
 
 %
-% Commands that need documenting
+% Commands that need documenting, delete from here when done...
 %
 % gsas_add_diffuse_scattering
 % gsas_calc_bond_length
 % gsas_change_DIFC
 % gsas_change_Fobs_extraction_flag
-% gsas_change_lattice
 % gsas_change_phase_flag
 % gsas_change_phase_scale
-% gsas_change_sigma1
-% gsas_change_sigmas
 % gsas_constrain_atom
 % gsas_constrain_phase
 % gsas_constrain_sigma1
@@ -111,7 +108,6 @@ gsas_waterfall_plot
 % gsas_delete_atom_constraint
 % gsas_delete_sigma1_constraint
 % gsas_exclude_region
-% gsas_fourier_maps
 % gsas_plot
 % gsas_plot_bond
 % gsas_plot_overview
@@ -260,6 +256,22 @@ gsas\_change\_background 2 1 16
 Changes the background of histogram 2 to GSAS background function number 1 with 16 parameters.
 }
 
+\glcommand{gsas\_change\_lattice}
+{
+Changes the lattice parameters of a given phase. This might be necessary for instance when the parameters from the phase file read with gsas\_read\_phase do not match the experimental data, e.g. due to differences in the chemistry.
+}{
+gsas\_change\_lattice <phase> <lattice parameters>
+}{
+\item \texttt{phase}: The number of the phase for which the lattice parameters are changed.
+\item \texttt{lattice parameters}: The new lattice parameters. The number of parameters depends on the space-group of the phase, e.g. one for cubic, two for hexagonal, or six for triclinic crystal structures. The parameters are input as in GSAS, e.g. first $a$, then $c$ for hexagonal, or in the sequence $a, b, c, \alpha, \beta, \gamma$ for triclinic phases. The parameters can be either given as individual numbers, or as a single string encapsulated in double-quotes.
+}{
+gsas\_change\_lattice 1 3.14 11.05 OR
+gsas\_change\_lattice 1 "3.14 11.05"
+}{
+Sets the lattice parameters of phase 1 to 3.14A and 11.05A. Since there are two parameters given, the phase is either hexagonal, tetragonal, or rhombohedral.
+}
+
+
 \glcommand{gsas\_refine}
 {
 Performs the actual refinement by calling POWPREF and GENLES for a given number of refinement cycles. Each call to this command adds a section to the refinement protocol generated at the very end of the refinement.
@@ -293,15 +305,56 @@ Turns on variation of \texttt{DIFC} for histogram number 1 and fixes all diffrac
 
 \section{Neutron time-of-flight specific}
 
-\glcommand{gsa\_vary\_sigma1}
+\glcommand{gsas\_change\_sigmas}
 {
-Variation of the $\sigma_1$ peak-width parameter for neutron time-of-flight data using profile function number 1.
+Changes the values for the three peak width parameters of neutron time-of-flight profile function number 1. This function can be used to reset the values if needed or initialize to a specific value in case constraints between peak width parameters are introduced that require a certain ratio, e.g. that they are the same, between peak width parameters of different histograms or phases.
+}{
+gsas\_change\_sigmas <histogram> <phase> <sigma0> <sigma1> <sigma2>
+}{
+\item \texttt{histogram}: The number of the histogram for which the value of the $\sigma$ parameters should be changed.
+\item \texttt{phase}: The number of the phase for which the value of the $\sigma$ parameters should be changed.
+\item \texttt{sigma0,sigma1,sigma2}: The value for each of the three parameters.
+}{
+gsas\_change\_sigmas 2 1 0 60 0
+}{
+Changes the peak width parameters $\sigma_0$, $\sigma_1$, and $\sigma_2$ for histogram 2, phase number 1, to 0, 60, and 0, respectively.
+}
+
+\glcommand{gsas\_vary\_sigma1}
+{
+Variation of the $\sigma_1$ peak-width parameter for neutron time-of-flight data using profile function number 1, the default for many neutron time-of-flight diffractometers.
 }{
 gsas\_vary\_sigma1 <histogram> <phase> <flag> <damping>
 }{
-\item LATEX \item LIST WITH PARAMETERS
+\item \texttt{histogram}: The number of the histogram for which the $\sigma_1$ parameter should be varied.
+\item \texttt{phase}: The number of the phase for which the $\sigma_1$ parameter should be varied.
+\item \texttt{flag}: The refinement flag, either \texttt{y} for varyiable or \texttt{n} for fixed.
+\item \texttt{damping}: The damping flag, a number between 0 (no damping) and 9 (maximal damping).
 }{
-gsas\_vary\_sigma1 2 1
+gsas\_vary\_sigma1 2 1 y 4
 }{
-COMMENTS FOR EXAMPLE
+Varies (\texttt{y}) the $\sigma_1$ parameter for histogram 2, phase 1 and damps the variation with a damping factor of 4.
 }
+
+\section{Generating extra infomation}
+
+\glcommand{gsas\_fourier\_maps}
+{
+Generates all Fourier maps defined in GSAS: Calculated (FCLC), observed (experimental, FOBS) and difference Fourier map (DELF) as well as a 2FDF map (the Fourier map $2F_o-F_c$) . After generation, the Fourier maps are output in \texttt{.grd} format, which can be imported for instance into Koichi Momma's software VESTA for viewing Fourier maps in 3D together with the crystal structure for comparison and e.g. identification of potentially missing atoms. You may download VESTA from
+
+\url{http://www.geocities.jp/kmo_mma/crystal/en/vesta.html}
+
+Open the grd file in VESTA. To modify the contour levels in VESTA, go to Objects -- Properties -– Isosurfaces, select an isosurface in the list (roughly center of the dialog box, next to new, delete and clear buttons) and modify the level, color etc. above the list. In order to also plot the atoms, go to Edit Data -– Structure Parameters and click on import (bottom right) and read the EXP file with the current crystal structure. If you save a VESTA file with a .grd and your current imported EXP file, you may just re-open the VESTA file to obtain updated structure plots after refinement and/or generation of Fourier plots have run again.
+}{
+gsas\_fourier\_maps <section>
+}{
+\item \texttt{section}: The type of section for the Fourier map, x, y, or z. The default (if this parameter is not given) is z.
+}{
+gsas\_fourier\_maps
+}{
+This will simply generate all Fourier maps in \texttt{.grd} format.
+}
+
+\section{Plotting of results}
+
+
