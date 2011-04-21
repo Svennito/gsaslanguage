@@ -273,11 +273,11 @@ gsas\_change\_lattice 1 "3.14 11.05"
 Sets the lattice parameters of phase 1 to 3.14A and 11.05A. Since there are two parameters given, the phase is either hexagonal, tetragonal, or rhombohedral.
 }
 
-\glcommand{gsas\_convert\_atom\_thermal
+\glcommand{gsas\_convert\_atom\_thermal}
 {
 Converts thermal motion parameters of atoms to isotropic (UISO) or anisotropic (U11, U22, U33, etc).
 }{
-gsas\_convert\_atom\_thermal <phase\#> <atom range> <flag a/i>}   
+gsas\_convert\_atom\_thermal <phase\#> <atom range> <flag a/i>
 }{
 \item \texttt{phase\#}: Number of phase for which parameters should be changed.
 \item \texttt{atom range}: Atom(s) for which thermal factors should be changed.  This is an atom range, e.g. the number of a single atom, a sequence in the GSAS atom list of the phase, or a specific type (element or isotope). This parameter can be anything EXPEDT understands. \texttt{<t>}, \texttt{<s>} or \texttt{<s1:s2>}
