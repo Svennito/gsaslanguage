@@ -1,0 +1,72 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+  echo "$0 called without number of phase for which texture variations should be changed!"
+  read -p "There is a problem! Hit Ctrl-C to abort!"
+  exit 0
+else
+  echo "Changing variation of texture for phase $1..."
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without a flag for the texture variation!"
+	read -p "There is a problem! Hit Ctrl-C to abort!"
+	exit 0
+else
+  echo "Changing texture variation flag of phase $1 to $2..."
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without a damping flag - assuming no change in damping!"
+else
+	echo "Changing texture damping flag of phase $1 to $3..."
+fi
+
+# Change the order
+echo "k l o o h" > temp.txt
+# Send enters to skip over output of phase 1
+for i in {1..20}; do
+  echo "" >> temp.txt
+done
+# for phases higher than 1 we have to change the phase
+if [ $1 -gt 1 ]; then
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+  # Do it again due to bug in older EXPEDT
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+fi
+# set symmetry to no triclinic as default
+echo "v" >> temp.txt
+# skip over variation for angles
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "$2" >> temp.txt
+# set damping if necessary
+if [ "$3" != "" ]; then
+  echo "d" >> temp.txt
+  # need to damp also angles for now
+  echo "$3" >> temp.txt
+  echo "$3" >> temp.txt
+fi
+# get out
+for i in {1..5}; do
+  echo "x" >> temp.txt
+done
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed texture variation flags for phase $1 to $2 " >> temp.tex
+if [ "$3" != "" ]; then
+  echo "(damping to $3).\newline" >> temp.tex
+else
+  echo "(damping unchanged).\newline" >> temp.tex
+fi

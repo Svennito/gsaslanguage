@@ -1,0 +1,96 @@
+#!/bin/bash
+# 
+# plot all histograms in a single overview file, mostly for texture analysis when tens of histograms are used
+#
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Determine the number of histograms in the refinement
+grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+NHIST=`cat nhist.txt`
+if [ "$NHIST" = "  " ]; then
+	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 3 > nhist.txt
+	NHIST=`cat nhist.txt`
+fi
+echo "We have <$NHIST> histograms in this refinement."
+rm HIST*.EPS
+
+# Output the LaTex header
+echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" > all_hist.tex
+echo "\documentclass[letterpaper,       % Paper format" >> all_hist.tex
+echo "               11pt               % character size" >> all_hist.tex
+echo "               ]{report}          " >> all_hist.tex
+echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >> all_hist.tex
+echo "\usepackage{graphicx}" >> all_hist.tex
+echo "" >> all_hist.tex
+echo "\topmargin-1cm" >> all_hist.tex
+echo "\textheight26cm" >> all_hist.tex
+echo "" >> all_hist.tex
+echo "\oddsidemargin-1cm" >> all_hist.tex
+echo "\evensidemargin-1cm" >> all_hist.tex
+echo "\textwidth18cm" >> all_hist.tex
+echo "\begin{document}" >> all_hist.tex
+echo "All plots of \verb=`cat GSAS_EXP`.EXP=." >> all_hist.tex
+echo " " >> all_hist.tex
+echo " " >> all_hist.tex
+
+# plot the histograms and add them to the file
+COUNTER=0
+while [ $COUNTER -lt $NHIST ]; do
+	let COUNTER=COUNTER+1 
+
+	echo "Plotting histogram $COUNTER of $NHIST..."
+
+	echo "z" > temp.txt
+	echo "e" >> temp.txt
+	echo "i b m d t" >> temp.txt
+	
+	echo "h $COUNTER p" >> temp.txt
+	if [ $COUNTER -lt 10 ]; then
+		echo "HIST0$COUNTER" >> temp.txt
+		echo "HIST0$COUNTER" >> temp.txt
+		echo "\includegraphics[width=0.3\textwidth]{HIST0$COUNTER.EPS}" >> all_hist.tex
+	else
+		echo "HIST$COUNTER" >> temp.txt
+		echo "HIST$COUNTER" >> temp.txt
+		echo "\includegraphics[width=0.3\textwidth]{HIST$COUNTER.EPS}" >> all_hist.tex
+	fi
+	echo " " >> temp.txt
+	echo " " >> temp.txt
+	echo "x" >> temp.txt
+
+	nice powplot `cat GSAS_EXP`.EXP < temp.txt > out.txt
+	
+	# do we need a new line in all_plots.tex
+	if [ `expr $COUNTER % 3` -eq 0 ]; then
+	    echo " " >> all_hist.tex
+	fi
+done
+
+# end the Latex document
+echo "\end{document}" >> all_hist.tex
+
+# generate PDF
+latex all_hist.tex
+if [ "$OS" = "Windows_NT" ]; then
+	echo "I think I run on a Windows box..."
+	dvips all_hist
+	ps2pdf all_hist.ps
+else
+	echo "I think I run on a Unix box..."
+	echo "Generating PDF file..."
+	dvipdf all_hist.dvi
+fi
+
+# clean up
+rm all_hist.tex
+rm all_hist.dvi
+rm all_hist.aux
+rm out.txt
+rm temp.txt
+rm HIST??.EPS
+rm nhist.txt
+
+
+# Tell people we're done
+echo "Done - all histograms are in all_hist.pdf"
