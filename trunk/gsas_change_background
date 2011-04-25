@@ -24,7 +24,7 @@ echo "h $1" >> temp.txt
 echo "c $2 $3 /" >> temp.txt
 echo "x x x x" >> temp.txt
 
-expedt `cat GSAS_EXP` < temp.txt
+expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
 echo "Changed background for histogram $1 to function number $2 and $3 coefficients.\newline" >> temp.tex

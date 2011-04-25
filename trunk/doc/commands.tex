@@ -22,6 +22,7 @@
 
 % template for a commands copy, paste, use editor's Uncomment command to remove % characters, then replace placeholders
 % if you get a missing $ error message, you likely forgot to use \_ instead of _...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\glcommand{COMMAND_NAME}
 %{
 % DESCRIPTION
@@ -35,11 +36,14 @@
 % COMMENTS FOR EXAMPLE
 % }
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{The commands}
-The following sections describe the commands of the gsas\_language. They are arranged by topic, an alphabetic list is also provided.
+The following sections describe the commands of the gsas\_language. They are arranged by topic and alphabetically therein. An alphabetic list is also provided. For detailed descriptions of the GSAS functions utilized, refer to the GSAS function and references therein. Introduction to more complex concepts such as constraints, texture etc. are beyond the scope of this document.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Complete list of commands}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{verbatim}
 gsas_add_atom
@@ -56,6 +60,7 @@ gsas_change_phase_flag
 gsas_change_phase_scale
 gsas_change_sigma1
 gsas_change_sigmas
+gsas_change_texture
 gsas_constrain_atom
 gsas_constrain_phase
 gsas_constrain_sigma1
@@ -69,6 +74,7 @@ gsas_fourier_maps
 gsas_initialize
 gsas_plot
 gsas_plot_bond
+gsas_plot_histograms
 gsas_plot_overview
 gsas_prepare_mem
 gsas_read_phase
@@ -86,17 +92,17 @@ gsas_vary_histogram_scale
 gsas_vary_lattice
 gsas_vary_phase
 gsas_vary_sigma1
+gsas_vary_texture
 gsas_vary_UVW
 gsas_waterfall_add
 gsas_waterfall_plot
 \end{verbatim}
 
 % Added by Nina: (Maybe you want to double check them)
-%
-% gsas_constrain_phase
-% gsas_constrain_atom (still need to add something about multi)
-% gsas_vary_phase
-% gsas_convert_atom_thermal
+% Hi Nina - looked at them - thanks a lot! Minor edits. Let's keep commands alphabetic within a section.
+% I also deleted the # for the phase - just another \ one can forget...
+% Please continue to list your entries here so I can double-check.
+% Thanks again - you may delete the comment after you read it!
 %%
 % Commands that need documenting, delete from here when done...
 %
@@ -110,7 +116,6 @@ gsas_waterfall_plot
 % gsas_copy_expfile
 % gsas_delete_atom_constraint
 % gsas_delete_sigma1_constraint
-% gsas_exclude_region
 % gsas_plot
 % gsas_plot_bond
 % gsas_plot_overview
@@ -130,10 +135,25 @@ gsas_waterfall_plot
 % gsas_waterfall_add
 % gsas_waterfall_plot
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Beginning and end of refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\glcommand{1}{2}{3}{\item 4}{5}{6}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_done}
+{
+This command finishes a refinement. Plots of $\chi^2$, normalized shifts, time per iteration and number of variables are generated using gnuplot and included in the final Acrobat PDF file describing the refinement. Several checks (negative thermal motion, parameters that are zero within their error bars) are performed and added to the refinement report. Temporary files are deleted. If a refinement is aborted and the user wishes to see the overview PDF file, gsas\_done can be issued from the command line.
+}{
+gsas\_done
+}{
+\item None.
+}{
+gsas\_done
+}{
+This would finish a refinement.
+}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_initialize}
 {
 This command initializes a new refinement by generating a new GSAS EXP file. It deletes temporary files of possible previous refinements and initializes the documentation file of this refinement.
@@ -150,21 +170,11 @@ named 100C.gda, the \$1 occurences will be replaced with "100" by bash, generati
 SIO2\_FURNACE\_100C.EXP with a run title label "SiO2, furnace, 100C".
 }
 
-\glcommand{gsas\_done}
-{
-This command finishes a refinement. Plots of $\chi^2$, normalized shifts, time per iteration and number of variables are generated using gnuplot and included in the final Acrobat PDF file describing the refinement. Several checks (negative thermal motion, parameters that are zero within their error bars) are performed and added to the refinement report. Temporary files are deleted. If a refinement is aborted and the user wishes to see the overview PDF file, gsas\_done can be issued from the command line.
-}{
-gsas\_done
-}{
-\item None.
-}{
-gsas\_done
-}{
-This would finish a refinement.
-}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Adding histograms and phases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_add\_atom}
 {
 Adds an atom to an existing phase of the refinement. The phase can be either added using the gsas\_read\_phase or gsas\_add\_phase commands.
@@ -179,6 +189,7 @@ gsas\_add\_atom 1 "NI 0 0 0 1 / i 0.004"
 This would add a nickel atom to phase 1 on position x=0, y=0, z=0 that is fully occuped (FRAC=1) with the default name that GSAS assigns (the element symbol plus the number of the atom in the sequence). The atom would have isotropic thermal motion with a starting value of $U_{iso}=0.004$.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_add\_histogram}
 {
 Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information. Existence of the data and the instrument parameter file are checked before the insertion of the histogram data is attempted. Existence of the histogram data filename in the EXP file is checked after the insertion. This command may be used multiple times if multiple histograms are required for a refinement.
@@ -195,7 +206,7 @@ gsas\_add\_histogram nickel.raw inst\_tof.prm 2 0.25 3
 This would add histogram number 2 from the GSAS data file nickel.raw, using the GSAS instrument parameter file inst\_tof.prm. The minimum d-spacing for this histogram would be set to 0.25\AA\ and the upper d-spacing limit would be 3\AA.
 }
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_add\_phase}
 {
 Adds a phase to the refinement by adding the phase information "manually" rather than loading all information from a file. Similar to the addition in GSAS, no atom information is provided in this step (see gsas\_add\_atom). The existence of the space group and the lattice parameters in the main EXP file is verified after adding this information.
@@ -211,6 +222,23 @@ gsas\_add\_phase "Nickel" "f m -3 m" "3.5234"
 This will add a phase with the label \texttt{Nickel} that has the cubic space group $Fm\bar{3}m$ and a lattice parameter of 3.5234\AA.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_exclude\_region}
+{
+Excludes a region (in the native x-axis unit of the data, i.e. time-of-flight or 2$\theta$) from the refinement. To convert from d-spacing to the native x-axis unit, either convert using the equations in the manual or use the EXPEDT minimum d-spacing function (enter the d-spacing to converted, read the value in the native x-axis unit, then enter the true minimum again). Make sure that an extra excluded region does not overlap with the upper or lower limit, this will cause instabilties as e.g. background functions to diverge.
+}{
+gsas\_exclude\_region <histogram> <from> <to>
+}{
+\item \texttt{histogram}: The histogram number for which the excluded region is to be inserted.
+\item \texttt{from}: The lower limit of the excluded region in native units of the x-axis.
+\item \texttt{to}: The upper limit of the excluded region in native units of the x-axis.
+}{
+gsas\_exclude\_region 1 16 18
+}{
+Excludes for histogram 1 the region from 16 to 17, either 2$\theta$ or time-of-flight in ms. For the HIPPO neutron time-of-flight diffractometer, this command would exclude a background generated from the adjacent WNR facility from around 16-18 ms (1/60 of a second=16.6 ms) in backscattering detector bank 1.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_read\_phase}
 {
 Adds a phase to the refinement by loading a crystal structure from a file. The file with the crystal structure information has to be in GSAS format, CIF files are currently not supported. The existence of the phase file is checked before loading is attempted. The number of the phase during the refinement is determined by the sequence by which the phases are added to the refinement.
@@ -225,8 +253,11 @@ gsas\_read\_phase "Boron\_beta\_68106.exp" 1
 This would read phase information (lattice parameters, space group, atom parameters such as positions and thermal motion parameters) from a file name \texttt{Boron\_beta\_68106.exp} (case sensitive!). In that file, phase number 1 would be read.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Crystal structure refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_change\_atom}
 {
 This command is used to change values of atom parameters, such as position or thermal motion, but also the atom type to change the element/isotope for a given atom or atom sequence. Using the EXPEDT convention to address several atoms at once, e.g. in the sequence of atoms within a phase or by their element type, multiple atoms can be affected at once.
@@ -243,6 +274,7 @@ gsas\_change\_atom 1 NI UISO 0.004
 This would change the isotropic thermal motion parameter \texttt{UISO} of all atoms of the type \texttt{NI} in phase 1 to 0.004\AA$^2$.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_change\_background}
 {
 This command changes the type of the background function used for a given histogram and the number of parameters for that function.
@@ -258,6 +290,7 @@ gsas\_change\_background 2 1 16
 Changes the background of histogram 2 to GSAS background function number 1 with 16 parameters.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_change\_lattice}
 {
 Changes the lattice parameters of a given phase. This might be necessary for instance when the parameters from the phase file read with gsas\_read\_phase do not match the experimental data, e.g. due to differences in the chemistry.
@@ -273,63 +306,75 @@ gsas\_change\_lattice 1 "3.14 11.05"
 Sets the lattice parameters of phase 1 to 3.14A and 11.05A. Since there are two parameters given, the phase is either hexagonal, tetragonal, or rhombohedral.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_change\_texture}
+{
+Changes for a given phase the order of the spherical harmonics representation of the crystal orientation distribution function (ODF - the texture or preferred orientation of a phase) and the sample symmetry of the texture. In general, this function should only be used when sufficient sample directions are probed in a multi-histogram refinement. If this is not the case, any intensity-dependent parameters (atomic structure, phase fractions) will be affected and this may lead to false results. Imposing a sample symmetry will reduce the number of required sample directions/histogram, however, one may wish to verify the existence of such symmetry independently, i.e. with a full texture measurement. In case a symmetry is imposed, the center of symmetry, e.g. fiber axis, has to be in the center of the resulting pole figures and the sample orientation angles may have to be changed.
+}{
+gsas\_change\_texture <phase> <order> <symmetry>
+}{
+\item \texttt{phase}: The number of the phase for which to change the texture description.
+\item \texttt{order}: The order of spherical harmonics to be used, must be an even number.
+\item \texttt{symmetry}: The sample symmetry of the spherical harmonics description of the ODF. Valid numbers are 0 (cylindrical symmetry or single fiber texture), 1 (triclinic or no symmetry), 2 (2/m or shear texture), or mmm (orthorhombic or rolling texture).
+}{
+gsas\_change\_texture 1 8 1
+}{
+Changes the ODF description for phase 1 to an 8th order spherical harmonics series expansion with no sample symmetry.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_constrain\_atom}
+{
+This command is used to set a given atom parameter (e.g. occupancy, position, thermal motion) for different atoms in a phase to be constrained together during refinements.  By default, this would set the different atom parameters to vary together (for example, if you wanted the thermal motion of atoms 2 and 3 to be constrained together since they are crystallographically similar and the refinement diverges otherwise).  Note that if you want two atom parameters to be equal, they must start out equal before they are varied when constrained together, otherwise they will vary proportional to one another.  In the case of constraining the occupancy, the values will be constrained such that they alway add up to the sum of the their starting occupancies (usually 1). More complex and multi-phase constraints, i.e. constraints affecting atoms from different phases, are also possible. This allows for instance in a mix of two oxides to constrain the oxygen atoms together. Note that differently from the \texttt{gsas\_change\_atom} etc. commands addressing by atomic species is not allowed, whereas sequences, e.g. \texttt{1:3}, are possible.
+}{
+gsas\_constrain\_atom <phase> <atom prm> <atom 1> <atom 2> <atom 3>...\\
+\\
+OR
+\\
+gsas\_constrain\_atom multi "<constraint term 1>" "<constraint term 2>" ...
+}{
+\item \texttt{phase}:  Phase number for which atom parameters should be constrained. If \texttt{phase} is \texttt{multi}, constraints over multiple phases may be defined. In this case all following parameters will have to be entries (in quotes or double-quotes) as given during definition of these constraints in EXPEDT (see example).
+\item \texttt{atom prm}: Atom parameters which should be constrained, one of \texttt{X, Y, Z, UISO, FRAC, U11, U22, U33, U12, U13, U23}.
+\item \texttt{atom i}:  Atom numbers of the atom set that should be constrained, listed separately.
+\item \texttt{constraint term i}:  A constraint term as required by EXPEDT consisting of phase number, variable identifier \texttt{atom prm}, atom or atom sequence and multiplier.
+}{
+gsas\_constrain\_atom 1 U11 2 3 \\
+gsas\_constrain\_atom multi "1 UISO 1:3 1" "2 UISO 1 1"
+}{
+The first example sets the thermal motion parameter U11 for atoms 2 and 3 in phase 1 to be constrained together. The second example constrains the Uiso of atoms 1 to 3 of phase with a multiplier of 1 to the atom 1 of phase 2, also with a multiplier of 1 (the multiplier is the last entry).
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_constrain\_phase}
+{
+Constrains a phase to have a constant weight fraction in all histograms.  In most cases, this should be set before varying a phase during refinements. Excemptions might be refinements of histograms originating from different instruments and only some of them show an extra phase.
+}{
+gsas\_constrain\_phase <phase>
+}{
+\item \texttt{phase}:  Phase number for which weight fraction should be constrained.
+}{
+gsas\_constrain\_phase 2
+}{
+Sets the weight fraction of phase 2 to be equal in all histograms. 
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_convert\_atom\_thermal}
 {
-Converts thermal motion parameters of atoms to isotropic (UISO) or anisotropic (U11, U22, U33, etc).
+Converts thermal motion parameters of atoms from isotropic (UISO) to anisotropic (U11, U22, U33, etc) or vice versa.
 }{
-gsas\_convert\_atom\_thermal <phase\#> <atom range> <flag a/i>
+gsas\_convert\_atom\_thermal <phase> <atom range> <flag>
 }{
-\item \texttt{phase\#}: Number of phase for which parameters should be changed.
-\item \texttt{atom range}: Atom(s) for which thermal factors should be changed.  This is an atom range, e.g. the number of a single atom, a sequence in the GSAS atom list of the phase, or a specific type (element or isotope). This parameter can be anything EXPEDT understands. \texttt{<t>}, \texttt{<s>} or \texttt{<s1:s2>}
-\texttt{flag A/I}:  Flag for thermal factors: \texttt{i} for isotropic or \texttt{a} for anisotropic. \\
+\item \texttt{phase}: Number of the phase for which parameters should be changed.
+\item \texttt{atom range}: Atom(s) for which thermal factors should be changed.  This is a valid GSAS atom range, e.g. the number of a single atom, a sequence in the GSAS atom list of the phase, or a specific type (element or isotope). This parameter can be anything EXPEDT understands. \texttt{<t>}, \texttt{<s>} or \texttt{<s1:s2>}
+\item \texttt{flag}:  Flag for thermal factors: \texttt{i} for isotropic or \texttt{a} for anisotropic.
 }{
 gsas\_convert\_atom\_thermal 1 1:4 a
 }{
-This would convert the thermal motion parameters to anisotropic for atoms 1, 2, 3 and 4 of phase \#1.
+This would convert the thermal motion parameters to anisotropic for atoms 1, 2, 3 and 4 of phase 1.
 }
 
-\glcommand{gsas\_constrain\_atom}
-{
-This command is used to set a given atom parameter (e.g. occupancy, position, thermal motion) for different atoms in a phase to be constrained together during refinements.  In most cases, this would set the different atom parameters to vary together (for example, if you wanted the thermal motion of atoms \# 2 and \#3 to be constrained together).  Note that if you want to atom parameters to be equal, they must start out equal before they are constrained together, otherwise they will vary proportional to one another.  In the case of constraining the occupancy, the values will be constrained such that they alway add up to the sum of the their starting occupancies (in many cases, 1). 
- }{
-gsas\_constrain\_atom <phase\#> <atom prm> <atom\#s>
- }{
- \item \texttt{phase\#}:  Phase number for which atom parameters should be constrained. 
-\item \texttt{atom prm}: Atom parameters which should be constrained, one of \texttt{X, Y, Z, UISO, FRAC, U11, U22, U33, U12, U13, U23}.
-\item \texttt{atom\#s}:  Atom numbers of the atom set that should be constrained, listed separately.
- }{
-gsas\_constrain\_atom 1 U11 2 3 
- }{
-Sets the thermal motion parameter U11 for atoms 2 and 3 in phase 1 to be constrained together.
- }
-
-\glcommand{gsas\_contrain\_phase}
-{
-Constrains a phase to have a constant weight fraction in all histograms.  In most cases, this should be set before varying a phase during refinements. 
- }{
-gsas\_contrain\_phase <phase\#>
- }{
- \item \texttt{phase\#}  Phase number for which weight fraction should be constrained.
- }{
-gsas\_contrain\_phase 2
- }{
-Sets the weight fraction of phase 2 to be equal in all histograms. 
- }
-
-\glcommand{gsas\_vary\_phase}
-{
-Sets refinement flag for weight fraction of specified phase.  
-}{
-gsas\_vary\_phase <phase\#> <flag>
-}{
-\item \texttt{phase\#}:  Number of phase for which weight fraction should be varied or fixed. 
-\item \texttt{flag}: Flag for varying phase: \texttt{<y>} to vary or \texttt{<n>} to fix; if no flag then assume \texttt{<y>}.  
-}{
-gsas\_vary\_phase 2 y
-}{
-Sets refinement flag for phase 2 to ``y'' (vary it).
-}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_refine}
 {
 Performs the actual refinement by calling POWPREF and GENLES for a given number of refinement cycles. Each call to this command adds a section to the refinement protocol generated at the very end of the refinement.
@@ -345,6 +390,7 @@ gsas\_refine 2 noplot
 Performs a least-squares cycle by calling POWPREF, then changing the number of refinement cycles to 2 and calling GENLES. Plots of the fit will not be generated for the overview file.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_vary\_DIFC}
 {
 Changes the refinement flags for the diffractometer constants (DIFCs) for a given histogram. This is needed to e.g. calibrate an instrument or sample environment or to accomodate sample misalignment.
@@ -361,8 +407,42 @@ gsas\_vary\_DIFC 2 " "
 Turns on variation of \texttt{DIFC} for histogram number 1 and fixes all diffractometer constants for histogram 2.
 }
 
-\section{Neutron time-of-flight specific}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_vary\_phase}
+{
+Sets refinement flag for weight fraction of specified phase.  
+}{
+gsas\_vary\_phase <phase\#> <flag>
+}{
+\item \texttt{phase\#}:  Number of phase for which weight fraction should be varied or fixed. 
+\item \texttt{flag}: Variation flag: \texttt{<y>} to vary or \texttt{<n>} to fix; if no flag then assume \texttt{<y>}.  
+}{
+gsas\_vary\_phase 2 y
+}{
+Sets refinement flag for phase 2 to ``y'' (vary it).
+}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_vary\_texture}
+{
+Changes the variation and damping flags for the spherical harmonics description of the ODF for a given phase.
+}{
+gsas\_vary\_texture <phase> <variation flag> <damping>
+}{
+\item \texttt{phase}:  Number of phase for which the ODF/texture should be varied or fixed. 
+\item \texttt{variation flag}: Variation flag: \texttt{<y>} to vary or \texttt{<n>} to fix.  
+\item \texttt{damping}: The damping flag, a number between 0 (no damping) and 9 (maximal damping). This parameter is optional - if not given, the previous damping flag persists (no damping by default).
+}{
+gsas\_vary\_texture 1 n
+}{
+Fixes the texture for phase 1.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Neutron time-of-flight specific}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_change\_sigmas}
 {
 Changes the values for the three peak width parameters of neutron time-of-flight profile function number 1. This function can be used to reset the values if needed or initialize to a specific value in case constraints between peak width parameters are introduced that require a certain ratio, e.g. that they are the same, between peak width parameters of different histograms or phases.
@@ -378,6 +458,7 @@ gsas\_change\_sigmas 2 1 0 60 0
 Changes the peak width parameters $\sigma_0$, $\sigma_1$, and $\sigma_2$ for histogram 2, phase number 1, to 0, 60, and 0, respectively.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_vary\_sigma1}
 {
 Variation of the $\sigma_1$ peak-width parameter for neutron time-of-flight data using profile function number 1, the default for many neutron time-of-flight diffractometers.
@@ -394,8 +475,11 @@ gsas\_vary\_sigma1 2 1 y 4
 Varies (\texttt{y}) the $\sigma_1$ parameter for histogram 2, phase 1 and damps the variation with a damping factor of 4.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Generating extra infomation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_fourier\_maps}
 {
 Generates all Fourier maps defined in GSAS: Calculated (FCLC), observed (experimental, FOBS) and difference Fourier map (DELF) as well as a 2FDF map (the Fourier map $2F_o-F_c$) . After generation, the Fourier maps are output in \texttt{.grd} format, which can be imported for instance into Koichi Momma's software VESTA for viewing Fourier maps in 3D together with the crystal structure for comparison and e.g. identification of potentially missing atoms. You may download VESTA from
@@ -413,6 +497,23 @@ gsas\_fourier\_maps
 This will simply generate all Fourier maps in \texttt{.grd} format.
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_plot\_histograms}
+{
+Plots all histograms of a GSAS refinement. Contrary to the main refinement protocol, no error plots are given. This particularly useful for multi-histogram refinements, e.g. for texture analysis, as it allows to more easily inspect all histograms. The output file is always \texttt{all\_hist.pdf}, which may be renamed to inspect a longer refinement at various steps after the refinement is done (or crashed...).
+}{
+gsas\_plot\_histograms
+}{
+\item This function has no parameters.
+}{
+gsas\_plot\_histograms
+mv all\_hist.pdf After8thOrder.pdf
+}{
+Generates all plots of the current refinement and then renames the resulting PDF file to \texttt{After8thOrder.pdf} to indicate at which step the "snapshot" was taken.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Plotting of results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

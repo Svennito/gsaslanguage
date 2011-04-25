@@ -1,0 +1,85 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+  echo "$0 called without number of phase for which texture order should be changed!"
+  read -p "There is a problem! Hit Ctrl-C to abort!"
+  exit 0
+else
+  echo "Changing texture of phase $1..."
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without order for the texture!"
+	read -p "There is a problem! Hit Ctrl-C to abort!"
+	exit 0
+else
+  echo "Changing texture of phase $1 to $2th order spherical harmonics..."
+fi
+
+case $3 in 
+0)  echo "Setting fiber symmetry..." ;;
+1)  echo "Setting triclinic symmetry..." ;;
+2)  echo "Setting 2/m symmetry..." ;;
+3)  echo "Setting mmm symmetry..." ;;
+*)  echo "$0 called without symmetry for the texture!"
+    read -p "There is a problem! Hit Ctrl-C to abort!"
+    exit 0
+    ;;
+esac
+
+# Change the order
+echo "k l o o h" > temp.txt
+# Send enters to skip over output of phase 1
+for i in {1..20}; do
+  echo "" >> temp.txt
+done
+# for phases higher than 1 we have to change the phase
+if [ $1 -gt 1 ]; then
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+  # Do it again due to bug in EXPEDT
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+fi
+# set symmetry to no triclinic as default
+echo "s" >> temp.txt
+echo "$3" >> temp.txt
+# Send enters to skip over output of new coefficients
+for i in {1..20}; do
+  echo "" >> temp.txt
+done
+# Set the order and skip over output of coefficients
+echo "o" >> temp.txt
+echo "$2" >> temp.txt
+# Send enters to skip over output of new coefficients
+for i in {1..20}; do
+  echo "" >> temp.txt
+done
+# get out
+for i in {1..5}; do
+  echo "x" >> temp.txt
+done
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed spherical harmonics model for phase $1 to order $2 and " >> temp.tex
+if [ $3 -eq 0 ]; then
+  echo "cylindrical sample symmetry (fiber texture).\newline" >> temp.tex
+fi
+if [ $3 -eq 1 ]; then
+  echo "triclinic sample symmetry (no sample symmetry).\newline" >> temp.tex
+fi
+if [ $3 -eq 2 ]; then
+  echo "2/m sample symmetry (shear texture).\newline" >> temp.tex
+fi
+if [ $3 -eq 3 ]; then
+  echo "mmm sample symmetry (rolling texture).\newline" >> temp.tex
+fi
+
