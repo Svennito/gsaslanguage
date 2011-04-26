@@ -17,7 +17,7 @@ if [ "$3" = "" ]; then
 	echo "$0 called without damping flag!"
 fi
 
-grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+grep NHST `cat GSAS_EXP`.EXP | tail -c 67 | sed "s/ //g" > nhist.txt
 NHIST=`cat nhist.txt`
 echo "We have $NHIST histograms in this refinement."
 

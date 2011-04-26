@@ -25,12 +25,8 @@ echo "0 1">> temp.txt
 echo "0 1">> temp.txt
 echo "0 1">> temp.txt
 # get number of histograms so we can include them all
-grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+grep NHST `cat GSAS_EXP`.EXP | tail -c 67 | sed "s/ //g" > nhist.txt
 NHIST=`cat nhist.txt`
-if [ "$NHIST" = "  " ]; then
-	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 3 > nhist.txt
-	NHIST=`cat nhist.txt`
-fi
 echo "We have <$NHIST> histograms in this refinement."
 COUNTER=0
 while [ $COUNTER -lt $NHIST ]; do
