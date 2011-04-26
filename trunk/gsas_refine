@@ -81,12 +81,8 @@ echo " " >> `cat GSAS_EXP`.tex
 if [ "$NOPLOT" -eq "0" ]; then
 	echo "NOPLOT is $NOPLOT"
 	# plot the file data
-	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+	grep NHST `cat GSAS_EXP`.EXP | tail -c 67 | sed "s/ //g" > nhist.txt
 	NHIST=`cat nhist.txt`
-	if [ "$NHIST" = "  " ]; then
-		grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 3 > nhist.txt
-		NHIST=`cat nhist.txt`
-	fi
 	echo "We have <$NHIST> histograms in this refinement."
 	rm S`echo $STEP`H*.EPS
 	COUNTER=0

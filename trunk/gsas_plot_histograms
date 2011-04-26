@@ -6,12 +6,8 @@
 echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Determine the number of histograms in the refinement
-grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 2 > nhist.txt
+grep NHST `cat GSAS_EXP`.EXP | tail -c 67 | sed "s/ //g" > nhist.txt
 NHIST=`cat nhist.txt`
-if [ "$NHIST" = "  " ]; then
-	grep NHST `cat GSAS_EXP`.EXP | tail --bytes 67 | head --bytes 3 > nhist.txt
-	NHIST=`cat nhist.txt`
-fi
 echo "We have <$NHIST> histograms in this refinement."
 rm HIST*.EPS
 
