@@ -152,3 +152,9 @@ rm flag.txt
 rm Reduced.eps
 rm Shift.eps
 rm temp.plt
+
+# compute the total run time
+START=`cat gsas_start.txt`
+END=$(date +%s)
+DIFF=$(( $END - $START ))
+echo "Total run time since gsas_initialize: $DIFF seconds."
