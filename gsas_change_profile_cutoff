@@ -15,7 +15,7 @@ fi
 
 if [ "$3" = "" ]; then
 	echo "$0 called without new cut-off, assuming 0.1%"
-	flag="0.1"
+	flag="0.001"
 else 
 	flag="$3"
 fi

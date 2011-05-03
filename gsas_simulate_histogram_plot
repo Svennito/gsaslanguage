@@ -2,6 +2,9 @@
 # echo the call so we can see what's going on
 echo "$0 $1 $2 $3 $4 $5 $6"
 
+# copy the EXP file so we have a fixed filename
+cp `cat GSAS_EXP`.EXP PHASES_SIM.EXP
+
 # make a new tex file
 echo "\documentclass{article}" > `cat GSAS_EXP`.tex
 echo "\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}" >> `cat GSAS_EXP`.tex
@@ -13,8 +16,8 @@ echo "\begin{itemize}" >> `cat GSAS_EXP`.tex
 echo "\item Instrument parameter file \verb=`grep 'HST  1  IFIL ' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`=.  " >> `cat GSAS_EXP`.tex
 echo "Bank: `grep 'HST  1 BANK ' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`." >> `cat GSAS_EXP`.tex
 echo "\item Space group: \verb=`grep 'CRS1  SG SYM' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`=" >> `cat GSAS_EXP`.tex
-echo "\item Lattice parameters: \verb=`grep 'CRS1  ABC   ' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`= " >> `cat GSAS_EXP`.tex
-echo "\verb=`grep 'CRS1  ANGLES' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`=." >> `cat GSAS_EXP`.tex
+echo "\item Lattice parameters: \verb=`grep 'CRS1  ABC   ' PHASES_SIM.EXP | tail -c69 | head -c65 | sed 's/[ ]*$//g'`= " >> `cat GSAS_EXP`.tex
+echo "\verb=`grep 'CRS1  ANGLES' PHASES_SIM.EXP | tail -c69 | head -c65 | sed 's/[ ]*$//g'`=." >> `cat GSAS_EXP`.tex
 echo "\end{itemize} " >> `cat GSAS_EXP`.tex
 echo " " >> `cat GSAS_EXP`.tex
 # Plot the pattern normalized and without normalization
@@ -54,7 +57,7 @@ echo "0" >> temp.txt
 nice reflist `cat GSAS_EXP`.EXP < temp.txt > out.txt
 
 # process the reflection list a bit into a nice Latex table
-grep Iref PHASES_SIM.LST -A 30 | head -n 31 | tail -n 30 | awk '{print $2, $3, $4, $5, $7}' > temp.txt
+grep Iref `cat GSAS_EXP`.LST -A 30 | head -n 31 | tail -n 30 | awk '{print $2, $3, $4, $5, $7}' > temp.txt
 echo " " >> `cat GSAS_EXP`.tex
 echo " " >> `cat GSAS_EXP`.tex
 echo "\begin{tabular}{|ccc|c|l|}" >> `cat GSAS_EXP`.tex
@@ -65,7 +68,8 @@ cat temp.txt | sed -e 's/ /\&/g' -e 's/$/\\\\/g' >> `cat GSAS_EXP`.tex
 echo "\hline" >> `cat GSAS_EXP`.tex
 echo "\end{tabular}" >> `cat GSAS_EXP`.tex
 
-
+# delete the temporary EXP file
+rm PHASES_SIM.EXP
 
 # end the Latex source and compile to PDF
 echo "\end{document}" >> `cat GSAS_EXP`.tex
@@ -81,6 +85,5 @@ else
 	echo "I think I run on a Unix box..."
 	echo "Generating PDF file..."
 	dvipdf `cat GSAS_EXP`.dvi
-	#acroread `cat GSAS_EXP`.pdf
 fi
 

@@ -13,7 +13,7 @@ if [ "$2" = "" ]; then
 	exit 0
 fi
 
-grep NHST `cat GSAS_EXP`.EXP | tail -c68 | head -c3 > temp.txt
+grep NHST `cat GSAS_EXP`.EXP | tail -c67 | head -c65 | sed "s/ //g" > temp.txt
 histograms=`cat temp.txt`
 
 # change the phase in all histograms
