@@ -100,9 +100,7 @@ if [ "$?" = "1" ]; then
 fi
 
 # Which histogram in the EXP file did we add?
-grep "Histogram no." out.txt > temp.txt
-head -c 18 temp.txt > temp2.txt
-tail -c 2 temp2.txt > hist.txt
+grep "Histogram no." out.txt | head -c18 | tail -c2 > hist.txt
 
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's enter it

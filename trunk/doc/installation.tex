@@ -10,19 +10,22 @@
 \section{Linux or Windows?}
 
 We found that the same stuff runs faster when a given system runs under Linux. Here are some numbers on a 28 histogram refinement, including 8th order spherical harmonics texture. On both platforms, the same data was analyzed with the same script. The platform was a Dell Optiplex 960 (Quadcore Intel CPU, 3GHz, 4GB RAM). No other major tasks were running on the machine.
+
 \begin{tabular}{|l|c|c|}
 \hline
 &Linux&Windows\\
 \hline
 OS&OpenSuse&Windows XP Professional\\
-Version&&5.1.2600 SP3 Build 2600\\
-total runtime [s]&&2652\\
+Version&11.2, Kernel 2.6.31.14-0.6 SMP&5.1.2600 SP3 Build 2600\\
+total runtime [s]&2497&2652\\
 average GENLES cycle time [s]&11.2(2.7)&12.4 (3.2)\\
 Minimum GENLES cycle time [s]&4.1&4.8\\
 Maximum GENLES cycle time [s]&18.5&20.1\\
 \hline
 \end{tabular}
-On average, each GENLES cycle is 9% faster when running Linux with a maximum improvement of 17%.
+
+On average, each GENLES cycle is 9\% faster when running Linux with a maximum improvement of 17\%. The overall runtime is reduced by 6.2\% when running Linux.
+
 \section{Linux/Mac/Unix Installation}
 
 \begin{itemize}

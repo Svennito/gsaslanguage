@@ -60,7 +60,7 @@ genles `cat GSAS_EXP`_MEM
 echo "Ran powpref and single genles cycle on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex
 
 # run reflist
-grep NHST `cat GSAS_EXP`.EXP | tail -c 67 | sed "s/ //g" > nhist.txt
+grep NHST `cat GSAS_EXP`.EXP | tail -c67 | head -c65 | sed "s/ //g" > nhist.txt
 rm temp.txt
 COUNTER=0
 NHIST=`cat nhist.txt`
