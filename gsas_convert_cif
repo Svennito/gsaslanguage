@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Convert a CIF file to a GSAS EXP file using Brian Toby's expgui
+#
+# Call with 
+#
+# gsas_convert_cif <CIF file> <EXP file>
+#
+# where CIF file is the filename of a CIF file to be converted and EXP file the filename of the new EXP file
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without CIF file to be read!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without EXP file to be created!"
+	exit 0
+fi
+
+# do we have the CIF file?
+if [ -e $1 ]; then
+	echo "Your CIF file $1 was found!"
+else
+	echo "Your CIF file $1 was NOT found!"
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+fi
+
+# do we have tcl installed?
+ncnrpack_path=`which ncnrpack`
+if [ "$ncnrpack_path" = "" ]; then
+	echo "You don't have tcl installed! Please install for this function.!"
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+else
+	echo "tcl found."
+fi
+
+# do we have expgui files in reach?
+expgui_path="$gsas/expgui"
+if [ -e $expgui_path/gsascmds.tcl ]; then
+	echo "expgui found."
+else
+	echo "You don't have expgui installed in $expgui_path!"
+	echo "Please install for this function."
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+fi
+
+# do we have exptool installed?
+if [ -e $gsas/exe/exptool ]; then
+	echo "GSAS found."
+else
+	echo "You don't have GSAS installed!"
+	echo "Did not find $gsas/exe/exptool."
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+fi
+
+# get the full path to the tcl script
+fn="gsas_convert_cif"
+rc_path=`which gsas_convert_cif`
+rc_path=${rc_path:0:${#rc_path}-${#fn}}
+echo "Searching for rc.tcl in $rc_path"
+
+# convert it!
+ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas
+
+ncnrpack_exit=$?
+echo "Exit status of ncnrpack: <$ncnrpack_exit>"
+
+if [ $ncnrpack_exit -eq 0 ]; then
+	mv TEMP.EXP $2
+	echo "$1 was converted to $2!"
+	# clean up
+	rm TEMP.O*
+	rm TEMP.LST
+else
+	echo "A problem occured while converting $1!"
+	echo "Left the temporary files for debugging!"
+fi
+  
