@@ -1,31 +1,73 @@
 #!/bin/bash
+# check the arguments
+
+# we need at least the iparm file
+if [ "$3" = "" ]; then
+	# didn't find it - complain and exit
+	echo "gsas_simpattern - simulates diffraction patterns. Call with"
+	echo ""
+	echo "gsas_simpattern <exp file with phase information - no extension!> <phase number in file> <iparm file> <bank number> <min_d> <max_d>"
+	echo ""
+	echo "Defaults are"
+	echo "<bank number=1>"
+	echo "<min_d=1>"
+	echo "<max_d=5>"
+	
+	exit 0
+fi
+
+if [ -e "$3" ]; then
+	echo "Your instrument parameter file $3 was found!"
+else
+	echo "Your instrument parameter file $3 was not found!"
+	exit 0
+fi
+
 if [ -e "$1.EXP" ]; then
-	echo "Your Phase file $1.EXP was found!"
+	echo "Your phase file $1.EXP was found!"
 	file=$1.EXP
 else
 	# try small letters for EXP file extension
 	if [ -e "$1.exp" ]; then
-		echo "Your Phase file $1.exp was found!"
+		echo "Your phase file $1.exp was found!"
 		file=$1.exp
 	else
 		# didn't find it - complain and exit
-		echo "gsas_simpattern - simulates diffraction patterns. Call with"
-		echo ""
-		echo "gsas_simpattern <exp file with phase information> <phase number in file> <iparm file> <bank number> <min_d> <max_d>"
-		echo ""
-		echo "Defaults are"
-		echo "<bank number=1>"
-		echo "<min_d=1>"
-		echo "<max_d=5>"
-		
 		echo "Found neither $1.EXP nor $1.exp - please check!"
 		exit 0
 	fi
 fi
-	
+
+# check the bank
+if [ "$4" -eq "" ]; then
+	echo "No bank number given - assuming bank 1"
+	bank=1
+else
+	bank=$4
+fi
+echo "Simulating for bank $bank."
+
+# check min_d
+if [ "$5" -eq "" ]; then
+	echo "No minimum d given - assuming 1A"
+	min_d=1
+else
+	min_d=$5
+fi
+
+# check max_d
+if [ "$6" -eq "" ]; then
+	echo "No maximum d given - assuming 5A"
+	max_d=1
+else
+	max_d=$6
+fi
+
+echo "Simulating for d-spacing range from $min_d to $max_d A."
+
 gsas_initialize $1_sim "simulated pattern for $1_Phase_$2"
 gsas_read_phase $file $2
-gsas_simulate_histogram $3 $4 $5 $6 $7
+gsas_simulate_histogram $3 $bank $min_d $max_d
 gsas_refine 0
 gsas_simulate_histogram_plot
 echo " "
