@@ -41,9 +41,24 @@ fi
 echo "k p h j" > temp.txt
 echo "$1" >> temp.txt
 echo "$bank" >> temp.txt
-echo "l" >> temp.txt
-echo "/" >> temp.txt
-echo "/" >> temp.txt
+# now we need to know if we are dealing with CW or TOF to find out which region to modify...
+grep HTYPE $1 | head -c 17 > htype.txt
+if [ "`tail -c 1 htype.txt`" == "C" ]; then
+    echo "We have a constant wavelength instrument, give range limits in 2theta"
+    # give dummy values since we will overwrite them anyways
+    echo "45 50 " >> temp.txt
+    echo "0.02" >> temp.txt
+else
+    if [ "`tail -c 1 htype.txt`" == "T" ]; then
+	echo "We have a time-of-flight instrument, give range limits in TOF."
+	echo "l" >> temp.txt
+	echo "/" >> temp.txt
+	echo "/" >> temp.txt
+    else
+	echo "We have a unknown type of instrument - need debugging!"
+	read -p "Break here with Ctrl-c and debug!"
+    fi
+fi
 echo "d" >> temp.txt
 echo "$max_d" >> temp.txt
 echo "$min_d" >> temp.txt
@@ -82,8 +97,6 @@ rm mintof2.txt
 
 echo "k p h" > temp.txt
 echo "e 1" >> temp.txt
-echo "l" >> temp.txt
-echo "/" >> temp.txt
 # now we need to know if we are dealing with CW or TOF to find out which region to modify...
 grep HTYPE $1 | head -c 17 > htype.txt
 if [ "`tail -c 1 htype.txt`" == "C" ]; then
@@ -92,9 +105,12 @@ if [ "`tail -c 1 htype.txt`" == "C" ]; then
     echo " " >> temp.txt
     cat mintof.txt >> temp.txt
     echo " " >> temp.txt
+    echo "0.02" >> temp.txt
 else
     if [ "`tail -c 1 htype.txt`" == "T" ]; then
 	echo "We have a time-of-flight instrument, give min and max range same as in d-spacing."
+	echo "l" >> temp.txt
+	echo "/" >> temp.txt
 	cat mintof.txt >> temp.txt
 	echo " " >> temp.txt
 	cat maxtof.txt >> temp.txt
@@ -104,7 +120,8 @@ else
 	read -p "Break here with Ctrl-c and debug!"
     fi
 fi
-echo "x x x x x x " >> temp.txt
+echo "x x x " >> temp.txt
+echo "x x x " >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 rm htype.txt
 

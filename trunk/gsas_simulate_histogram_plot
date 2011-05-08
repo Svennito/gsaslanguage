@@ -25,24 +25,49 @@ echo "z" > temp.txt
 echo "e" >> temp.txt
 echo "b m d t" >> temp.txt
 
-rm S_NONORM.EPS
-rm S_NORM.EPS
-echo "n p" >> temp.txt
-echo "S_NONORM" >> temp.txt
-echo "S_NONORM" >> temp.txt
-echo " " >> temp.txt
-echo "n" >> temp.txt
-echo " " >> `cat GSAS_EXP`.tex
-echo "Pattern without normalization:\\\\" >> `cat GSAS_EXP`.tex
-echo "\includegraphics[width=125mm]{S_NONORM.EPS}" >> `cat GSAS_EXP`.tex
+# determine whether we have TOF or CW
+echo "grep..."
+grep HTYPE `grep "1  IFIL" PHASES_SIM.EXP | awk '{ print $4}'` | head -c 17 > htype.txt
+echo "if..."
+if [ "`tail -c 1 htype.txt`" == "C" ]; then
+    echo "We have a constant wavelength instrument no need to normalize with incident intensity."
+    rm S_NONORM.EPS
+    echo "n p" >> temp.txt
+    echo "S_NONORM" >> temp.txt
+    echo "S_NONORM" >> temp.txt
+    echo " " >> temp.txt
+    echo "n" >> temp.txt
+    echo " " >> `cat GSAS_EXP`.tex
+    echo "Pattern:\\\\" >> `cat GSAS_EXP`.tex
+    echo "\includegraphics[width=160mm]{S_NONORM.EPS}" >> `cat GSAS_EXP`.tex
 
-echo "i p" >> temp.txt
-echo "S_NORM" >> temp.txt
-echo "S_NORM" >> temp.txt
-echo " " >> temp.txt
-echo "n" >> temp.txt
-echo "\\\\Pattern normalized by incident intensity:\\\\" >> `cat GSAS_EXP`.tex
-echo "\includegraphics[width=125mm]{S_NORM.EPS}" >> `cat GSAS_EXP`.tex
+else
+    if [ "`tail -c 1 htype.txt`" == "T" ]; then
+	echo "We have a time-of-flight instrument, give both normalized and non-normalized intensity."
+	rm S_NONORM.EPS
+	rm S_NORM.EPS
+	echo "n p" >> temp.txt
+	echo "S_NONORM" >> temp.txt
+	echo "S_NONORM" >> temp.txt
+	echo " " >> temp.txt
+	echo "n" >> temp.txt
+	echo " " >> `cat GSAS_EXP`.tex
+	echo "Pattern without normalization:\\\\" >> `cat GSAS_EXP`.tex
+	echo "\includegraphics[width=120mm]{S_NONORM.EPS}" >> `cat GSAS_EXP`.tex
+
+	echo "i p" >> temp.txt
+	echo "S_NORM" >> temp.txt
+	echo "S_NORM" >> temp.txt
+	echo " " >> temp.txt
+	echo "n" >> temp.txt
+	echo "\\\\Pattern normalized by incident intensity:\\\\" >> `cat GSAS_EXP`.tex
+	echo "\includegraphics[width=120mm]{S_NORM.EPS}" >> `cat GSAS_EXP`.tex
+    else
+	echo "We have a unknown type of instrument - need debugging!"
+	read -p "Break here with Ctrl-c and debug!"
+    fi
+fi
+
 
 echo "x" >> temp.txt
 
