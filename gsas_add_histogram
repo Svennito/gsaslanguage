@@ -47,7 +47,7 @@ fi
 echo "k p h i" > temp.txt
 echo $1 >> temp.txt
 echo "y" >> temp.txt
-grep "Instrument parameter file" $1
+grep "Instrument parameter file" $1 > out.txt
 if [ "$?" = "1" ]; then
 	echo "IPARM file is not stored in the data file!"
 else
@@ -70,8 +70,18 @@ echo "x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
+# did we get the warning about re-using the instrument data?
+grep "WARNING - instrument data for this bank also used for histogram" out.txt > temp2.txt
+if [ "$?" = "0" ]; then
+  echo "Re-using the instrument parameters - need to re-insert"
+  sed '7i\y' temp.txt > temp2.txt
+  expedt `cat GSAS_EXP` < temp2.txt > out.txt
+fi
+#read -p "wait..."
+
+
 # Test the EXP file
-grep "$1" `cat GSAS_EXP`.EXP
+grep "$1" `cat GSAS_EXP`.EXP > out.txt
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	echo "Data file name is NOT in the EXP file"
@@ -79,7 +89,7 @@ if [ "$?" = "1" ]; then
 	exit 0
 fi
 
-grep "$2" `cat GSAS_EXP`.EXP
+grep "$2" `cat GSAS_EXP`.EXP > out.txt
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	echo "Instrument parameter file name is NOT in the EXP file"
@@ -88,9 +98,9 @@ if [ "$?" = "1" ]; then
 fi
 
 if [ $3 -lt 10 ]; then
-	grep "BANK     $3" `cat GSAS_EXP`.EXP 
+	grep "BANK     $3" `cat GSAS_EXP`.EXP > out.txt
 else 
-	grep "BANK    $3" `cat GSAS_EXP`.EXP 
+	grep "BANK    $3" `cat GSAS_EXP`.EXP > out.txt
 fi
 
 #echo "grep returned $?"
@@ -135,6 +145,10 @@ if [ "$5" != "" ]; then
 	echo "x x x x x x " >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
 	rm htype.txt
+fi
+
+if [ -e temp2 ]; then
+  rm temp2.txt
 fi
 
 echo "Added histogram from \verb=$1= (bank $3, min. d-spacing $4A, max. d-spacing $5A) with instrument parameter file \verb=$2= as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex

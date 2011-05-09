@@ -1,0 +1,45 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without histogram for which to change the sample orientation!"
+	read -p "Maybe you should debug? Hit Ctrl-c to abort..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without omega angle for sample orientation!"
+	read -p "Maybe you should debug? Hit Ctrl-c to abort..."
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without chi angle for sample orientation!"
+	read -p "Maybe you should debug? Hit Ctrl-c to abort..."
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without phi angle for sample orientation!"
+	read -p "Maybe you should debug? Hit Ctrl-c to abort..."
+	exit 0
+fi
+
+# Add the histogram
+echo "k p h" > temp.txt
+echo "e $1" >> temp.txt
+# re-issue min d-spacing to fix bug in EXPEDT
+echo "d" >> temp.txt
+echo "/" >> temp.txt
+echo "a $2 $3 $4" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Changed sample orientations angles for histogram $1 to \$\omega=$2\$, \$\chi=$3\$, and \$\phi=$4\$.\newline" >> `cat GSAS_EXP`.tex
+
