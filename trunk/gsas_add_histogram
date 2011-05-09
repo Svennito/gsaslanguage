@@ -79,9 +79,11 @@ if [ "$?" = "0" ]; then
 fi
 #read -p "wait..."
 
+# Which histogram in the EXP file did we add?
+grep "Histogram no." out.txt | head -c18 | tail -c2 > hist.txt
 
 # Test the EXP file
-grep "$1" `cat GSAS_EXP`.EXP > out.txt
+grep "$1" `cat GSAS_EXP`.EXP > temp.txt
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	echo "Data file name is NOT in the EXP file"
@@ -89,7 +91,7 @@ if [ "$?" = "1" ]; then
 	exit 0
 fi
 
-grep "$2" `cat GSAS_EXP`.EXP > out.txt
+grep "$2" `cat GSAS_EXP`.EXP > temp.txt
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	echo "Instrument parameter file name is NOT in the EXP file"
@@ -98,9 +100,9 @@ if [ "$?" = "1" ]; then
 fi
 
 if [ $3 -lt 10 ]; then
-	grep "BANK     $3" `cat GSAS_EXP`.EXP > out.txt
+	grep "BANK     $3" `cat GSAS_EXP`.EXP > temp.txt
 else 
-	grep "BANK    $3" `cat GSAS_EXP`.EXP > out.txt
+	grep "BANK    $3" `cat GSAS_EXP`.EXP > temp.txt
 fi
 
 #echo "grep returned $?"
@@ -108,9 +110,6 @@ if [ "$?" = "1" ]; then
 	echo "Entry with this bank is NOT in the EXP file"
 	exit 0
 fi
-
-# Which histogram in the EXP file did we add?
-grep "Histogram no." out.txt | head -c18 | tail -c2 > hist.txt
 
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's enter it

@@ -3,9 +3,20 @@
 \section{Prerequisites}
 
 \begin{itemize}
-\item This package aims at automating GSAS, therefore, a running GSAS is required. To test this, at the command line from which you wish to run this (mouse junkies - this will NOT be your cup of tea - but maybe we can pull you into the great land of command lines) change into a folder with GSAS data and try to plot it in rawplot by typing in rawplot. If this fails with a file not found error, GSAS is either not installed or not in the search path\footnote{On windows systems, go to the control panel, advanced setup, environment variables, and add "\texttt{;c:\textbackslash gsas\textbackslash exe}" at the end of the search path. On Unix systems, add ":/usr/local/gsas/exe" to you PATH variable in something like \texttt{\textasciitilde/.bashrc} or so.}. If it plots, but doesn't have text around the graph, the PGPLOT\_FONT variable is not set. Another missing bit could be the GSAS variable, in which case GSAS wouldn't know where to look for the scattering length etc. All this is documented somewhat in the README file coming with GSAS, but who reads those these days... Please note that PC-GSAS and EXPGUI are setting the environment variables only for the current session, that is enough for what we want to do here, so a running PC-GSAS or EXPGUI is not sufficient.
+\item This package aims at automating GSAS, therefore, a running GSAS is required. To test this, at the command line from which you wish to run this (mouse junkies - this will NOT be your cup of tea - but maybe we can pull you into the great land of command lines) change into a folder with GSAS data and try to plot it in rawplot by typing in \texttt{rawplot}. If this fails with a file not found error, GSAS is either not installed or not in the search path\footnote{On windows systems, go to the control panel, advanced setup, environment variables, and add "\texttt{;c:\textbackslash gsas\textbackslash exe}" at the end of the search path. On Unix systems, add ":/usr/local/gsas/exe" to you PATH variable in something like \texttt{\textasciitilde/.bashrc} or so.}. If it plots, but doesn't have text around the graph, the PGPLOT\_FONT variable is not set. Another missing bit could be the GSAS variable, in which case GSAS wouldn't know where to look for the scattering length etc. All this is documented somewhat in the README file coming with GSAS, but who reads those these days... Please note that PC-GSAS and EXPGUI are setting the environment variables only for the current session, that is enough for what we want to do here, so a running PC-GSAS or EXPGUI is not sufficient.
 \item The 2nd prerequisite is a working understanding of GSAS by the user. If you don't know what GSAS does and how it works, this here will be of little help, it might be even dangerous due to the GIGO problem\footnote{garbage in, garbage out}... We strongly suggest you work at least through the excellent tutorials that come with GSAS to get an idea what GSAS does. To encourage that, the examples we provide here are the tutorials from the GSAS manual cast into scripts.
 \end{itemize}
+
+\section{GSAS installation}
+
+The best starting point to install GSAS and EXPGUI is \url{https://subversion.xor.aps.anl.gov/trac/EXPGUI/}. From there, go to the "New installation instructions" for your operating system. In order to use the subversion automatic update and installation mode, on Unix systems you may have to add the lines
+
+\texttt{http-proxy-host = proxyout.lanl.gov\\
+http-proxy-port = 8080\\
+}
+
+into the subversion server configuration stored in \texttt{~/.subversion/servers}. Otherwise you will get an error message that subversion could not connect to the server at APS.
+
 
 \section{Linux or Windows?}
 
