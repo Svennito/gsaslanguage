@@ -5,16 +5,19 @@ echo "$0 $1 $2 $3 $4 $5 $6 $7 $8"
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "$0 called without number of phase for which atom parameters should be constrained!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
 	echo "$0 called without atom parameter which should be constrained!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$3" = "" ]; then
 	echo "$0 called without first atom range of constrained set!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 

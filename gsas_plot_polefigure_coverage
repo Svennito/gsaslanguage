@@ -1,0 +1,51 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax - no parameters...
+
+
+# generate a coverage map
+echo "z e" > temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+# compute arbitrary pole figure
+echo "h 1 0 0 c" >> temp.txt
+# select minimum number of contours 
+echo "i 1" >> temp.txt
+echo "m 1" >> temp.txt
+echo "n 1" >> temp.txt
+echo "0" >> temp.txt
+echo "p" >> temp.txt
+echo "Coverage" >> temp.txt
+echo "Coverage" >> temp.txt
+echo "q" >> temp.txt
+polfplot `cat GSAS_EXP` < temp.txt > out.txt
+
+# rename the pole figure file so we don't overwrite if we do multiple phases
+echo "Done. Pole figure coverage is displayed in Coverage.EPS." 
+
+# Output stuff to the Latex document.
+echo "Computed the pole figure coverage and saved it as Coverage.EPS." >> `cat GSAS_EXP`.tex
+echo "If you are close to the maximum number of histograms in your refinement, you want to look at location of your histograms in the pole figure" >> `cat GSAS_EXP`.tex
+echo "and exclude histograms that are close to another one. This will allow to add another histogram in another location." >> `cat GSAS_EXP`.tex
+echo "If you are working with a new instrument setup, also verify the location of the histograms against your sample and detector orientations.\\\\" >> `cat GSAS_EXP`.tex
+echo "\includegraphics[width=0.9\textwidth]{Coverage.EPS}\\\\" >> `cat GSAS_EXP`.tex
