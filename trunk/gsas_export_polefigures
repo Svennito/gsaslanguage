@@ -1,0 +1,82 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase number!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without first hkl - need at least one hkl in quotes or double-quotes!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+# generate the pole figures
+echo "z e" > temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "f $1" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+echo "" >> temp.txt
+# output the pole figures
+counter=0
+echo "Output these pole figures for phase $1:\begin{itemize}"  >> `cat GSAS_EXP`.tex
+for arg in "$@"; do
+	let counter+=1
+	if [ $counter -lt 2 ]; then continue; fi
+	echo "h $arg c o" >> temp.txt
+	# always suppress negative values since they are meaningless anyways
+	echo "y" >> temp.txt
+	echo " \item\$($arg)\$"  >> `cat GSAS_EXP`.tex
+done
+echo "q" >> temp.txt
+echo "\end{itemize}"  >> `cat GSAS_EXP`.tex
+polfplot `cat GSAS_EXP` < temp.txt > out.txt
+
+# rename the pole figure file so we don't overwrite if we do multiple phases
+mv `cat GSAS_EXP`.GPF Step`cat gsas_step.txt`_Phase$1.gpf
+echo "Done. Pole figures are in Step`cat gsas_step.txt`_Phase$1.gpf." 
+
+# Output stuff to the Latex document.
+echo "The pole figures are in file \verb=Step`cat gsas_step.txt`_Phase$1.gpf=." >> `cat GSAS_EXP`.tex
+echo "They can be plotted in pod2K (contact Sven Vogel at sven\@lanl.gov), mtex, Beartex or popla."  >> `cat GSAS_EXP`.tex

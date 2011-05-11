@@ -5,6 +5,7 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "$0 called without phase number!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
