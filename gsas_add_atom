@@ -28,7 +28,9 @@ echo "k l a" > temp.txt
 echo "p $1" >> temp.txt
 echo "i n" >> temp.txt
 echo $2 >> temp.txt
-echo "x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

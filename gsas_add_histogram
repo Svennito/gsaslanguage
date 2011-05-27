@@ -75,7 +75,9 @@ echo $4 >> temp.txt
 echo "/" >> temp.txt
 echo "x" >> temp.txt
 echo "0" >> temp.txt
-echo "x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 #read -p "wait after first insert..."
@@ -152,7 +154,12 @@ if [ "$5" != "" ]; then
 		read -p "Break here with Ctrl-c and debug!"
 	    fi
 	fi
-	echo "x x x x x x " >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
 	#read -p "wait after entering d-spacing..."
 	rm htype.txt

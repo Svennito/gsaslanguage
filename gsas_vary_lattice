@@ -18,7 +18,10 @@ fi
 echo "k l o l" > temp.txt
 echo "p $1" >> temp.txt
 echo "v" >> temp.txt
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 # find out what the current flag is
 grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c36 | head -c1 > flag.txt
@@ -87,7 +90,10 @@ if [ "$3" != " " ]; then
 	echo "k l o l" > temp.txt
 	echo "p $1" >> temp.txt
 	echo "d $3" >> temp.txt
-	echo "x x x x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
 fi
 

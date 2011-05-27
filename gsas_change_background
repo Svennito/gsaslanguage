@@ -22,7 +22,10 @@ fi
 echo "k l o b" > temp.txt
 echo "h $1" >> temp.txt
 echo "c $2 $3 /" >> temp.txt
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

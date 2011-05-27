@@ -27,7 +27,12 @@ echo "d $1" >> temp.txt
 echo "  " >> temp.txt
 echo "l " >> temp.txt
 echo "  " >> temp.txt
-echo "x x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

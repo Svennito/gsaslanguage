@@ -29,7 +29,10 @@ if [ "$4" = "" ]; then
 else 
 	echo "d $4" >> temp.txt
 fi
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt
 

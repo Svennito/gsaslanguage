@@ -23,7 +23,9 @@ echo "k p p i" > temp.txt
 echo $1 >> temp.txt
 echo $2 >> temp.txt
 echo $3 >> temp.txt
-echo "x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt
 

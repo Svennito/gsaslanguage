@@ -39,7 +39,8 @@ echo "a FOBS" >> temp.txt
 echo "a FCLC" >> temp.txt
 echo "a NFDF" >> temp.txt
 echo "2" >> temp.txt
-echo "x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

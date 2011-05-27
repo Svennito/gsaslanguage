@@ -70,7 +70,9 @@ echo "x" >> temp.txt
 	if [ "$scale" != "" ]; then
 	echo "l o h c" >> temp.txt
 	echo "$scale" >> temp.txt
-	echo "x x x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
 fi
 echo "x" >> temp.txt
 
@@ -120,8 +122,12 @@ else
 	read -p "Break here with Ctrl-c and debug!"
     fi
 fi
-echo "x x x " >> temp.txt
-echo "x x x " >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 rm htype.txt
 
