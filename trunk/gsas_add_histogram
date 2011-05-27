@@ -57,6 +57,15 @@ fi
 echo $2 >> temp.txt
 echo $3 >> temp.txt
 echo "n" >> temp.txt
+# give out a few zeros - if we use a bank multiple times it will get us out of the warning for adding banks with same parameters
+# if it is the first time the bank is used, it won't do any harm...
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
@@ -69,15 +78,17 @@ echo "0" >> temp.txt
 echo "x x x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
+#read -p "wait after first insert..."
 
 # did we get the warning about re-using the instrument data?
 grep "WARNING - instrument data for this bank also used for histogram" out.txt > temp2.txt
 if [ "$?" = "0" ]; then
   echo "Re-using the instrument parameters - need to re-insert"
   sed '7i\y' temp.txt > temp2.txt
+  #read -p "wait before second insert..."
   expedt `cat GSAS_EXP` < temp2.txt > out.txt
+  #read -p "wait after second insert..."
 fi
-#read -p "wait..."
 
 # Which histogram in the EXP file did we add?
 grep "Histogram no." out.txt | head -c18 | tail -c2 > hist.txt
@@ -113,7 +124,7 @@ fi
 
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's enter it
-	if [ $5 -lt 10 ]; then
+	if [ `echo "$5 < 10" | bc ` ]; then
 		grep "d-minimum" out.txt | grep " of  $5" > maxtof.txt
 	else
 		grep "d-minimum" out.txt | grep " of $5" > maxtof.txt
@@ -143,6 +154,7 @@ if [ "$5" != "" ]; then
 	fi
 	echo "x x x x x x " >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
+	#read -p "wait after entering d-spacing..."
 	rm htype.txt
 fi
 

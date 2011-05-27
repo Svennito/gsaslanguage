@@ -77,7 +77,7 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # read the TOF/2theta values from the otherwise meaningless d-exercise
-if [ $max_d -lt 10 ]; then
+if [ `echo "$max_d < 10" | bc ` ]; then
 	grep "d-minimum" out.txt | grep " of  $max_d" > maxtof.txt
 else
 	grep "d-minimum" out.txt | grep " of $max_d" > maxtof.txt
@@ -86,7 +86,7 @@ tail -c 15 maxtof.txt > maxtof2.txt
 head -c 8 maxtof2.txt > maxtof.txt
 rm maxtof2.txt
 
-if [ $min_d -lt 10 ]; then
+if [ `echo "$min_d < 10" | bc ` ]; then
 	grep "d-minimum" out.txt | grep " of  $min_d" > mintof.txt
 else
 	grep "d-minimum" out.txt | grep " of $min_d" > mintof.txt

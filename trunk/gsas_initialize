@@ -12,13 +12,14 @@ if [ "$gsas" = "" ]; then
 		echo "GSAS will not be able to find atom parameters etc."
 		echo "You need to set it to point to the path with your GSAS installation, e.g. GSAS=C:\GSAS or so."
 		echo "See the GSAS readme.txt file for more details."
-		read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+		read -p "Hit Ctrl-c to abort."
 		exit 0
 	else
 		# we found the capital version, warn about Unix GSAS wanting the small letter version
 		echo "Your environment variable GSAS should be in small letters"
 		echo "on a UNIX system for GSAS to recognize it! Ignore this "
 		echo "message on a Windows system."
+		read -p "Hit Ctrl-c to abort."
 	fi
 fi
 
@@ -28,7 +29,7 @@ if [ "$PGPLOT_FONT" = "" ]; then
 		echo "GSAS will not be able to find fonts for the plotting routines."
 		echo "You need to set it to point to the path with the grfont.dat file in your GSAS installation, e.g. PGPLOT_FONT=C:\GSAS\PGL\GRFONT.DAT or so."
 		echo "See the GSAS readme.txt file for more details."
-		read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+		read -p "Hit Ctrl-c to abort."
 		exit 0
 	fi
 fi
@@ -39,18 +40,20 @@ if [ "$gsas_path" = "" ]; then
 	echo "GSAS will not be able to work at all!"
 	echo "You need to set it to point to the path with the executable files in your GSAS installation, e.g. PATH=...;C:\GSAS\EXE or so."
 	echo "See the GSAS readme.txt file for more details."
-	read -p "Hit enter to confirm this message - your script is likely continue, hit Ctrl-C if that happens."
+	read -p "Hit Ctrl-c to abort."
 	exit 0
 fi
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "initialize called without name for EXP file!"
+	echo "$0 called without name for EXP file!"
+	read -p "Hit Ctrl-c to abort."
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
-	echo "initialize called without title for EXP file!"
+	echo "$0 called without title for EXP file!"
+	read -p "Hit Ctrl-c to abort."
 	exit 0
 fi
 
@@ -89,9 +92,21 @@ rm gsas_print.txt     2>/dev/null
 
 echo "Deleted older temporary files.\newline" >> `cat GSAS_EXP`.tex
 
+# test if the EXP file was deleted
+if [ -e `cat GSAS_EXP`.EXP ]; then
+	echo "Could not delete `cat GSAS_EXP`.EXP - this will cause trouble!"
+	echo "Please check if the file is write-protected or opened by another application."
+	echo "Restart the script after fixing this problem."
+	read -p "Hit Ctrl-c to abort."
+	exit 0
+else
+	echo "File `cat GSAS_EXP`.EXP does not exisit, creating a new one."
+fi
+
 # Create the new file
 echo "y" > temp.txt
 echo $2 >> temp.txt
 echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
+echo "Your new experiment file is \verb=`cat GSAS_EXP`.EXP=.\newline" >> `cat GSAS_EXP`.tex
 echo "Experiment title set to \verb=$2=.\newline" >> `cat GSAS_EXP`.tex
