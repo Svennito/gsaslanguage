@@ -54,7 +54,9 @@ echo "Copied `cat GSAS_EXP`.EXP to `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.te
 powpref `cat GSAS_EXP`_MEM
 echo "k l l c" > temp.txt
 echo "1" >> temp.txt
-echo "x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 expedt `cat GSAS_EXP`_MEM < temp.txt
 genles `cat GSAS_EXP`_MEM
 echo "Ran powpref and single genles cycle on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_EXP`.tex

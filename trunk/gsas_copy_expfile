@@ -57,7 +57,10 @@ echo "Deleted older temporary files.\newline" >> `cat GSAS_EXP`.tex
 cp $1.EXP `cat GSAS_EXP`.EXP
 echo "k p t t" > temp.txt
 echo $3 >> temp.txt
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt
 echo "Experiment title set to \verb=$3=.\newline" >> `cat GSAS_EXP`.tex
 

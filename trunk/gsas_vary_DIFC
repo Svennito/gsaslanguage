@@ -17,7 +17,10 @@ fi
 echo "k l o c" > temp.txt
 echo "h $1" >> temp.txt
 echo "v $2" >> temp.txt
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt
 

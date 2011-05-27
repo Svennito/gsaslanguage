@@ -34,7 +34,9 @@ echo "y" >> temp.txt
 echo "n " >> temp.txt
 echo "y" >> temp.txt
 echo "n " >> temp.txt
-echo "x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 disagl `cat GSAS_EXP` > out.txt

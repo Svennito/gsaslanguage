@@ -43,7 +43,10 @@ echo "k l o d" > temp.txt
 echo "v" >> temp.txt
 echo "$1 $2 $3 $4" >> temp.txt
 echo "d $5" >> temp.txt
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

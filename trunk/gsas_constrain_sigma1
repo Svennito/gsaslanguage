@@ -29,12 +29,12 @@ if [ "$3" = "" ]; then
 fi
 
 if [ "$4" = "" ]; then
-	echo "$0 called without second histogram!"
+	echo "$0 called without second phase!"
 	exit 0
 fi
 
 if [ "$5" = "" ]; then
-	echo "$0 called without second phase!"
+	echo "$0 called without second histogram!"
 	exit 0
 fi
 
@@ -64,7 +64,11 @@ done
 echo "  " >> temp.txt
 echo "l " >> temp.txt
 echo "  " >> temp.txt
-echo "x x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 

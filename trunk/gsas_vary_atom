@@ -53,7 +53,10 @@ else
 	echo " " >> temp.txt
 	echo " " >> temp.txt
 fi
-echo "x x x x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt
 

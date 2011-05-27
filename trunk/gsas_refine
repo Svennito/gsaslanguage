@@ -16,7 +16,9 @@ if [ "$1" != "" ]; then
       #if [ "$1" -gt 0 ]; then
 	echo "k l l c" > temp.txt
 	echo $1 >> temp.txt
-	echo "x x x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP`.EXP < temp.txt
       #fi
     fi
@@ -41,7 +43,9 @@ if [ -f gsas_print.txt ]; then
 else
 	echo "k l l p" > temp.txt
 	echo "c v" >> temp.txt
-	echo "x x x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
+	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt
 	echo "Y" > gsas_print.txt
 fi
