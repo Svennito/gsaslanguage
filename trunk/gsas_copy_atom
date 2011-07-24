@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Copy an atom
+#
+# Call with 
+#
+# gsas_copy_atom <source phase #> <source atom #> <target phase #>
+#
+#
+
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase number from which atom should be copied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom number from which atom should be copied!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without phase number to which atom should be copied!"
+	exit 0
+fi
+
+# extract atom data
+if [ $2 -gt 10 ]; then
+	grep "CRS$1  AT $2" `cat GSAS_EXP`.EXP > atomtemp.txt 
+else
+	grep "CRS$1  AT  $2" `cat GSAS_EXP`.EXP > atomtemp.txt 
+fi
+
+# Add the atom
+echo "k l a" > temp.txt
+echo "p $3" >> temp.txt
+echo "i r" >> temp.txt
+echo "atomtemp.txt" >> temp.txt
+echo "y" >> temp.txt
+echo "78" >> temp.txt
+echo "y" >> temp.txt
+echo "y" >> temp.txt
+echo "63 72" >> temp.txt
+echo "53 62" >> temp.txt
+echo "23 32" >> temp.txt
+echo "33 42" >> temp.txt
+echo "43 52" >> temp.txt
+echo "/" >> temp.txt
+echo "15 23" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "/" >> temp.txt
+echo "13 22" >> temp.txt
+echo "13 22" >> temp.txt
+echo "23 32" >> temp.txt
+echo "33 42" >> temp.txt
+echo "43 52" >> temp.txt
+echo "53 62" >> temp.txt
+echo "63 72" >> temp.txt
+echo "75 75" >> temp.txt
+echo "A" >> temp.txt
+echo "U" >> temp.txt
+echo "U" >> temp.txt
+echo "N" >> temp.txt
+echo "1" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Copied atom $2 of phase $1 to phase $3.\newline" >> `cat GSAS_EXP`.tex
+
+rm atomtemp.txt
+
