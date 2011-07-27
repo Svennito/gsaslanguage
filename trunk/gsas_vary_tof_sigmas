@@ -1,0 +1,53 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which sigmas should be varied!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number phase for which sigmas should be varied!"
+	exit 0
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without flag for sigmas - we need this!"
+	exit
+fi
+
+if [ "$6" = "" ]; then
+	echo "$0 called without flag for sigma damping - leaving untouched!"
+fi
+
+# Change the flags
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "v" >> temp.txt
+echo "/" >> temp.txt 
+echo "/" >> temp.txt 
+echo "$3 $4 $5" >> temp.txt 
+echo "/" >> temp.txt 
+echo "/" >> temp.txt
+echo "l" >> temp.txt
+if [ "$6" != "" ]; then
+	echo "d $4" >> temp.txt
+fi
+ 
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed sigma refinement flags for histogram $1 and phase $2 to $3 $4 $5" >> temp.tex
+if [ "$6" = "" ]; then
+	echo " with damping untouched.\newline" >> temp.tex
+else
+	echo " with damping set to $6.\newline" >> temp.tex
+fi
