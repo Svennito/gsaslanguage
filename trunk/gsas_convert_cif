@@ -65,11 +65,26 @@ fi
 
 # get the full path to the tcl script
 fn="gsas_convert_cif"
-rc_path=`which gsas_convert_cif`
-rc_path=${rc_path:0:${#rc_path}-${#fn}}
+
+
+if [ "$OS" = "Windows_NT" ]; then
+	echo "I think we are on a Windows box - use where instead of which"
+	rc_path=`where gsas_convert_cif`
+else
+	rc_path=`which gsas_convert_cif`
+fi
+rc_path=${rc_path:0:${#rc_path}-${#fn}-1}
+
 echo "Searching for rc.tcl in $rc_path"
+#read -p "wait..."
 
 # convert it!
+echo $rc_path
+echo $expgui_path
+#rc_path="c:\gsaslanguage"
+#expgui_path="c:\gsas\expgui"
+#gsas="c:\gsas"
+echo "Call for ncnrpack: <ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas>"
 ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas
 
 ncnrpack_exit=$?
