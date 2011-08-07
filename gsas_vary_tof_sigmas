@@ -20,6 +20,8 @@ fi
 
 if [ "$6" = "" ]; then
 	echo "$0 called without flag for sigma damping - leaving untouched!"
+else 
+	echo "Damping will be changed to $6."
 fi
 
 # Change the flags
@@ -34,7 +36,8 @@ echo "/" >> temp.txt
 echo "/" >> temp.txt
 echo "l" >> temp.txt
 if [ "$6" != "" ]; then
-	echo "d $4" >> temp.txt
+	echo "d" >> temp.txt
+	echo "$6" >> temp.txt
 fi
  
 echo "x" >> temp.txt
