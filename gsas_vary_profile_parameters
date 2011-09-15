@@ -5,19 +5,20 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "$0 called without number of histogram for which profile parameters should be varied!"
+	read -p "You should hit Ctrl-c to abort here..."
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
 	echo "$0 called without number of phase for which profile parameters should be varied!"
+	read -p "You should hit Ctrl-c to abort here..."
 	exit 0
 fi
 
 if [ "$3" = "" ]; then
-	echo "$0 called without flags for first set of parameters - assuming </>!"
-	flag="/"
-else 
-	flag="$3"
+	echo "$0 called without flags!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
 fi
 
 # Change the flags

@@ -1,0 +1,89 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+  echo "$0 called without number of phase for which sample orientation should be varied!"
+  read -p "There is a problem! Hit Ctrl-C to abort!"
+  exit 0
+else
+  echo "Changing variation of sample orientation for phase $1..."
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without a flag for the variation of the sample orientation angle omega!"
+	read -p "There is a problem! Hit Ctrl-C to abort!"
+	exit 0
+else
+  echo "Changing sample orientation angle omega variation flag of phase $1 to $2..."
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without a flag for the variation of the sample orientation angle chi!"
+	read -p "There is a problem! Hit Ctrl-C to abort!"
+	exit 0
+else
+  echo "Changing sample orientation angle chi variation flag of phase $1 to $3..."
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without a flag for the variation of the sample orientation angle phi!"
+	read -p "There is a problem! Hit Ctrl-C to abort!"
+	exit 0
+else
+  echo "Changing sample orientation angle phi variation flag of phase $1 to $4..."
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without a damping flag - assuming no change in damping!"
+else
+	echo "Changing texture damping flag of phase $1 to $5..."
+fi
+
+# Change the flags
+echo "k l o o h" > temp.txt
+# Send enters to skip over output of phase 1
+for i in {1..20}; do
+  echo "" >> temp.txt
+done
+# for phases higher than 1 we have to change the phase
+if [ $1 -gt 1 ]; then
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+  # Do it again due to bug in older EXPEDT
+  echo "p $1" >> temp.txt
+  for i in {1..20}; do
+    echo "" >> temp.txt
+  done
+fi
+# set symmetry to no triclinic as default
+echo "v" >> temp.txt
+# set variation for angles
+echo "$2" >> temp.txt
+echo "$3" >> temp.txt
+echo "$4" >> temp.txt
+# set to yes for now!
+echo "y" >> temp.txt
+# set damping if necessary
+if [ "$5" != "" ]; then
+  echo "d" >> temp.txt
+  # damp angles 
+  echo "$5" >> temp.txt
+  echo "/" >> temp.txt
+fi
+# get out
+for i in {1..5}; do
+  echo "x" >> temp.txt
+done
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed tge sample orientation angle variation flags for phase $1 to $2 for omega, $3 for chi, and $4 for phi" >> temp.tex
+if [ "$3" != "" ]; then
+  echo "(damping to $3).\newline" >> temp.tex
+else
+  echo "(damping unchanged).\newline" >> temp.tex
+fi

@@ -43,7 +43,7 @@ if [ $1 -gt 1 ]; then
     echo "" >> temp.txt
   done
 fi
-# set symmetry to no triclinic as default
+# set flags
 echo "v" >> temp.txt
 # skip over variation for angles
 echo "/" >> temp.txt
