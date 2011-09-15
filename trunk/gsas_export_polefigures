@@ -79,4 +79,4 @@ echo "Done. Pole figures are in Step`cat gsas_step.txt`_Phase$1.gpf."
 
 # Output stuff to the Latex document.
 echo "The pole figures are in file \verb=Step`cat gsas_step.txt`_Phase$1.gpf=." >> `cat GSAS_EXP`.tex
-echo "They can be plotted in pod2K (contact Sven Vogel at sven\@lanl.gov), mtex, Beartex or popla."  >> `cat GSAS_EXP`.tex
+echo "They can be plotted in pod2K (contact Sven Vogel at sven\\@lanl.gov), mtex, Beartex or popLA."  >> `cat GSAS_EXP`.tex
