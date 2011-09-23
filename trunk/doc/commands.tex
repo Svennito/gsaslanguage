@@ -106,7 +106,6 @@ gsas_waterfall_plot
 %%
 % Commands that need documenting, delete from here when done...
 %
-% gsas_add_diffuse_scattering
 % gsas_calc_bond_length
 % gsas_change_DIFC
 % gsas_change_phase_flag
@@ -254,6 +253,26 @@ This would read phase information (lattice parameters, space group, atom paramet
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Crystal structure refinement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_add\_diffuse\_scattering}
+{
+This function allows to use the diffuse scattering function to model a contribution to the "background" by e.g. an amorphous phase.
+}{
+gsas\_add\_diffuse\_scattering <histogram> <function type> <amplitude> <radius> <Uiso> <atom type 1> <atom type 2> 
+}{
+\item \texttt{<histogram>}: The histogram for which the diffuse scattering term will be added.
+\item \texttt{<function type>}: The diffuse scattering function to be used. Possible options are "1" for diffuse scattering from substitional disorder (e.g. an alloy), "2" for positional disorder (e.g. a glass), and "3" for diffuse scattering caused by vibrational correlation. See the GSAS manual (page 131) for more information.
+\item \texttt{<amplitude>}: The starting value for the amplitude for the particular diffuse scattering term. "1" typically is a good starting value.
+\item \texttt{<radius>}: The starting value for radius or atomic distance for the particular diffuse scattering term.
+\item \texttt{<Uiso>}: The starting value for the isotropic thermal motion parameter for the atoms of this particular diffuse scattering term.
+\item \texttt{<atom type 1>}: The first atom of the pair, has to be a valid element in GSAS.
+\item \texttt{<atom type 2>}: The second atom of the pair, has to be a valid element in GSAS.
+}{
+EXAMPLE
+}{
+COMMENTS FOR EXAMPLE
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_change\_atom}
