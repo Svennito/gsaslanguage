@@ -124,6 +124,17 @@ if [ "$?" = "1" ]; then
 	exit 0
 fi
 
+# check if we have bc installed - it's not standard on cygwin
+bc_path=`which bc`
+if [ "$bc_path" = "" ]; then
+	echo "You don't have the calculator bc installed!"
+	echo "Please install for this function.!"
+	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
+	exit
+else
+	echo "Calculator bc found."
+fi
+
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's enter it
 	if [ `echo "$5 < 10" | bc ` ]; then
