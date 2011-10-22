@@ -16,10 +16,16 @@ if [ "$gsas" = "" ]; then
 		exit 0
 	else
 		# we found the capital version, warn about Unix GSAS wanting the small letter version
-		echo "Your environment variable GSAS should be in small letters"
-		echo "on a UNIX system for GSAS to recognize it! Ignore this "
-		echo "message on a Windows system."
-		read -p "Hit Ctrl-c to abort."
+		if [ "$OS" = "Windows_NT" ]; then
+			echo "I think I run on a Windows box... "
+			echo "No worries about capital or small letters for GSAS environment variable..."
+		else
+			echo "Your environment variable GSAS should be in small letters"
+			echo "on a UNIX system for GSAS to recognize it! Ignore this "
+			echo "message on a Windows system (I think this is NOT a Windows."
+			echo "system...)"
+			read -p "Hit Ctrl-c to abort."
+		fi
 	fi
 fi
 
@@ -100,7 +106,7 @@ if [ -e `cat GSAS_EXP`.EXP ]; then
 	read -p "Hit Ctrl-c to abort."
 	exit 0
 else
-	echo "File `cat GSAS_EXP`.EXP does not exisit, creating a new one."
+	echo "File `cat GSAS_EXP`.EXP does not exist, creating a new one."
 fi
 
 # Create the new file

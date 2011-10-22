@@ -5,7 +5,7 @@
 #
 # call
 #
-# gsas_waterfall_add <runno> <bank> <offset> <scale>
+# gsas_waterfall_add <GSAS data file> <bank> <offset> <scale>
 #
 # (expects data files to have the IPARM file in the 2nd line and in the same folder as the data file
 #
@@ -47,7 +47,11 @@ else
 	echo "Cannot find instrument parameter file $iparm"
 	exit
 fi
-difc=`grep -h "INS  $2 ICONS" $iparm`
+if [ $2 -gt 10 ]; then
+	difc=`grep -h "INS $2 ICONS" $iparm`
+else
+	difc=`grep -h "INS  $2 ICONS" $iparm`
+fi
 difc=${difc:13:10}
 
 if [ $difc = "" ]; then
