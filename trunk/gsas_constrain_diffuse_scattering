@@ -4,7 +4,7 @@
 #
 # Call with 
 #
-# gsas_constrain_diffuse_scattering <parameter> <term> <constraint value> <histogram1> <histogram2> ....
+# gsas_constrain_diffuse_scattering <parameter> <constraint string>
 #
 # where atom string is the information needed by GSAS to add an atom
 #
@@ -14,44 +14,25 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without a parameter (A, R, or U) for the diffuse scattering constraint!"
-	read -p "This is a problem, you should exit here with Ctrl-c and fix your script..."
+	echo "$0 called without a parameter to be constrained (A, R, or U)."
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
-	echo "$0 called without a term for the diffuse scattering constraint!"
-	read -p "This is a problem, you should exit here with Ctrl-c and fix your script..."
-	exit 0
-fi
-
-if [ "$3" = "" ]; then
-	echo "$0 called without constraint value for diffusce scattering constraint!"
-	read -p "This is a problem, you should exit here with Ctrl-c and fix your script..."
-	exit 0
-fi
-
-if [ "$4" = "" ]; then
-	echo "$0 called without histrogram(s) for diffusce scattering constraint!"
-	read -p "This is a problem, you should exit here with Ctrl-c and fix your script..."
-	exit 0
-fi
-
-if [ "$4" = "" ]; then
-	echo "$0 called with more than one histogram(s) for diffusce scattering constraint! This is currently not supported."
-	read -p "This is a problem, you should exit here with Ctrl-c and fix your script..."
+	echo "$0 called without a constraint term (term, histograms, value)!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 
-# add a constraint
+# Add the atom
 echo "k l o d" > temp.txt
-echo "k $1" >> temp.txt
-echo "l" >> temp.txt
+echo "k" >> temp.txt
+echo "$1" >> temp.txt
 echo "i" >> temp.txt
-echo "$2 $4 $3" >> temp.txt
+echo "$2 $3 $4 $5 $6 $7 $8 $9" >> temp.txt
 echo " " >> temp.txt
-echo "l" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
@@ -60,7 +41,7 @@ echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-echo "Added diffuse scattering constraint for parameter $1, term $2, to histogram $4 and constraint value $3.\newline" >> `cat GSAS_EXP`.tex
+echo "Constrained diffuse scattering term for parameter $1 with constraint strings $2 $3 $4 $5 $6 $7 $8 $9.\newline" >> `cat GSAS_EXP`.tex
 
 
 
