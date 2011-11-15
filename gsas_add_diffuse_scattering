@@ -15,36 +15,43 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "$0 called without a histogram for the diffuse scattering!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$2" = "" ]; then
 	echo "$0 called without a function type for the diffuse scattering!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$3" = "" ]; then
 	echo "$0 called without amplitude for diffusce scattering function!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$4" = "" ]; then
 	echo "$0 called without radius for diffusce scattering function!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$5" = "" ]; then
 	echo "$0 called without Uiso for diffusce scattering function!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$6" = "" ]; then
 	echo "$0 called without atom1 type for diffusce scattering function!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
 if [ "$7" = "" ]; then
 	echo "$0 called without atom2 type for diffusce scattering function!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
 	exit 0
 fi
 
@@ -71,7 +78,7 @@ echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-echo "Added diffuse scattering term to histogram $1 with function type $2, amplitude $3, radius/atomic distance $4, thermal motion parameter Uiso=$5, atom pair $6-$7.\newline" >> `cat GSAS_EXP`.tex
+echo "Added diffuse scattering term to histogram $1 with function type $2, amplitude $3, radius/atomic distance $4, thermal motion parameter Uiso=$5, atom pair \verb=$6-$7=.\newline" >> `cat GSAS_EXP`.tex
 if [ "$5" = "" ]; then
   echo "Leaving damping untouched. \newline" >> `cat GSAS_EXP`.tex
 else

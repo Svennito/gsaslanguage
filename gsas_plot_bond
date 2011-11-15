@@ -20,6 +20,17 @@ if [ "$1" = "" ]; then
 	exit 0
 fi
 
+# check if we have gnuplot
+gnuplot_path=`which gnuplot`
+if [ "$gnuplot_path" = "" ]; then
+	echo "You don't have gnuplot installed!"
+	echo "Please install for this function!"
+	read -p "You should abort here, please hit Ctrl-C."
+	exit
+else
+	echo "gnuplot found."
+fi
+
 
 dataset=1
 nodelete=0

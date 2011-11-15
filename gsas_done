@@ -1,6 +1,17 @@
 #!/bin/bash
 # Called when analysis is done
 
+# check if we have gnuplot
+gnuplot_path=`which gnuplot`
+if [ "$gnuplot_path" = "" ]; then
+	echo "You don't have gnuplot installed!"
+	echo "Please install for this function.!"
+	echo "You may continue here, but without plots for Reduced CHISQ and variable shifts."
+	read -p "To continue please hit enter, to abort, please hit Ctrl-c."
+else
+	echo "gnuplot found."
+fi
+
 # Produce plot of CHISQ evolution
 echo 'set xtics rotate by -15' > temp.plt
 echo 'set xrange [*:*]' >> temp.plt
