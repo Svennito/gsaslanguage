@@ -98,7 +98,7 @@ if [ "$NOPLOT" -eq "0" ]; then
 	
 		echo "z" > temp.txt
 		echo "e" >> temp.txt
-		echo "b m d t" >> temp.txt
+		echo "b m d i" >> temp.txt
 		
 		echo "h $COUNTER p" >> temp.txt
 		if [ $COUNTER -lt 10 ]; then
