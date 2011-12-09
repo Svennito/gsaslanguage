@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# syntax: gsas_rawplot_all <bank> [<nodelete>] <file1> <file2> <file3> 
+
+# Check syntax
+
+scale=.8
+#set to something smaller than 1 to squeeze them closer
+
+if [ "$1" = "" ]; then
+        echo "$0 called without bank number or data to plot"
+        exit 0
+fi
+
+
+# check if we have gnuplot
+gnuplot_path=`which gnuplot`
+if [ "$gnuplot_path" = "" ]; then
+        echo "You don't have gnuplot installed!"
+        echo "Please install for this function!"
+        read -p "You should abort here, please hit Ctrl-C."
+        exit
+else
+        echo "gnuplot found."
+fi
+
+plotfile=Rawplots_$1
+
+# Initialize gnuplot script
+
+echo "set output \"$plotfile.eps\"" > gnuhead.txt
+echo "set term postscript eps enhanced color 24" >> gnuhead.txt
+echo "set key outside below" >> gnuhead.txt
+echo "set title \"Rawplots for bank $1\"" >> gnuhead.txt
+echo "set xlabel \"d-spacing (Angstroms)\"" >> gnuhead.txt
+echo "set ylabel \"I/I0\"" >> gnuhead.txt
+echo "set size 1.3,2.5" >> gnuhead.txt
+echo "offset1=0" >> gnuhead.txt 
+echo "plot \\" > plot.tmp
+
+n_datasets=`echo "$#-1" | bc -l`
+dataset=0
+
+for x in "$@"
+do
+	if [ "$dataset" = 0 ]
+		then
+		# this is the bank number, skip
+#		echo "skipping dataset $dataset"
+		let "dataset+=1"
+		continue
+	elif [ "$x" = "nodelete" ]
+		then
+                let n_datasets--
+		continue
+	fi
+# Get tof, I, and I0 in a file
+# ****************************
+	# make sure exp file exists
+
+	if [ -e "$x".gda ]
+	then
+		echo ""$x".gda found"
+	else
+		echo ""$x".gda not found!"
+		exit 0
+	fi
+	
+	echo "c" > temp.txt
+	echo "" >> temp.txt
+	echo "$x.gda" >> temp.txt
+	echo "" >> temp.txt
+	echo "" >> temp.txt
+	echo "1" >> temp.txt
+	echo "o" >> temp.txt
+	echo "$x"'_b'"$1"'.txt' >> temp.txt
+	echo "x" >> temp.txt
+
+	rawplot < temp.txt > out.txt
+
+# get d-spacing vs. I/I0 for file $x and bank $1
+# **********************************************
+
+	datafile="$1"_"$x".dat
+	
+	echo "Getting dataset $dataset from $datafile.gda..."
+	# get DIFC to calculate d-spacing
+	DIFC=`grep DIFC out.txt | awk '{print $5}'`
+	echo "# d-spacing       I/I0" > $datafile          
+	awk -v DIFC=$DIFC '{print $1*1000/DIFC,$2/$3}' "$x"_b"$1".txt | sed '1d' >> $datafile
+	
+	# get maximum I/I0
+	max=`sort -n -k 2,2 $datafile | tail -n1 | awk '{print $2}'`
+
+	# set offset for next dataset
+	echo 'offset'"$((dataset+1))"'=offset'"$dataset"'+'"$max"'*'"$scale" >> gnuhead.txt	 
+	if [ "$dataset" = "$n_datasets" ]
+		then
+                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l lt 1" >> plot.tmp
+        else 
+                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l lt 1, \\" >> plot.tmp
+        fi
+
+	
+	if [ "$2" = "nodelete" ]
+		then
+		echo "d-spacing vs. intensity saved in $datafile, tof data saved to $x_b"$1".txt"
+	else
+	echo "rm $datafile" >> cleanup
+	echo "rm "$x"_b"$1".txt" >> cleanup
+
+	fi
+
+	let "dataset+=1"
+done
+
+cat gnuhead.txt plot.tmp > gnu.txt
+gnuplot gnu.txt
+ps2pdf $plotfile.eps
+echo "Rawplots of bank $1 in `echo $@ | awk '{$1=""; print $0}'` output in $plotfile.eps and $plotfile.pdf."
