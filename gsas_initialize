@@ -27,6 +27,8 @@ if [ "$gsas" = "" ]; then
 			read -p "Hit Ctrl-c to abort."
 		fi
 	fi
+else
+	echo "Environment variable for GSAS found. "
 fi
 
 if [ "$PGPLOT_FONT" = "" ]; then
@@ -37,7 +39,11 @@ if [ "$PGPLOT_FONT" = "" ]; then
 		echo "See the GSAS readme.txt file for more details."
 		read -p "Hit Ctrl-c to abort."
 		exit 0
+	else
+		echo "Environment variable PGPLOT found. "
 	fi
+else
+	echo "Environment variable for PGPLOT found. "
 fi
 
 gsas_path=`which expedt`
@@ -48,6 +54,8 @@ if [ "$gsas_path" = "" ]; then
 	echo "See the GSAS readme.txt file for more details."
 	read -p "Hit Ctrl-c to abort."
 	exit 0
+else
+	echo "Path includes GSAS executables. "
 fi
 
 # Check syntax
