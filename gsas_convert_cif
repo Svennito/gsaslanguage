@@ -90,6 +90,16 @@ ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas
 ncnrpack_exit=$?
 echo "Exit status of ncnrpack: <$ncnrpack_exit>"
 
+# Check if we got the atoms (conversion of atoms given with ion states fails...)
+if [ `grep NATOM TEMP.EXP | head -c17 | tail -c4` -eq 0 ]; then
+  echo "A problem occured while converting $1!"
+  echo "We did not get any atoms! Possibly the CIF file needs to be modified to get rid of charge states, i.e. convert Bi0+ to Bi as _atom_site_type_symbol?"
+  read -p "You should hit Ctrl-c here and check your CIF file."
+  exit
+else
+  echo "We read <`grep NATOM TEMP.EXP | head -c17 | tail -c4`> atoms from the CIF file."
+fi
+
 if [ $ncnrpack_exit -eq 0 ]; then
 	mv TEMP.EXP $2
 	echo "$1 was converted to $2!"
