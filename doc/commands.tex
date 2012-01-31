@@ -98,12 +98,6 @@ gsas_waterfall_add
 gsas_waterfall_plot
 \end{verbatim}
 
-% Added by Nina: (Maybe you want to double check them)
-% Hi Nina - looked at them - thanks a lot! Minor edits. Let's keep commands alphabetic within a section.
-% I also deleted the # for the phase - just another \ one can forget...
-% Please continue to list your entries here so I can double-check.
-% Thanks again - you may delete the comment after you read it!
-%%
 % Commands that need documenting, delete from here when done...
 %
 % gsas_calc_bond_length
@@ -118,7 +112,6 @@ gsas_waterfall_plot
 % gsas_plot_bond
 % gsas_plot_overview
 % gsas_prepare_mem
-% gsas_replace_histogram
 % gsas_simulate_histogram
 % gsas_single_peak_fits
 % gsas_single_peak_fits_make_list
@@ -135,6 +128,25 @@ gsas_waterfall_plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Beginning and end of refinement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_copy\_expfile}
+{
+Copies an existing, presumably successful refinement into a new EXP file. This can be used for sequential refinements to use the previous time/temperature/pressure/strain etc. data file as a template for the next one, assuming that the changes will be small. With this, in longer sequences of refinements one does not need to start from scratch for each run. After the EXP file was copied, use the gsas\_replace\_histogram command to replace the data files referenced in the EXP file, so the EXP file can actually work with the new data. This command replaces gsas\_initialize for subsequent refinements. Therefore, gsas\_initialize must NOT be called for subsequent runs.
+}{
+gsas\_copy\_expfile <old\_filename> <new\_filename> <new\_title>
+}{
+\item \texttt{<old\_filename>}: Filename of the old EXP file that is the source. No extension needed, ".EXP" will be added.
+\item \texttt{<new\_filename>}: Filename of the new EXP file that will be created. No extension needed, ".EXP" will be added.
+\item \texttt{<new\_title>}: Title string for the new refinement which will appear in the head of e.g. histogram plots.
+}{
+gsas\_copy\_expfile 0TESLA\_BEFORE 1TESLA "Wang, Bi, 1 Tesla magnetic field"\\
+gsas\_replace\_histogram "0Tesla\_00deg.gda" "1Tesla\_00deg.gda"\\
+gsas\_replace\_histogram "0Tesla\_10deg.gda" "1Tesla\_10deg.gda"\\
+gsas\_replace\_histogram "0Tesla\_45deg.gda" "1Tesla\_45deg.gda"\\
+}{
+Copies an EXP file 0TESLA\_BEFORE.EXP to 1TESLA.EXP and assigns a new title. After that, three data files used in the first EXP file are replaced with the data files of the 2nd EXP file.
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \glcommand{gsas\_done}
@@ -165,6 +177,21 @@ gsas\_initialize SIO2\_FURNACE\_\$1C "SiO2, furnace, \$1C"
 When a script with this line is called with a parameter 100, e.g. the GSAS data file for a run at  100C, 
 named 100C.gda, the \$1 occurences will be replaced with "100" by bash, generating a EXP filename 
 SIO2\_FURNACE\_100C.EXP with a run title label "SiO2, furnace, 100C".
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\glcommand{gsas\_replace\_histogram}
+{
+Replaces all references to a filename with a new filename in the current EXP file. This is typically done after a gsas\_copy\_expfile command, using a previous refinement as a template for a new refinement. Since the extension for data files in GSAS is not fixed, the extension of the data file has to be provided. This runs a simple text search and replace operation on the current EXP file, so in principle it can be used for other purposes, such as replacing instrument parameter files. 
+}{
+gsas\_replace\_histogram <old\_filename> <new\_filename>
+}{
+\item \texttt{<old\_filename>}: Filename of the old data file that needs to be replaced.
+\item \texttt{<new\_filename>}: Filename of the new data file that will be referenced after this operation.
+}{
+See example for gsas\_copy\_expfile.
+}{
+See example for gsas\_copy\_expfile.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

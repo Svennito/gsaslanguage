@@ -93,6 +93,22 @@ if [ "$NOPLOT" -eq "0" ]; then
 	while [ $COUNTER -lt $NHIST ]; do
 		let COUNTER=COUNTER+1 
 	
+		if [ $COUNTER -lt 10 ]; then
+			searchstring="HST  $COUNTER  HFIL"
+		else
+			searchstring="HST $COUNTER  HFIL"
+		fi
+		
+		# Check if this histogram refers to a dataset or something else, like a zero pole figure constraint
+		echo "Searching for <$searchstring> to check if this histogram has experimental data..."
+		grep "$searchstring" `cat GSAS_EXP`.EXP
+		if [ $? -eq 0 ]; then
+			echo "We found the search string, so the histogram has data."
+		else
+			echo "We did not find the search string, so the histogram has no data and is a constraint or so."
+			continue
+		fi
+
 		echo "Plotting histogram $COUNTER of $NHIST..."
 		echo "Histogram $COUNTER of $NHIST:\newline" >> `cat GSAS_EXP`.tex
 	
