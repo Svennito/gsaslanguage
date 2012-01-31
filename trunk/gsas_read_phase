@@ -22,13 +22,14 @@ if [ "$2" = "" ]; then
 fi
 
 # Does the phase have atoms?
-if [ `grep 'CRS$2   NATOM' $1 | head -c17 | tail -c4` -eq 0 ]; then
+natoms=`grep CRS$2 $1 | grep NATOM | head -c17 | tail -c4`
+if [ $natoms -eq 0 ]; then
   echo "A problem occured while converting $1!"
   echo "We did not get any atoms! Possibly the CIF file needs to be modified to get rid of charge states, i.e. convert Bi0+ to Bi as _atom_site_type_symbol?"
   read -p "You should hit Ctrl-c here and check your CIF file."
   exit
 else
-  echo "We read <`grep 'CRS$2   NATOM' $1 | head -c17 | tail -c4`> atoms from the EXP file $1."
+  echo "We read <$natoms> atoms from the EXP file $1."
 fi
 
 # Add the phase

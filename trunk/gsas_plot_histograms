@@ -45,16 +45,32 @@ while [ $COUNTER -lt $NHIST ]; do
 	if [ $COUNTER -lt 10 ]; then
 		echo "HIST0$COUNTER" >> temp.txt
 		echo "HIST0$COUNTER" >> temp.txt
-		echo "\includegraphics[width=0.3\textwidth]{HIST0$COUNTER.EPS}" >> all_hist.tex
+		searchstring="HST  $COUNTER  HFIL"
 	else
 		echo "HIST$COUNTER" >> temp.txt
 		echo "HIST$COUNTER" >> temp.txt
-		echo "\includegraphics[width=0.3\textwidth]{HIST$COUNTER.EPS}" >> all_hist.tex
+		searchstring="HST $COUNTER  HFIL"
 	fi
 	echo " " >> temp.txt
 	echo " " >> temp.txt
 	echo "x" >> temp.txt
 
+	# Check if this histogram refers to a dataset or something else, like a zero pole figure constraint
+	echo "Searching for <$searchstring> to check if this histogram has experimental data..."
+	grep "$searchstring" `cat GSAS_EXP`.EXP
+	if [ $? -eq 0 ]; then
+		echo "We found the search string, so the histogram has data."
+	else
+		echo "We did not find the search string, so the histogram has no data and is a constraint or so."
+		continue
+	fi
+	if [ $COUNTER -lt 10 ]; then
+		echo "\includegraphics[width=0.3\textwidth]{HIST0$COUNTER.EPS}" >> all_hist.tex
+	else
+		echo "\includegraphics[width=0.3\textwidth]{HIST$COUNTER.EPS}" >> all_hist.tex
+	fi
+
+	echo "Calling powplot to plot the data..."
 	nice powplot `cat GSAS_EXP`.EXP < temp.txt > out.txt
 	
 	# do we need a new line in all_plots.tex
