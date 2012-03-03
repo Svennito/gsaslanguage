@@ -24,7 +24,7 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 
 # find out what the current flag is
-grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | tail -c36 | head -c1 > flag.txt
+grep "CRS$1  ABC   " `cat GSAS_EXP`.EXP | awk '{print $6}' > flag.txt    
 echo "The refinement flag is <`cat flag.txt`>"
 if [ "`cat flag.txt`" = " " ]; then
 	echo "Could not determine refinement flag for lattice parameter of phase $1, trying again."
