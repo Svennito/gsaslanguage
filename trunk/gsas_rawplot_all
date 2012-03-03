@@ -24,6 +24,27 @@ else
         echo "gnuplot found."
 fi
 
+# check if bank is found
+
+	echo "c" > temp.txt
+	echo "" >> temp.txt
+	echo "$x.gda" >> temp.txt
+	echo "" >> temp.txt
+	echo "" >> temp.txt
+	echo "-1" >> temp.txt
+	echo "0" >> temp.txt
+	echo "x" >> temp.txt
+
+	rawplot < temp.txt > out.txt
+
+	flag=`grep "Bank  $1" out.txt | wc -c`
+
+	if [ $flag = 0 ]
+	then
+		echo "Bank number $1 not found!"
+		exit 0
+	fi
+
 plotfile=Rawplots_$1
 
 # Initialize gnuplot script
@@ -34,6 +55,13 @@ echo "set key outside below" >> gnuhead.txt
 echo "set title \"Rawplots for bank $1\"" >> gnuhead.txt
 echo "set xlabel \"d-spacing (Angstroms)\"" >> gnuhead.txt
 echo "set ylabel \"I/I0\"" >> gnuhead.txt
+echo "set style line 2 lt 1 lc rgb \"#8B008B\"
+set style line 3 lt 1 lc rgb \"orange\"
+set style line 4 lt 1 lc rgb \"green\" 
+set style line 5 lt 1 lc rgb \"#008B8B\"
+set style line 6 lt 1 lc rgb \"blue\"  
+set style line 7 lt 1 lc rgb \"violet\"
+set style line 8 lt 1 lc rgb \"#00008B\"" >> gnuhead.txt
 echo "set size 1.3,2.5" >> gnuhead.txt
 echo "offset1=0" >> gnuhead.txt 
 echo "plot \\" > plot.tmp
@@ -60,7 +88,7 @@ do
 
 	if [ -e "$x".gda ]
 	then
-		echo ""$x".gda found"
+		echo ""$x".gda found."
 	else
 		echo ""$x".gda not found!"
 		exit 0
@@ -71,7 +99,7 @@ do
 	echo "$x.gda" >> temp.txt
 	echo "" >> temp.txt
 	echo "" >> temp.txt
-	echo "1" >> temp.txt
+	echo "$1" >> temp.txt
 	echo "o" >> temp.txt
 	echo "$x"'_b'"$1"'.txt' >> temp.txt
 	echo "x" >> temp.txt
@@ -96,9 +124,9 @@ do
 	echo 'offset'"$((dataset+1))"'=offset'"$dataset"'+'"$max"'*'"$scale" >> gnuhead.txt	 
 	if [ "$dataset" = "$n_datasets" ]
 		then
-                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l lt 1" >> plot.tmp
+                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l ls $dataset" >> plot.tmp
         else 
-                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l lt 1, \\" >> plot.tmp
+                echo "   \""$datafile"\" u 1:(\$2+offset"$dataset") title \"$x\" w l lt $dataset, \\" >> plot.tmp
         fi
 
 	
