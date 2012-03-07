@@ -28,7 +28,7 @@ if [ "$3" = "" ]; then
 fi
 
 # extract atom data
-if [ $2 -gt 10 ]; then
+if [ $2 -gt 9 ]; then
 	grep "CRS$1  AT $2" `cat GSAS_EXP`.EXP > atomtemp.txt 
 else
 	grep "CRS$1  AT  $2" `cat GSAS_EXP`.EXP > atomtemp.txt 

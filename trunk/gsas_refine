@@ -114,8 +114,22 @@ if [ "$NOPLOT" -eq "0" ]; then
 	
 		echo "z" > temp.txt
 		echo "e" >> temp.txt
-		echo "b m d i" >> temp.txt
+		echo "b m d i t x" >> temp.txt
+		nice powplot `cat GSAS_EXP`.EXP < temp.txt > out.txt
 		
+		echo "z" > temp.txt
+		echo "e" >> temp.txt
+		echo "b m d i" >> temp.txt
+		# check if we see "Plot will use d-spacing in Angstroms" so we know whether we need to issue a "t"
+		grep "Plot will use d-spacing in Angstroms" out.txt
+		if [ $? -eq 0 ]; then
+			echo "Powplot needs a <t> option to switch to d-spacing for x-axis."
+			echo "t" >> temp.txt
+		else
+			echo "Powplot does not need <t> option, so d-spacing is still the default like in older GSAS versions."
+			continue
+		fi
+
 		echo "h $COUNTER p" >> temp.txt
 		if [ $COUNTER -lt 10 ]; then
 			echo "S`echo $STEP`H0$COUNTER" >> temp.txt
