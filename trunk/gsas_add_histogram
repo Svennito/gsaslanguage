@@ -96,7 +96,7 @@ fi
 grep "Histogram no." out.txt | head -c18 | tail -c2 > hist.txt
 
 # Test the EXP file
-grep "$1" `cat GSAS_EXP`.EXP > temp.txt
+grep "$1" `cat GSAS_EXP`.EXP > temp2.txt
 #echo "grep returned $?"
 if [ "$?" = "1" ]; then
 	echo "Data file name is NOT in the EXP file"
