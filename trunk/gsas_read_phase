@@ -23,7 +23,7 @@ fi
 
 # Does the phase have atoms?
 natoms=`grep CRS$2 $1 | grep NATOM | awk '{print $3}'`
-if [ $natoms -eq 0 ]; then
+if [ $natoms = "0" ]; then
   echo "A problem occured while converting $1!"
   echo "We did not get any atoms! Possibly the CIF file needs to be modified to get rid of charge states, i.e. convert Bi0+ to Bi as _atom_site_type_symbol?"
   read -p "You should hit Ctrl-c here and check your CIF file."
