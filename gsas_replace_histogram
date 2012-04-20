@@ -15,7 +15,8 @@ fi
 
 # Replace the histogram in the EXP file - using EXPEDT resets parameters we do not want to reset
 # (absorption, profile etc.)
-sed -i "s/$1/$2/g" `cat GSAS_EXP`.EXP
+# add a few extra spaces in the new file as the following cnvfile messes up if the new lines are too short
+sed -i "s/$1/$2          /g" `cat GSAS_EXP`.EXP
 if [ "$OS" = "Windows_NT" ]; then
 	echo "I think I run on a Windows box..."
 	unix2dos `cat GSAS_EXP`.EXP
@@ -25,7 +26,6 @@ fi
 
 echo `cat GSAS_EXP`.EXP > temp.txt
 cnvfile < temp.txt
-echo "sed -i "s/$1/$2/g" `cat GSAS_EXP`.EXP" 
 
 # Test the EXP file
 echo "Replaced all references to \verb=$1= with \verb=$2= .\newline" >> `cat GSAS_EXP`.tex
