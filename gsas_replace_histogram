@@ -18,7 +18,7 @@ fi
 # add a few extra spaces in the new file as the following cnvfile messes up if the new lines are too short
 sed -i "s/$1/$2                  /g" `cat GSAS_EXP`.EXP
 # make all lines length 80 again
-awk '{printf("%-80.80s\n", $0) }' `cat GSAS_EXP`.EXP > TEMP.EXP
+awk '{printf("%-80.80s\r\n", $0) }' `cat GSAS_EXP`.EXP > TEMP.EXP
 mv TEMP.EXP `cat GSAS_EXP`.EXP
 
 # run cnvfile to re-format
