@@ -50,6 +50,38 @@ else
 	echo "Y" > gsas_print.txt
 fi
 
+# determine the plot flags for x-axis in d-spacing, this makes sure that also older versions of powplot work
+if [ -f gsas_plotopt.txt ]; then
+	# Flag file exists, no action needed
+	echo "Plot options already set"
+else
+	echo "z e" > temp.txt
+	echo "t" >> temp.txt
+	echo "x" >> temp.txt
+	powplot `cat GSAS_EXP` < temp.txt > temp2.txt
+	# check if the "t" option changes to d-spacing on the x-axis
+	grep "Plot will use d-spacing in Angstroms" temp2.txt
+	if [ $? == "0" ];then
+	      # grep found the string, so one "t" is required
+	      echo "t" > gsas_plotopt.txt
+	else
+	      # might need more
+	      echo "z e" > temp.txt
+	      echo "t t" >> temp.txt
+	      echo "x" >> temp.txt
+	      powplot `cat GSAS_EXP` < temp.txt > temp2.txt
+	      # check if the "t" option changes to d-spacing on the x-axis
+	      grep "Plot will use d-spacing in Angstroms" temp2.txt
+	      if [ $? == "0" ];then
+		# grep found the string, so one "t" is required
+		echo "t t" > gsas_plotopt.txt
+	      else
+		# there are only three possibilities, so if we are here, the default was good
+		echo " " > gsas_plotopt.txt
+	      fi
+	fi
+fi
+
 if [ -f gsas_step.txt ]; then
 	# file with number of refinement step exists, read it
 	STEP=`cat gsas_step.txt`
@@ -114,6 +146,7 @@ if [ "$NOPLOT" -eq "0" ]; then
 	
 		echo "z" > temp.txt
 		echo "e" >> temp.txt
+		cat gsas_plotopt.txt >> temp.txt
 		echo "b m d i" >> temp.txt
 		
 		echo "h $COUNTER p" >> temp.txt

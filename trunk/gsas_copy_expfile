@@ -2,6 +2,9 @@
 # echo the call so we can see what's going on
 echo "$0 $1 $2 $3 $4 $5 $6"
 
+# remember the start time
+echo $(date +%s) > gsas_start.txt
+
 # Check syntax
 if [ "$1" = "" ]; then
 	echo "$0 called without name for source EXP file!"
