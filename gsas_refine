@@ -46,7 +46,7 @@ else
 	echo "x" >> temp.txt
 	echo "x" >> temp.txt
 	echo "x" >> temp.txt
-	expedt `cat GSAS_EXP` < temp.txt
+	expedt `cat GSAS_EXP` < temp.txt > out.txt
 	echo "Y" > gsas_print.txt
 fi
 

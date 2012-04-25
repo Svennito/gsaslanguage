@@ -58,7 +58,7 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 
-expedt `cat GSAS_EXP` < temp.txt
+expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
 echo "Changed atom refinement flags for phase $1, atom $2 to $3" >> temp.tex
