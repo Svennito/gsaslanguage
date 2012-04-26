@@ -1,0 +1,22 @@
+#!/bin/bash
+# 
+# gsas_current_value - extract the current value of a parameter from the PVE file
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_current_value <parameter>
+#
+# parameter - a parameter string to be found in the PVE file
+#
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 parameter string!"
+	read -p "You should abort here, please hit Ctrl-C."
+	exit 0
+fi
+
+grep "$1" `cat GSAS_EXP`.PVE | tail -c33 | head -c 16
+
+
