@@ -11,7 +11,7 @@ echo "\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}" >> `cat G
 echo "\usepackage{graphicx}" >> `cat GSAS_EXP`.tex
 echo "\begin{document}" >> `cat GSAS_EXP`.tex
 echo " " >> `cat GSAS_EXP`.tex
-echo "This file shows diffraction patterns for `grep PNAM PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`. Simulation parameters:" >> `cat GSAS_EXP`.tex
+echo "This file shows diffraction patterns for \verb=`grep PNAM PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`=. Simulation parameters:" >> `cat GSAS_EXP`.tex
 echo "\begin{itemize}" >> `cat GSAS_EXP`.tex
 echo "\item Instrument parameter file \verb=`grep 'HST  1  IFIL ' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`=.  " >> `cat GSAS_EXP`.tex
 echo "Bank: `grep 'HST  1 BANK ' PHASES_SIM.EXP | tail -c68 | head -c65 | sed 's/[ ]*$//g'`." >> `cat GSAS_EXP`.tex
