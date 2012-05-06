@@ -46,6 +46,6 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 
-expedt `cat GSAS_EXP` < temp.txt
+expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-echo "Set refinement flag for weight fraction of phase number $1 to $2.\newline" >> temp.tex
+echo "Set refinement flag for weight fraction of phase $1 to $2.\newline" >> temp.tex

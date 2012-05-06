@@ -1,0 +1,52 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which profile cut-off should be changed!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of phase for which profile cut-off should be changed!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without h of broadening axis"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without k of broadening axis"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$5" = "" ]; then
+	echo "$0 called without l of broadening axis"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+# Change the broadening axis
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "a" >> temp.txt
+echo $3 $4 $5 >> temp.txt 
+echo "n" >> temp.txt
+ 
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Add to the LaTeX file
+echo "Changed anisotropic broadening axis for peak broadening for histogram $1 and phase $2 to ($3 $4 $5). This will change also the anisotropic broadening axis of this phase for all other histograms. \newline" >> temp.tex
