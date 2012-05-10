@@ -1,0 +1,62 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of histogram for which profile parameter should be varied!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without number of phase for which profile parameter should be varied!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without number of number of profile parameter which should be varied!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+if [ "$4" = "" ]; then
+	echo "$0 called without new flag for the profile parameter!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+# need to test if $3 is a integer value, so we can loop to the right value
+if (($3)) 2>/dev/null; then
+	echo "We will change the variation flag for profile parameter #$3 to <$4> of the current peak profile parameter set for histogram $1, phase $2."
+else
+	echo "$0 called without integer value for the number of the profile parameter!"
+	read -p "You should hit Ctrl-c to abort here..."
+	exit 0
+fi
+
+# Change the parameter
+echo "k l o p" > temp.txt
+echo "h $1" >> temp.txt
+echo "p $2" >> temp.txt
+echo "v" >> temp.txt
+# make a loop starting at 2 instead of 1 to have one less ",", which keeps the present value
+for (( c=2; c<=$3; c++ )); do
+      echo "," >> temp.txt
+done
+echo "$4" >> temp.txt
+# leave the rest untouched, "/" at the menu prompt doesn't hurt, no profile function has more than 20-30 parameters....
+for i in {1..10}; do
+      echo "/" >> temp.txt
+done
+ 
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# report the change
+echo "Changed variation flag for profile parameter #$3 to $4 of the current peak profile parameter set for histogram $1, phase $2.\newline" >> temp.tex
