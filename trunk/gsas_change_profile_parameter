@@ -59,4 +59,4 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
-echo "Changed profile parameter #$3 to $4 of the current peak profile parameter set for histogram $1, phase $2.\newline" >> temp.tex
+echo "Changed profile parameter $3 to $4 of the current peak profile parameter set for histogram $1, phase $2.\newline" >> temp.tex

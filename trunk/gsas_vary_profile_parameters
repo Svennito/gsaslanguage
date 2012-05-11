@@ -31,20 +31,22 @@ echo "Changed refinement flag of profile parameters for histogram $1 and phase $
 for arg in "$@"; do
   let counter+=1
   # skip over first few parameters
-  if [ "$arg" = "$0" ]; then continue; fi
-  if [ "$arg" = "$1" ]; then continue; fi
-  if [ "$arg" = "$2" ]; then continue; fi
+  if [ "$arg" == "$0" ]; then continue; fi
+  if [ "$arg" == "$1" ]; then continue; fi
+  if [ "$arg" == "$2" ]; then continue; fi
   # now we deal with the real parameters
   echo "$arg" >> temp.txt
-  echo "<$arg> " >> temp.tex
+  echo "'$arg'" >> temp.tex
 done
 
 # do we have 7 entries (maximum of profile function parameters)
-while [ $counter -lt 9 ]; do
-  let counter+=1
-  echo "/" >> temp.txt
-  echo "<$arg>" >> temp.tex
-done
+if [ $counter -lt $# ]; then
+  while [ $counter -lt 9 ]; do
+    let counter+=1
+    echo "/" >> temp.txt
+    echo "'$arg'" >> temp.tex
+  done
+fi
 
 echo ". \newline" >> temp.tex
 
