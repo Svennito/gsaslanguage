@@ -50,7 +50,13 @@ echo "$4" >> temp.txt
 for i in {1..10}; do
       echo "/" >> temp.txt
 done
- 
+
+if [ "$5" = "" ]; then
+      echo "$0 called without new damping flag for the profile parameters - leaving damping untouched!"
+else
+      echo "d $5" >> temp.txt
+fi
+
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
@@ -59,4 +65,10 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # report the change
-echo "Changed variation flag for profile parameter #$3 to $4 of the current peak profile parameter set for histogram $1, phase $2.\newline" >> temp.tex
+echo "Changed variation flag for profile parameter $3 to $4 of the current peak profile parameter set for histogram $1, phase $2.">> temp.tex
+if [ "$5" = "" ]; then
+      echo "Leaving damping untouched." >> temp.tex
+else
+      echo "Changed damping flag to $5." >> temp.txt
+fi
+echo "\newline" >> temp.tex
