@@ -1,0 +1,35 @@
+#!/bin/bash
+# 
+# gsas_current_wtfrac - extract current weight fraction of a phase
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_current_wtfrac <phase>
+#
+# phase - the phase for which the weight fraction is extracted
+#
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without a phase number!"
+	read -p "You should abort here, please hit Ctrl-C."
+	exit 0
+fi
+
+grep "Wt." `cat GSAS_EXP`.LST > temp.txt
+if [ $? -ne 0 ]; then
+	echo "Could not find wt. fraction in current LST file - maybe it was not refined yet?"
+	read -p "You should abort here, please hit Ctrl-C."
+	exit 0
+fi
+
+grep "EXPR NPHAS" `cat GSAS_EXP`.EXP | awk '{print $3+$4+$5+$6+$7+$8+$9+$10+$11}' > temp.txt
+num_phases=`cat temp.txt`
+let num_blocks=num_phases*3
+let cur_block=$1*3
+grep -A 1 "Wt." `cat GSAS_EXP`.LST | tail -n $num_blocks | head -n $cur_block | tail -n 1 | awk '{print $3}' > temp.txt
+# output weight fraction, so the calling process can read it
+cat temp.txt
+
+
