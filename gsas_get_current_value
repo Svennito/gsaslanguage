@@ -12,9 +12,16 @@
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 parameter string!"
-	read -p "You should abort here, please hit Ctrl-C."
-	exit 0
+  echo "$0 called without parameter string!"
+  read -p "You should abort here, please hit Ctrl-C."
+  exit 0
+fi
+
+grep "$1" `cat GSAS_EXP`.PVE > temp.txt
+# did we find anything?
+if [ $? -eq 1 ]; then
+  read -p "$1 was not found in the PVE file - maybe it was not varied yet? You should abort here, please hit Ctrl-C."
+  exit 0
 fi
 
 grep "$1" `cat GSAS_EXP`.PVE | tail -c33 | head -c 16
