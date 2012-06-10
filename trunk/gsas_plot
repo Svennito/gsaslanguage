@@ -61,19 +61,8 @@ for arg in "$@"; do
 	label=`cat temp.txt`
 
 	# Let's output the values of the parameter
-	#grep "$arg" *.PVE > temp.txt
-	# Are we looking for a bond length or angle?
-	if [ `expr index "$arg" "_" ` -gt 1 ]; then
-		# It's a bond length, like Ti1_Ti2
-		echo "extracting a bond parameter..."
-		grep " $arg " `ls *.LST -rt` > temp1.txt
-		
-		grep 
-	else
-		# It's a normal variable in a PVE file
-		echo "extracting a Rietveld parameter..."
-		grep "$arg" `ls *.PVE -rt` > temp.txt
-	fi
+	echo "extracting a Rietveld parameter..."
+	grep "$arg" `ls *.PVE -rt` > temp.txt
 	
 	# Reformat the output
 	nl temp.txt > temp1.txt
