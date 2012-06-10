@@ -18,14 +18,6 @@ if [ "$1" = "" ]; then
 	exit 0
 fi
 
-if [ "$2" = "" ]; then
-	max_dist=3.5
-	echo "$0 called without maximum distance, assuming $max_dist A!"
-	exit 0
-else
-	max_dist=$2
-fi
-
 # Setup the computation
 echo "k d" > temp.txt
 echo "d $1" >> temp.txt
@@ -39,9 +31,80 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
+# calling disagl with the EXP as the parameter adds to the LST file
 disagl `cat GSAS_EXP` > out.txt
 
-echo "Computed bond length and angles for phase $1 and added them to the \verb=`cat GSAS_EXP`.LST= file.\newline" >> `cat GSAS_EXP`.tex
+# calling disagl with the EXP file piped in outputs to the screen which we can capture
+echo `cat GSAS_EXP` > temp.txt
+disagl <temp.txt > out.txt
 
+# create an awk script to extract bond lengths
+echo "{" > extract_bonds.awk
+echo "  if (\$1==\"Vector\" && \$2==\"Length\") {" >> extract_bonds.awk
+echo "    do {" >> extract_bonds.awk
+echo "      if(getline == 0) {" >> extract_bonds.awk
+echo "        break;" >> extract_bonds.awk
+echo "      }" >> extract_bonds.awk
+echo "      # catch new page header lines" >> extract_bonds.awk
+echo "      if (substr(\$0,0,1)!=\" \") {" >> extract_bonds.awk
+echo "        continue" >> extract_bonds.awk
+echo "      }" >> extract_bonds.awk
+echo "      bond=\$1;" >> extract_bonds.awk
+echo "      bl=substr(\$2,0,index(\$2,\"(\")-1);" >> extract_bonds.awk
+echo "      bl_esd=substr(\$2,index(\$2,\"(\")+1,index(\$2,\")\")-index(\$2,\"(\")-1);" >> extract_bonds.awk
+echo "      bl_dec=length(bl)-index(bl,\".\");" >> extract_bonds.awk
+echo "      bl_esd_abs=substr(\"0.0000000000000000000\",0,2+bl_dec-length(bl_esd))bl_esd;" >> extract_bonds.awk
+echo "      printf \"  \\\"%1s %8s\\\"   %8.6e   %8.6e\n\",phase,bond,bl,bl_esd_abs;" >> extract_bonds.awk
+echo "    } while (\$1!=\"\" && \$2!=\"\") " >> extract_bonds.awk
+echo "  }" >> extract_bonds.awk
+echo "}" >> extract_bonds.awk
 
+# run the script to extract the bonds from the disagl output
+awk -f extract_bonds.awk -v phase=$1 out.txt > bonds.txt
+# sort them
+sort bonds.txt > bonds_sort.txt
+# remove duplicates (same bond with different esds counts NOT as a duplicate!)
+uniq bonds_sort.txt > bonds.txt
+# add it to the PVE file
+cat bonds.txt >> `cat GSAS_EXP`.PVE
+
+# create an awk script to extract bond lengths
+echo "{" > extract_angles.awk
+echo "  if (\$1==\"Angle\" && \$2==\"Degrees\") {" >> extract_angles.awk
+echo "    do {" >> extract_angles.awk
+echo "      if(getline == 0) {" >> extract_angles.awk
+echo "        break;" >> extract_angles.awk
+echo "      }" >> extract_angles.awk
+echo "      # catch new page header lines" >> extract_angles.awk
+echo "      if (substr(\$0,0,1)!=\" \") {" >> extract_angles.awk
+echo "        continue" >> extract_angles.awk
+echo "      }" >> extract_angles.awk
+echo "      bond=\$1;" >> extract_angles.awk
+echo "      bl=substr(\$2,0,index(\$2,\"(\")-1);" >> extract_angles.awk
+echo "      bl_esd=substr(\$2,index(\$2,\"(\")+1,index(\$2,\")\")-index(\$2,\"(\")-1);" >> extract_angles.awk
+echo "      bl_dec=length(bl)-index(bl,\".\");" >> extract_angles.awk
+echo "      bl_esd_abs=substr(\"0.0000000000000000000\",0,2+bl_dec-length(bl_esd))bl_esd;" >> extract_angles.awk
+echo "      printf \"  \\\"%1s %8s\\\"   %8.6e   %8.6e\n\",phase,bond,bl,bl_esd_abs;" >> extract_angles.awk
+echo "    } while (\$1!=\"\" && \$2!=\"\") " >> extract_angles.awk
+echo "  }" >> extract_angles.awk
+echo "}" >> extract_angles.awk
+
+# run the script to extract the angles from the disagl output
+awk -f extract_angles.awk  -v phase=$1 out.txt > angles.txt
+# sort them
+sort angles.txt > angles_sort.txt
+# remove duplicates (same angle with different esds counts NOT as a duplicate!)
+uniq angles_sort.txt > angles.txt
+# add it to the PVE file
+cat angles.txt >> `cat GSAS_EXP`.PVE
+
+echo "Computed bond length and angles for phase $1 and added them to the \verb=`cat GSAS_EXP`.LST= and \verb=`cat GSAS_EXP`.PVE= files.\newline" >> `cat GSAS_EXP`.tex
+
+# clean up
+rm extract_angles.awk
+rm extract_bonds.awk
+rm bonds.txt
+rm bonds_sort.txt
+rm angles.txt
+rm angles_sort.txt
 
