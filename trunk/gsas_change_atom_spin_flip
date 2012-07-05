@@ -1,0 +1,44 @@
+#!/bin/bash
+# 
+# gsas_change_atom - change atom parameter
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_change_atom <phase> <atom range> <parameter name> <value>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom spin flip should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without spin flip operater number for which spin flip should be changed!"
+	exit 0
+fi
+
+# Change the value
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "m" >> temp.txt
+echo "s" >> temp.txt
+echo "c $2" >> temp.txt
+echo "l" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed spin flip operator number $2 for phase $1. The unique symmetry operations and the associated spin colors are \newline \verb=" >> temp.tex
+grep "The unique symmetry operations" out.txt -A 2 | tail -n 2 >> temp.tex
+echo "=\newline" >> temp.tex
+
