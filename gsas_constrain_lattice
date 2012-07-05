@@ -1,0 +1,46 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without first constraint string!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without second constraint string!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+# Add the phase
+echo "k l o l" > temp.txt
+echo "k l" >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo "i" >> temp.txt
+counter=0
+for arg in "$@"; do
+	let counter+=1
+	if [ $counter -lt 1 ]; then continue; fi
+	echo "$arg" >> temp.txt
+done
+
+echo " " >> temp.txt
+echo "l x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Constrained lattice parameters with the following constraint terms:\newline\verb=" >> temp.tex
+for arg in "$@"; do
+	let counter+=1
+	if [ $counter -lt 1 ]; then continue; fi
+	echo "$arg" >> temp.tex
+done
+echo "=\newline" >> temp.tex

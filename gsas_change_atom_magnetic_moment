@@ -1,0 +1,46 @@
+#!/bin/bash
+# 
+# gsas_change_atom - change atom parameter
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_change_atom <phase> <atom range> <parameter name> <value>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without number of phase for which atom magnetic moment should be changed!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without atom for which magnetic moment should be changed!"
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without magnetic moment component"
+	exit 0
+fi
+
+
+# Change the value
+echo "k l a" > temp.txt
+echo "p $1" >> temp.txt
+echo "m" >> temp.txt
+echo "m $2" >> temp.txt
+echo "$3" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+# Test the EXP file
+echo "Changed for phase $1, atom $2, magnetic moment component to \verb=$3=." >> temp.tex

@@ -1,0 +1,36 @@
+#!/bin/bash
+# 
+# gsas_change_phase_type - change phase type (nuclear only, magnetic only, nuclear and magnetic)
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_change_phase_type <phase> <flag>
+#
+# 
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without phase number!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without new phase type!"
+	exit 0
+fi
+
+# change the phase flags
+echo "k p p" > temp.txt
+echo "m $1" >> temp.txt
+echo "$2" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+echo "x" >> temp.txt
+
+expedt `cat GSAS_EXP` < temp.txt > out.txt
+
+echo "Changed phase type for phase $1 to $2.\newline" >> temp.tex
