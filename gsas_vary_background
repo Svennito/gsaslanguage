@@ -17,6 +17,12 @@ fi
 echo "k l o b" > temp.txt
 echo "g $1 $1" >> temp.txt
 echo "$2" >> temp.txt
+if [ "$3" == "" ]; then
+  echo "No damping flag given, leaving damping untouched..."
+else
+  echo "Changing damping to $3..."
+  echo "d $3" >> temp.txt
+fi
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
@@ -25,4 +31,10 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt
 
 # Test the EXP file
-echo "Changed background refinement flags for histogram $1 to \verb=$2=.\newline" >> temp.tex
+echo "Changed background refinement flags for histogram $1 to \verb=$2=." >> temp.tex
+if [ "$3" == "" ]; then
+  echo "No damping flag given, leaving damping untouched.\newline"  >> temp.tex
+else
+  echo "Changing damping to $3.\newline"  >> temp.tex
+  echo "d $3" >> temp.txt
+fi
