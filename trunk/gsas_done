@@ -181,3 +181,4 @@ START=`cat gsas_start.txt`
 END=$(date +%s)
 DIFF=$(( $END - $START ))
 echo "Total run time since gsas_initialize: $DIFF seconds."
+
