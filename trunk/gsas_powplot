@@ -1,0 +1,44 @@
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# call with gsas_powplot <filename> <histogram> <Intensity normalized?>
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 called without filename!"
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without histogram!"
+	exit 0
+fi
+
+echo "z e" > temp.txt
+echo "h $2" >> temp.txt
+if [ "$3" = "n" ]; then
+	echo "b m d p" >> temp.txt
+else
+	echo "i b m d p" >> temp.txt
+fi
+echo "$1 bank $2" >> temp.txt
+echo ""$2"_"$1"" >> temp.txt
+echo " " >> temp.txt
+echo " " >> temp.txt
+echo "x" >> temp.txt
+powplot $1 < temp.txt
+
+epsfile=`ls -rt "$2"_*.EPS | tail -n1`
+
+ps2pdf $epsfile
+
+# clean up
+rm `echo $1`.CMT
+rm `echo $1`.O??
+rm `echo $1`.P[^VE]*
+rm `echo $1`.R??
+#rm temp.txt
+
+echo "Histogram and least squares of $1 for bank $2 plotted in "$epsfile" and "$2"_"$1".pdf"
+
+
