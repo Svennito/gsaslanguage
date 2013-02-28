@@ -37,10 +37,10 @@ echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
-echo "Constrained lattice parameters with the following constraint terms:\newline\verb=" >> temp.tex
+echo "Constrained lattice parameters with the following constraint terms:\newline" >> temp.tex
 for arg in "$@"; do
 	let counter+=1
 	if [ $counter -lt 1 ]; then continue; fi
 	echo "$arg" >> temp.tex
 done
-echo "=\newline" >> temp.tex
+echo "\newline" >> temp.tex
