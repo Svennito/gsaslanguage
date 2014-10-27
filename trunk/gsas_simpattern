@@ -69,7 +69,7 @@ gsas_initialize $1_sim "simulated pattern for $1_Phase_$2"
 gsas_read_phase $file $2
 gsas_simulate_histogram $3 $bank $min_d $max_d
 gsas_refine 0
-gsas_simulate_histogram_plot
+gsas_simulate_histogram_plot $min_d $max_d
 echo " "
 echo " "
 echo "The output was written to `cat GSAS_EXP`.pdf."
