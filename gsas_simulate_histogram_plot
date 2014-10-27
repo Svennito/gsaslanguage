@@ -32,7 +32,8 @@ echo "if..."
 if [ "`tail -c 1 htype.txt`" == "C" ]; then
     echo "We have a constant wavelength instrument no need to normalize with incident intensity."
     rm S_NONORM.EPS
-    echo "n p" >> temp.txt
+    echo "n s p" >> temp.txt
+    echo "$1 $2 a" >> temp.txt
     echo "S_NONORM" >> temp.txt
     echo "S_NONORM" >> temp.txt
     echo " " >> temp.txt
@@ -46,7 +47,8 @@ else
 	echo "We have a time-of-flight instrument, give both normalized and non-normalized intensity."
 	rm S_NONORM.EPS
 	rm S_NORM.EPS
-	echo "n p" >> temp.txt
+	echo "n s p" >> temp.txt
+	echo "$1 $2 a" >> temp.txt
 	echo "S_NONORM" >> temp.txt
 	echo "S_NONORM" >> temp.txt
 	echo " " >> temp.txt
@@ -56,6 +58,7 @@ else
 	echo "\includegraphics[width=120mm]{S_NONORM.EPS}" >> `cat GSAS_EXP`.tex
 
 	echo "i p" >> temp.txt
+	echo "$1 $2 a" >> temp.txt
 	echo "S_NORM" >> temp.txt
 	echo "S_NORM" >> temp.txt
 	echo " " >> temp.txt
