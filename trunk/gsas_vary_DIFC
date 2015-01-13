@@ -17,6 +17,10 @@ fi
 echo "k l o c" > temp.txt
 echo "h $1" >> temp.txt
 echo "v $2" >> temp.txt
+if [ "$3" != "" ]; then
+	echo "$0 called with new damping flag, changing it!"
+	echo "d $3" >> temp.txt
+fi
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
