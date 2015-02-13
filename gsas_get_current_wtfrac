@@ -28,6 +28,6 @@ grep "EXPR NPHAS" `cat GSAS_EXP`.EXP | awk '{print $3+$4+$5+$6+$7+$8+$9+$10+$11}
 num_phases=`cat temp.txt`
 grep "Wt." `cat GSAS_EXP`.LST | tail -n $num_phases | head -n $1 | tail -n 1 | awk '{print $3}' > temp.txt
 # output weight fraction, so the calling process can read it
-cat temp.txt
+awk '{print +$1 }' <  temp.txt
 
 
