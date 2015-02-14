@@ -72,6 +72,19 @@ echo "0" >> temp.txt
 echo "0" >> temp.txt
 echo "0" >> temp.txt
 echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
