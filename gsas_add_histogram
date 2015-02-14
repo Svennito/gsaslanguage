@@ -66,6 +66,12 @@ echo "0" >> temp.txt
 echo "0" >> temp.txt
 echo "0" >> temp.txt
 echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
@@ -80,16 +86,16 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
-#read -p "wait after first insert..."
+# read -p "wait after first insert..."
 
 # did we get the warning about re-using the instrument data?
 grep "WARNING - instrument data for this bank also used for histogram" out.txt > temp2.txt
 if [ "$?" = "0" ]; then
   echo "Re-using the instrument parameters - need to re-insert"
   sed '7i\y' temp.txt > temp2.txt
-  #read -p "wait before second insert..."
+#   read -p "wait before second insert..."
   expedt `cat GSAS_EXP` < temp2.txt > out.txt
-  #read -p "wait after second insert..."
+#   read -p "wait after second insert..."
 fi
 
 # Which histogram in the EXP file did we add?
@@ -172,7 +178,7 @@ if [ "$5" != "" ]; then
 	echo "x" >> temp.txt
 	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
-	#read -p "wait after entering d-spacing..."
+# 	read -p "wait after entering d-spacing..."
 	rm htype.txt
 fi
 
