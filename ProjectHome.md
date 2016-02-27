@@ -1,0 +1,1 @@
+This script language allows to automate the analysis of diffraction data using the GSAS Rietveld package.
