@@ -59,32 +59,9 @@ echo $3 >> temp.txt
 echo "n" >> temp.txt
 # give out a few zeros - if we use a bank multiple times it will get us out of the warning for adding banks with same parameters
 # if it is the first time the bank is used, it won't do any harm...
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
-echo "0" >> temp.txt
+for (( i=1; i<=30; i++ )); do
+  echo "0" >> temp.txt
+done
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
