@@ -59,7 +59,8 @@ echo $3 >> temp.txt
 echo "n" >> temp.txt
 # give out a few zeros - if we use a bank multiple times it will get us out of the warning for adding banks with same parameters
 # if it is the first time the bank is used, it won't do any harm...
-for (( i=1; i<=30; i++ )); do
+# Number of 0s equals max number of histograms, thus preventing any trouble with this.
+for (( i=1; i<=98; i++ )); do
   echo "0" >> temp.txt
 done
 echo "d" >> temp.txt
@@ -175,6 +176,7 @@ fi
 if [ -e temp2 ]; then
   rm temp2.txt
 fi
+
 
 echo "Added histogram from \verb=$1= (bank $3, min. d-spacing $4A, max. d-spacing $5A) with instrument parameter file \verb=$2= as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex
 
