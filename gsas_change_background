@@ -4,24 +4,28 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without number of histogram for which background should be changed!"
-	exit 0
+  echo "$0 called without number of histogram for which background should be changed!"
+  exit 0
 fi
 
 if [ "$2" = "" ]; then
-	echo "$0 called without background function to be used!"
-	exit 0
+  echo "$0 called without background function to be used!"
+  exit 0
 fi
 
 if [ "$3" = "" ]; then
-	echo "$0 called without number of coefficients to be used!"
-	exit 0
+  echo "$0 called without number of coefficients to be used!"
+  exit 0
 fi
 
 # Add the phase
 echo "k l o b" > temp.txt
 echo "h $1" >> temp.txt
 echo "c $2 $3 /" >> temp.txt
+if [ "$4" != "" ]; then
+  # change the damping
+  echo "d $4" >> temp.txt
+fi
 echo "x" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
@@ -30,4 +34,8 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
-echo "Changed background for histogram $1 to function number $2 and $3 coefficients.\newline" >> temp.tex
+if [ "$4" != "" ]; then
+  echo "Changed background for histogram $1 to function number $2 and $3 coefficients, changed damping to $4.\newline" >> temp.tex
+else
+  echo "Changed background for histogram $1 to function number $2 and $3 coefficients.\newline" >> temp.tex
+fi
