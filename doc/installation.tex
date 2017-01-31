@@ -41,13 +41,12 @@ On average, each GENLES cycle is 9\% faster when running Linux with a maximum im
 \section{Linux/Mac/Unix Installation}
 This should be fairly quick:
 \begin{itemize}
-\item Download the zip file with the latest scripts from \url{http://code.google.com/p/gsaslanguage/}. 
+\item Download the zip file with the latest scripts from \url{https://github.com/Svennito/gsaslanguage.git}. 
 \item Copy the scripts into an appropriate folder and add it to the path\footnote{Add something like\newline \texttt{PATH=\$PATH:/usr/local/gsas/exe:$\sim$/gsaslanguage\newline export PATH\newline} to your \texttt{~/.bashrc} file if you installed GSAS in \texttt{/usr/local/gsas} and gsaslanguage in a folder of the same name in your home folder, adapt as needed by your installation. If you are there, also add \texttt{\\export gsas=/usr/local/gsas \\export PGPLOT\_FONT=\$GSAS/pgl/grfont.dat}.Run \texttt{source $\sim$/.bashrc} to activate your changes for the current shell, new shells will read it from the \texttt{$\sim$/.bashrc} file. Try \texttt{echo \$PATH} to see if it was added.}. Done.
 \item If you want to get the very latest version and you have subversion
 installed on your system, navigate to the folder under which you want
 gsaslanguage installed, and type\\
-\texttt{svn checkout https://gsaslanguage.googlecode.com/svn/trunk/
-gsaslanguage}
+\texttt{svn checkout https://github.com/Svennito/gsaslanguage.git}
 \item Ok, maybe not completely. Make sure you have \LaTeX{}  installed (punch in \texttt{latex} at a command prompt, it should come up with a \LaTeX{}  prompt). If you want to plot the results of a multi-run analysis using gsas\_plot\_overview, make sure you have gnuplot installed, try typing \texttt{gnuplot} at a shell prompt.
 \end{itemize}
 
@@ -64,7 +63,7 @@ This is a bit more lengthy since many of the Unix standard software, like a bash
 \label{fig:Screenshot1}
 \end{figure}
 
-\item Get the GSAS scripts from \url{http://code.google.com/p/gsaslanguage/}. Add the folder name to the search path (Control Panel -- System -- Advanced
+\item Get the GSAS scripts from \url{https://github.com/Svennito/gsaslanguage.git}. Add the folder name to the search path (Control Panel -- System -- Advanced
 -- Environment Variables -- PATH)
 \item Install \LaTeX{}  (go to miktex.org to download the basic installation for a Windows system).
 \item You may have to install the \LaTeX{}  package fullpage manually if your firewall does not allow \LaTeX{}  to install it on the fly. If you are using Miktex (Basic MiKtex 2.7), install it into a subfolder of your Miktex installation and refresh the Filename database in the Miktex options.
