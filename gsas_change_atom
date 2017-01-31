@@ -62,4 +62,4 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
-echo "Changed value for phase $1, atom(s) $2, parameter $3 to \verb=$4=." >> temp.tex
+echo "Changed value for phase $1, atom(s) $2, parameter $3 to \verb=$4=.\newline" >> temp.tex

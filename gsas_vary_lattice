@@ -97,10 +97,10 @@ if [ "$3" != " " ]; then
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
 fi
 
-echo "Changed lattice parameter refinement flag for phase $1 to $2" >> temp.tex
+echo "Changed lattice parameter refinement flag for phase $1 to $2 " >> temp.tex
 if [ "$3" != " " ]; then
 	echo "(damping set to $3)" >> temp.tex
 fi
-echo "." >> temp.tex
+echo ".\newline" >> temp.tex
 
 

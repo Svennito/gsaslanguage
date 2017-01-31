@@ -59,10 +59,20 @@ echo $3 >> temp.txt
 echo "n" >> temp.txt
 # give out a few zeros - if we use a bank multiple times it will get us out of the warning for adding banks with same parameters
 # if it is the first time the bank is used, it won't do any harm...
-# Number of 0s equals max number of histograms, thus preventing any trouble with this.
-for (( i=1; i<=98; i++ )); do
-  echo "0" >> temp.txt
-done
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
+echo "0" >> temp.txt
 echo "d" >> temp.txt
 if [ "$5" != "" ]; then
 	# We have a maximum d-spacing, let's convert it to the native x-axis value (TOF or 2theta)
@@ -77,7 +87,7 @@ echo "x" >> temp.txt
 echo "x" >> temp.txt
 
 expedt `cat GSAS_EXP` < temp.txt > out.txt
-# read -p "wait after first insert..."
+#read -p "wait after first insert..."
 
 # did we get the warning about re-using the instrument data?
 grep "WARNING - instrument data for this bank also used for histogram" out.txt > temp2.txt
@@ -169,14 +179,13 @@ if [ "$5" != "" ]; then
 	echo "x" >> temp.txt
 	echo "x" >> temp.txt
 	expedt `cat GSAS_EXP` < temp.txt > out.txt
-# 	read -p "wait after entering d-spacing..."
+	#read -p "wait after entering d-spacing..."
 	rm htype.txt
 fi
 
 if [ -e temp2 ]; then
   rm temp2.txt
 fi
-
 
 echo "Added histogram from \verb=$1= (bank $3, min. d-spacing $4A, max. d-spacing $5A) with instrument parameter file \verb=$2= as histogram `cat hist.txt` to EXP file.\newline" >> `cat GSAS_EXP`.tex
 

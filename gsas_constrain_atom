@@ -72,9 +72,9 @@ expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
 if [ "$1" = "multi" ]; then
-	echo "Constrained atoms of multiple phases with GSAS constraints " >> temp.tex
+	echo "Constrained atoms of multiple phases with GSAS constraints.\newline " >> temp.tex
 else
-	echo "Constrained for phase $1 the $2 parameter of atoms " >> temp.tex
+	echo "Constrained for phase $1 the $2 parameter of atoms.\newline " >> temp.tex
 fi
 for arg in "$@"; do
 	if [ "$arg" = "$0" ]; then continue; fi
