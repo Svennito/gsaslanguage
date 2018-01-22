@@ -133,7 +133,7 @@ else
 	#acroread `cat GSAS_EXP`.pdf
 fi
 
-# Was a phase fraction refined?
+# Was a phase fraction refined? If so, we need to add it again the PVE file...
 grep "PHFR" `cat GSAS_EXP`.PVE > temp.txt
 if [ $? -eq 0 ]; then
   # phase scale was refined, let's add the weight fraction (need to do error bars on another day...
@@ -141,7 +141,7 @@ if [ $? -eq 0 ]; then
     wtfrac=`gsas_get_current_wtfrac $phase`
     wtfrac_esd=`gsas_get_current_wtfrac_esd $phase`
     echo "Outputting phase fraction of phase $phase ($wtfrac +/- $wtfrac_esd) to PVE file..."
-    echo "dummy" | awk -v phase=$phase -v val=$wtfrac -v esd=$wtfrac_esd '{printf("  \042%d   WTFR\042    %8.6e    %8.6e\n",phase,val,esd)}'  >> `cat GSAS_EXP`.PVE
+    echo "dummy" | awk -v phase=$phase -v val=$wtfrac -v esd=$wtfrac_esd '{printf("  \042%d   WTFR\042    %8.6e    %8.6e\n",phase,val,esd)}'  >> $expfile.PVE
   done
 fi
 

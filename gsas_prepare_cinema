@@ -1,0 +1,294 @@
+# #!/bin/bash
+# conditions for this to work:
+# - PNAM entries/phase names have to be defined in input phase files
+# - PNAM entries must be unique
+# - refinements should have converged
+
+# remove previous files
+rm phase_list.txt
+
+# loop through all PVE files in a folder in the sequence they were created
+for file in `ls -1rt *.PVE`; do
+  echo "Extracting data from $file..."
+
+  # remove previous files
+  rm -v ${file:0:${#file}-4}_*.csv 2>/dev/null
+
+  # for debugging, if a file gives grief
+  let troublemaker=0
+  if [ "${file:0:${#file}-4}" == "$troublemaker" ]; then
+    read -p "working on $troublemaker..."
+  fi
+
+  # loop thorugh all phases in the corresponding EXP file
+  expfile=${file:0:${#file}-4}
+  expfile=$expfile".EXP"
+  echo "- extracting phases from $expfile"
+  for (( phase=1; phase<=`grep PNAM $expfile|wc -l`; phase++ ))
+  do  
+    echo "  - working on phase $phase"
+    # get the phase name and get rid of spaces
+    name=`grep PNAM $expfile | grep "CRS$phase"`
+    name=${name:14:60}
+    name=`echo $name | sed 's/[ ,.\/\\]//g'`
+    echo "    - phase name is <$name>"
+    
+    # is there a phase name?
+    if [ ${#name} -eq 0 ]; then
+      echo "Phase $phase has no name! You may want to change the PNAM line in your exp file!"
+      read -p "Suggest to hit Ctrl-c and re-analyse the dataset with proper phase names, otherwise $file will be skipped..."
+      continue
+    fi
+    # extract the phase info from that file 
+    echo "{gsub(/\"$phase /,\"$name\_\",\$1);gsub(/ /,\"\",\$1);print \$1,\$2}" > awk_temp.awk
+    echo "{print \$1,\",\",\$2}" > awk_temp2.awk
+    grep "\"$phase " $file | awk -f awk_temp.awk -F'\" ' 2>/dev/null | awk -f awk_temp2.awk > ${file:0:${#file}-4}_$name.csv
+    echo "    - output PVE values to <${file:0:${#file}-4}_$name.csv>"
+
+	# read -p "Wait after filename...."
+    # check if the phase name is already listed in the phase list
+    grep $name phase_list.txt > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "    - phase name <$name> is listed in phase_list.txt"
+    else
+      echo "    - phase name <$name> is not yet listed in phase_list.txt"
+      echo $name >> phase_list.txt
+    fi
+#     read -p "wait..."
+  if [ "${file:0:${#file}-4}" == "$troublemaker" ]; then
+    read -p "working on $troublemaker..."
+  fi
+  done  
+done
+
+echo ""
+echo ""
+echo ""
+echo "Assembling CINEMA csv file..."
+# now we extracted everything and have to assemble the csv file with all the data
+# remove the old files
+rm cinema_data.csv 2>/dev/null
+
+# check if we have extra data
+if [ "$1" != "" ]; then
+  # convert to unix format, just in case someone uses Windows...
+  dos2unix $1
+  if [ $? -eq 127 ]; then
+    echo "dos2unix not found - if no files from a Windows machine are involved, you may continue."
+    read -p "...otherwise, please Ctrl-c and install dos2unix."
+  fi
+  let extra_data_cols=`awk -F ',' '{ print NF; exit;}' $1`
+  # first column has to be analysis run
+  let "extra_data_cols -= 1"
+  # make file with place holders for data without extra data
+  printf ' NaN %.0s , ' `seq 1 $extra_data_cols` > temp_extra_data.txt
+  echo " - Found $extra_data_cols columns of extra data in $1"
+else
+  let extra_data_cols=0
+  echo " - No file with extra data given"
+fi
+# read -p "wait..."
+
+
+echo " - Checking number of columns provided for each phase"
+# make files with extra "," to pad for missing phases
+for phase in `cat phase_list.txt`; do
+  cat `ls -1S *_$phase.csv | head -n 1` | wc -l > temp.txt
+  data_cols=`cat temp.txt`
+  cat `ls -1S *_$phase.csv | head -n 1` > temp_max_$phase.txt
+  echo "   - Found a maximum of $data_cols columns for phase $phase."
+  printf ' NaN %.0s , ' `seq 1 $data_cols` > temp_cols_$phase.txt
+done
+# read -p "wait..."
+
+# TODO: test if all csv files for a given phase have the same number of parameters...
+
+# make the header line
+# extra data file
+if [ $extra_data_cols -gt 0 ]; then
+  # use the extra data file as it has to have the file name in the first column
+  head -n 1 $1 | tr "\n" "," > cinema_data.csv
+else
+  # just the file name
+  echo -n "File," > cinema_data.csv
+fi
+# add header for the CHISQ as a goodness of fit
+echo -n " CHISQ, "  >> cinema_data.csv
+
+# add headers for all phase data files
+for phase in `cat phase_list.txt`; do
+#   find . -iname "*_$phase.csv" | head -n 1 > temp.txt
+  cut -f1 -d',' temp_max_$phase.txt | paste -s -d',' | tr "\n" " , " >> cinema_data.csv
+  echo -n " , "  >> cinema_data.csv
+done
+
+# add header for the graphic as the last column
+echo -n " FILE "  >> cinema_data.csv
+
+# add newline
+echo "" >> cinema_data.csv
+# read -p "wait..."
+
+# loop through all PVE files/analysis runs
+for file in `ls -1rt *.PVE`; do
+  expfile=${file:0:${#file}-4}
+  echo -e "\n\n\nAdding data for $expfile (columns with extra data: <$extra_data_cols>..."
+  # check if we have extra data
+  if [ "$extra_data_cols" != "0" ]; then
+    # find the line with the analysis file, search only in the first column
+    cut -f1 -d',' $1 | grep -i -n $expfile | cut -f1 -d':' > temp.txt 
+    if [ -s temp.txt ]; then
+      echo "  - Found extra data in $1"
+      head -n `cat temp.txt` $1 | tail -n 1 | tr "\n" "," >> cinema_data.csv
+    else
+      echo "  - Found no extra data in $1"
+      echo -n "$expfile,`cat temp_extra_data.txt`">> cinema_data.csv
+    fi
+  else
+    # no exra data
+    echo -n "$expfile,">> cinema_data.csv
+  fi
+#   read -p "wait after extra data"
+
+  # add the CHISQ, need to get it from LST files
+  grep Reduced $expfile.LST | tail -n 1 | awk '{ if($4=="nan" || $4=="-nan"){print "NaN";}else{print $4;} }' |  tr "\n" "," >> cinema_data.csv
+  
+  # loop through all phases, either add data or blanks
+  for phase in `cat phase_list.txt`; do
+    echo -n $expfile > temp.txt
+    echo "_$phase.csv">>temp.txt
+    # add a space to the fieldname to avoid false positives
+#     field=`echo "$field "`
+#     echo "Field: <$field>"
+    if [ -e `cat temp.txt` ]; then
+      # we have a file - let's transpose and add
+      echo "  - adding phase $phase from `cat temp.txt`..."
+      # go through each field in the longest file for that phase and see if we have it in the current one
+      for field in `cut -f1 -d',' temp_max_$phase.txt`; do
+#  	echo "    - checking field <$field>..."
+	grep "$field " `cat temp.txt` > /dev/null
+	if [ $? -eq 0 ]; then
+	  # found it, output and add one comma
+	  grep "$field " `cat temp.txt` | cut -f2 -d',' | paste -s -d',' | tr "\n" " , " >> cinema_data.csv
+	  echo -n " , " >> cinema_data.csv
+	else
+	  # did not find it, add empty field
+	  echo -n " NaN , " >> cinema_data.csv
+# 	  read -p " found missing field "
+	fi
+# 	cut -f2 -d',' `cat temp.txt` | paste -s -d',' | tr "\n" " , " >> cinema_data.csv
+      done
+    else
+      # we don't have a file, let's add the empty columns
+      echo "  - no data found for phase $phase in `cat temp.txt`..."
+      cat temp_cols_$phase.txt >> cinema_data.csv
+    fi
+#     read -p "wait after phase <$phase>"
+  done
+  
+  # check if we have a folder for images
+  if [ -d "images" ]; then
+    echo "  - image folder exists"
+  else
+    echo "  - creating folder for images"
+    mkdir images
+  fi
+  
+  # generate graphic
+  echo $expfile > GSAS_EXP
+  echo "k l l c" > temp.txt
+  echo "2" >> temp.txt
+  echo "x" >> temp.txt
+  echo "x" >> temp.txt
+  echo "x" >> temp.txt
+#   expedt `cat GSAS_EXP`.EXP < temp.txt > output.txt
+#   powpref $expfile > output.txt
+#   genles $expfile > output.txt
+  let bank=2
+  echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
+  echo "z e" > input.txt
+  echo "i b m d t" >> input.txt
+  # select histogram 2 #### THIS IS WHERE WE SELECT ANOTHER HISTOGRAM FOR PLOTTING! #####
+  echo "h $bank" >> input.txt
+  # plot
+  echo "p" >> input.txt
+  # title
+  echo "TEMP" >> input.txt
+  # filename
+  echo "TEMP" >> input.txt
+  # empty line
+  echo " " >> input.txt
+  # get out
+  echo "x" >> input.txt
+  # run the thing
+#   powplot $expfile < input.txt > output.txt
+  # convert EPS to png and delete original file
+#   convert -density 300 TEMP.EPS images/$expfile-B$bank.png 
+  
+  # add the file to the output CSV, no comma since this is the last entry
+  echo -n " images/$expfile-B2.png " >> cinema_data.csv
+
+  # Was a phase fraction refined? If so we need to add it to the new PVE file
+  grep "PHFR" $expfile.PVE > temp.txt
+  if [ $? -eq 0 ]; then
+    # phase scale was refined, let's add the weight fraction (need to do error bars on another day...
+    for ((phase=1;phase<=`gsas_get_number_of_phases`;phase++)); do
+      wtfrac=`gsas_get_current_wtfrac $phase`
+      wtfrac_esd=`gsas_get_current_wtfrac_esd $phase`
+      echo "Outputting phase fraction of phase $phase ($wtfrac +/- $wtfrac_esd) to PVE file..."
+      echo "dummy" | awk -v phase=$phase -v val=$wtfrac -v esd=$wtfrac_esd '{printf("  \042%d   WTFR\042    %8.6e    %8.6e\n",phase,val,esd)}'  >> `cat GSAS_EXP`.PVE
+    done
+  fi
+
+
+  # newline
+  echo "" >> cinema_data.csv
+  echo " - Done with processing analysis <$expfile>."
+#   read -p "wait..."
+done
+
+# remove columns we don't want
+echo "Deleting unwanted columns..."
+# don't want reciprocal matrix for cell parameters
+echo "_RM" > cinema_exclude.txt
+# don't want PHFR as we compute the WTFR
+echo "PHFR" >> cinema_exclude.txt
+# don't want symmetry-equivalent parameters
+echo -e "\*" >> cinema_exclude.txt
+for column in  `cat cinema_exclude.txt`; do
+  echo "Searching for <$column> in cinema_data.csv..."
+  grep $column cinema_data.csv >> /dev/null
+  while [ $? -eq 0 ]; do
+    echo "{for (i=1;i<=NF;i++){if(index(\$i,\"$column\")!=0){print i;}}}" > awk_temp.awk
+    let col=`grep "$column" cinema_data.csv | awk -F ',' -f awk_temp.awk | head -n 1`
+#     let col+=1
+    
+    echo "- found <$column> in header of column <$col> in cinema_data.csv..."
+    
+    cut -d, -f$col --complement cinema_data.csv > temp.csv
+#     read -p "wait..."
+    mv temp.csv cinema_data.csv
+    
+    grep $column cinema_data.csv > /dev/null
+  done
+done
+
+# remove the last column
+# awk -F ',' -v OFS=, '{ for (i=1;i<=NF-2;i++){ printf $i"," }; printf $i; printf "\n" } ' < cinema_data.csv > temp.txt
+# mv temp.txt cinema_data.csv
+
+read -p "wait before deleting temp files"
+
+# clean up
+for phase in `cat phase_list.txt`; do
+  rm *_$phase.csv
+done
+rm awk_temp.awk
+rm awk_temp2.awk
+rm temp.txt
+rm temp_extra_data.txt
+rm phase_list.txt
+rm temp_max*.txt
+rm temp_cols_*.txt
+rm temp_*.txt
+rm TEMP.EPS 
