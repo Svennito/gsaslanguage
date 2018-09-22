@@ -69,3 +69,4 @@ echo "Experiment title set to \verb=$3=.\newline" >> `cat GSAS_EXP`.tex
 
 # Leave the print options untouched
 echo "Y" > gsas_print.txt
+rm temp.txt
