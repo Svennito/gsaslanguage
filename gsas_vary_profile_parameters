@@ -39,7 +39,7 @@ for arg in "$@"; do
   echo "'$arg'" >> temp.tex
 done
 
- do we have 7 entries (maximum of profile function parameters)
+# do we have 7 entries (maximum of profile function parameters)
 if [ $counter -lt $# ]; then
   while [ $counter -lt 9 ]; do
     let counter+=1
