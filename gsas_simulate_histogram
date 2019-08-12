@@ -52,8 +52,10 @@ else
     if [ "`tail -c 1 htype.txt`" == "T" ]; then
 	echo "We have a time-of-flight instrument, give range limits in TOF."
 	echo "l" >> temp.txt
+	grep "INS  ${bank}DCALIB" $1 | tail -c 36 > temp_log.txt
+	echo `cat temp_log.txt` >> temp.txt
 	echo "/" >> temp.txt
-	echo "/" >> temp.txt
+	rm temp_log.txt
     else
 	echo "We have a unknown type of instrument - need debugging!"
 	read -p "Break here with Ctrl-c and debug!"

@@ -28,9 +28,8 @@ for file in `ls -1rt *.PVE`; do
     # get the phase name and get rid of spaces
     name=`grep PNAM $expfile | grep "CRS$phase"`
     name=${name:14:60}
-    name=`echo $name | sed 's/[\/\\. ;?\r]//g'`
+    name=`echo $name | sed 's/ //g'`
     echo "    - phase name is <$name>"
-#     read -p "wait..."
     
     # is there a phase name?
     if [ ${#name} -eq 0 ]; then
@@ -126,25 +125,24 @@ for file in `ls -1rt *.PVE`; do
   expfile=${file:0:${#file}-4}
   echo "Adding data for $expfile..."
   # check if we have extra data
-  if [ $extra_data_cols -gt 0 ]; then
+  if [ $extra_data_cols ]; then
     # find the line with the analysis file, search only in the first column
     cut -f1 -d',' $1 | grep -n $expfile | cut -f1 -d':' > temp.txt 
     if [ -s temp.txt ]; then
-      echo " - Found extra data in $1"
+      echo "  - Found extra data in $1"
       head -n `cat temp.txt` $1 | tail -n 1 | tr "\n" "," >> cinema_data.csv
     else
-      echo " - Found no extra data in $1"
+      echo "    - Found no extra data in $1"
       echo -n "$expfile,`cat temp_extra_data.txt`">> cinema_data.csv
     fi
   else
-    # no extra data
+    # no exra data
     echo -n "$expfile,">> cinema_data.csv
   fi
 #   read -p "wait after extra data"
 
   # add the CHISQ, need to get it from LST files
   grep Reduced $expfile.LST | tail -n 1 | awk '{ if($4=="nan" || $4=="-nan"){print "NaN";}else{print $4;} }' |  tr "\n" "," >> cinema_data.csv
-  echo " - Added CHISQ"
   
   # loop through all phases, either add data or blanks
   for phase in `cat phase_list.txt`; do
@@ -155,7 +153,7 @@ for file in `ls -1rt *.PVE`; do
 #     echo "Field: <$field>"
     if [ -e `cat temp.txt` ]; then
       # we have a file - let's transpose and add
-      echo " - adding phase $phase from `cat temp.txt`..."
+      echo "  - adding phase $phase from `cat temp.txt`..."
       # go through each field in the longest file for that phase and see if we have it in the current one
       for field in `cut -f1 -d',' temp_max_$phase.txt`; do
 #  	echo "    - checking field <$field>..."
@@ -189,7 +187,7 @@ for file in `ls -1rt *.PVE`; do
   
   # generate graphic
   let bank=2
-  echo " - Generating plot of histogram <$bank> for analysis <$expfile>..."
+  echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
   echo "z e" > input.txt
   echo "i b m d t" >> input.txt
   # select histogram 2 #### THIS IS WHERE WE SELECT ANOTHER HISTOGRAM FOR PLOTTING! #####
@@ -197,9 +195,9 @@ for file in `ls -1rt *.PVE`; do
   # plot
   echo "p" >> input.txt
   # title
-  echo "temp" >> input.txt
+  echo "$expfile-B$bank" >> input.txt
   # filename
-  echo "temp" >> input.txt
+  echo "$expfile-B$bank" >> input.txt
   # empty line
   echo " " >> input.txt
   # get out
@@ -208,29 +206,18 @@ for file in `ls -1rt *.PVE`; do
   powpref $expfile > output.txt
   genles $expfile > output.txt
   powplot $expfile < input.txt > output.txt
-  
-  # test if convert is ImageMagick
-  convert -version | grep ImageMagick > /dev/null
-  if [ $? -eq 0 ]; then
-    # convert EPS to png and delete original file
-    echo " - ImageMagick found - converting EPS to PNG..."
-    convert -density 300 temp.EPS images/$expfile-B$bank.png 
-  else
-    echo "ImageMagick convert command not found or not in the primary search path!"
-    echo "Cannot convert EPS file to PNG, please abort and "
-    read -p "install ImageMagick and make sure it's found when <convert> is issued."
-  fi
-  rm temp.EPS 
+  # convert EPS to png and delete original file
+  convert -density 300 $expfile-B$bank.EPS images/$expfile-B$bank.png 
+  rm $expfile-B$bank.EPS 
   
   # add the file to the output CSV, no comma since this is the last entry
   echo -n " images/$expfile-B2.png " >> cinema_data.csv
 
   # Was a phase fraction refined? If so we need to add it to the new PVE file
   grep "PHFR" $expfile.PVE > temp.txt
+  echo $expfile > GSAS_EXP
   if [ $? -eq 0 ]; then
-    echo $expfile > GSAS_EXP
-    # phase scale was refined, let's add the weight fraction (need to do 
-    # error bars on another day...
+    # phase scale was refined, let's add the weight fraction (need to do error bars on another day...
     for ((phase=1;phase<=`gsas_get_number_of_phases`;phase++)); do
       wtfrac=`gsas_get_current_wtfrac $phase`
       wtfrac_esd=`gsas_get_current_wtfrac_esd $phase`
@@ -269,8 +256,6 @@ for column in  `cat cinema_exclude.txt`; do
     grep $column cinema_data.csv > /dev/null
   done
 done
-# get rid of spaces after commas to avoid confusing the import
-sed -i "s/, \+/,/g" cinema_data.csv 
 
 # remove the last column
 # awk -F ',' -v OFS=, '{ for (i=1;i<=NF-2;i++){ printf $i"," }; printf $i; printf "\n" } ' < cinema_data.csv > temp.txt

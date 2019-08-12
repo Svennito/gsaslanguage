@@ -1,0 +1,17 @@
+#!/bin/bash
+
+EXPFILE=${1}
+
+# get number of phases in file
+PHASEVARS=`grep CRS[1-9] ${EXPFILE} | awk '{print $1}' | sort -u`
+PHASEARR=($PHASEVARS)
+NPHASES=`echo "${PHASEVARS}" | wc -w`
+echo Found ${NPHASES} phases in file ${EXPFILE}
+
+# loop over and add phases using gsas_read_phase
+for ((i=1; i<=NPHASES; i++)); do
+  PHASENAME=`grep ${PHASEARR[$(($i-1))]} ${EXPFILE} | grep PNAM | awk '{print $3 $4 $5 $6 $7 $8}'`
+  echo Reading phase \#${i}: ${PHASENAME} 
+  gsas_read_phase ${EXPFILE} ${i}
+
+done

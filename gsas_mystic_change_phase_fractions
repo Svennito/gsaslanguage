@@ -1,0 +1,22 @@
+#!/bin/bash
+
+EXPFILE=${1}
+
+# get number of phases in file
+PHASEVARS=`grep HAP[1-9] ${EXPFILE} | awk '{print $1}' | sort -u`
+PHASEARR=($PHASEVARS)
+NPHASES=`echo "${PHASEVARS}" | wc -w`
+echo Found ${NPHASES} phases in file ${EXPFILE}
+
+for ((i=1; i<=NPHASES; i++)); do
+
+  # get number of histograms for this phase
+  NHISTS=`grep ${PHASEARR[$(($i-1))]} ${EXPFILE} | grep PHSFR | wc -l`
+  echo Found ${NHISTS} histograms for phase \#${i}
+  for ((j=1; j<=NHISTS; j++)); do
+    # get phase fraction
+    PHASEFRAC=`grep ${PHASEARR[$(($i-1))]} ${EXPFILE} | grep ${j}PHSFR | awk '{print $3}'`
+    gsas_change_phase_fraction ${j} ${i} ${PHASEFRAC}
+  done
+
+done

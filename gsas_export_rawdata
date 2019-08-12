@@ -1,0 +1,46 @@
+#!/bin/bash
+# echo the call so we can see what's going on
+echo "$0 $1 $2 $3 $4 $5 $6"
+
+# Check syntax
+if [ "$1" = "" ]; then
+	echo "$0 raw data file (gda file)"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+if [ "$2" = "" ]; then
+	echo "$0 called without instrument parameter file!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+if [ "$3" = "" ]; then
+	echo "$0 called without bank number!"
+	read -p "This will go wrong - maybe you should break here with Ctrl-C..."
+	exit 0
+fi
+
+# generate the pole figures
+echo "z e" > temp.txt
+echo "$1" >> temp.txt
+echo "y" >> temp.txt
+echo "n" >> temp.txt
+echo "$2" >> temp.txt
+echo "$3" >> temp.txt
+echo "o" >> temp.txt
+echo "temp.out" >> temp.txt
+echo "x" >> temp.txt
+# output the data
+echo "Writing data from $1 with parameter file $2 for bank $3..."
+rawplot  < temp.txt > out.txt
+echo "Done, starting conversion..."
+# get DIFC, DIFA, and ZERO
+difc=`grep "$3 ICONS" $2 | awk '{ print $4 }'`
+difa=`grep "$3 ICONS" $2 | awk '{ print $5 }'`
+zero=`grep "$3 ICONS" $2 | awk '{ print $6 }'`
+echo "Read DIFC=<$difc>, DIFA=<$difa>, ZERO=<$zero>"
+# replace the commas in the header with semicolons to avoid confusion with the csv file
+cat temp.out | tr "," ";" > temp2.out
+awk -v c=$difc -v a=$difa -v z=$zero ' NR>1 { print $1,",",$2,",",$3,",",$4,",",-0.5*c/a-sqrt(0.25*c*c/(a*a)-(z-$1*1000)/a),",",$2/$3 }; NR==1 { print $1,",",$2,",",$3,",",$4,",d [A],norm I[counts/microsec]" }' temp2.out > $1.csv
+

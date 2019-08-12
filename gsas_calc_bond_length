@@ -46,7 +46,7 @@ echo "      if(getline == 0) {" >> extract_bonds.awk
 echo "        break;" >> extract_bonds.awk
 echo "      }" >> extract_bonds.awk
 echo "      # catch new page header lines" >> extract_bonds.awk
-echo "      if (substr(\$0,0,1)!=\" \") {" >> extract_bonds.awk
+echo "      if (substr(\$0,1,1)!=\" \") {" >> extract_bonds.awk
 echo "        continue" >> extract_bonds.awk
 echo "      }" >> extract_bonds.awk
 echo "      bond=\$1;" >> extract_bonds.awk
@@ -76,7 +76,7 @@ echo "      if(getline == 0) {" >> extract_angles.awk
 echo "        break;" >> extract_angles.awk
 echo "      }" >> extract_angles.awk
 echo "      # catch new page header lines" >> extract_angles.awk
-echo "      if (substr(\$0,0,1)!=\" \") {" >> extract_angles.awk
+echo "      if (substr(\$0,1,1)!=\" \") {" >> extract_angles.awk
 echo "        continue" >> extract_angles.awk
 echo "      }" >> extract_angles.awk
 echo "      bond=\$1;" >> extract_angles.awk

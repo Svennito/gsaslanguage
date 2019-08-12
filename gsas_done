@@ -113,6 +113,19 @@ else
   echo "No site occupation parameters have un-physical values greater than 1." >> `cat GSAS_EXP`.tex
 fi
 
+# Was a phase fraction refined?
+grep "PHFR" `cat GSAS_EXP`.PVE > temp.txt
+if [ $? -eq 0 ]; then
+  # phase scale was refined, let's add the weight fraction (need to do error bars on another day...
+  for ((phase=1;phase<=`gsas_get_number_of_phases`;phase++)); do
+    wtfrac=`gsas_get_current_wtfrac $phase`
+    wtfrac_esd=`gsas_get_current_wtfrac_esd $phase`
+    echo "Outputting phase fraction of phase $phase ($wtfrac +/- $wtfrac_esd) to PVE file..."
+    echo "dummy" | awk -v phase=$phase -v val=$wtfrac -v esd=$wtfrac_esd '{printf("  \042%d   WTFR\042    %8.6e    %8.6e\n",phase,val,esd)}'  >> `cat GSAS_EXP`.PVE
+  done
+fi
+
+
 echo "The refined parameters and their values and esds are:" >> `cat GSAS_EXP`.tex
 echo "\begin{verbatim}" >> `cat GSAS_EXP`.tex
 cat `cat GSAS_EXP`.PVE >> `cat GSAS_EXP`.tex
@@ -164,6 +177,8 @@ rm `cat GSAS_EXP`.P[^VE]*
 rm `cat GSAS_EXP`.R??
 rm gsas_print.txt
 rm gsas_step.txt
+rm gsas_start.txt
+rm gsas_plotopt.txt
 rm hist.txt
 rm nhist.txt
 rm powpref
@@ -175,10 +190,4 @@ rm flag.txt
 rm Reduced.eps
 rm Shift.eps
 rm temp.plt
-
-# compute the total run time
-START=`cat gsas_start.txt`
-END=$(date +%s)
-DIFF=$(( $END - $START ))
-echo "Total run time since gsas_initialize: $DIFF seconds."
 
