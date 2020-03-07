@@ -100,7 +100,10 @@ done
 gnuplot plot.tmp
 
 rm temp_{0,1,2,3,4,5,6,7,8,9}.txt 2>/dev/null
-rm plot.tmp
+if [ $nodelete -eq 0 ]; then
+  rm plot.tmp
+fi
+
 
 
 
