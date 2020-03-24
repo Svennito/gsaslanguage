@@ -46,7 +46,7 @@ grep HTYPE $1 | head -c 17 > htype.txt
 if [ "`tail -c 1 htype.txt`" == "C" ]; then
     echo "We have a constant wavelength instrument, give range limits in 2theta"
     # give dummy values since we will overwrite them anyways
-    echo "45 50 " >> temp.txt
+    echo "0.5 160 " >> temp.txt
     echo "0.02" >> temp.txt
 else
     if [ "`tail -c 1 htype.txt`" == "T" ]; then
@@ -69,7 +69,7 @@ echo "x" >> temp.txt
 echo "0" >> temp.txt
 echo "x" >> temp.txt
 echo "x" >> temp.txt
-	if [ "$scale" != "" ]; then
+if [ "$scale" != "" ]; then
 	echo "l o h c" >> temp.txt
 	echo "$scale" >> temp.txt
 	echo "x" >> temp.txt
