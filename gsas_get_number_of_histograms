@@ -1,0 +1,18 @@
+#!/bin/bash
+# 
+# gsas_get_number_of_histograms - extract the number of histograms in the current EXP file
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_get_number_of_histograms
+#
+
+# Check syntax
+# nothing to do
+
+grep "EXPR  NHST" `cat GSAS_EXP`.EXP | awk '{print $3}' > temp.txt
+# output number of phases, so the calling process can read it
+cat temp.txt
+
+

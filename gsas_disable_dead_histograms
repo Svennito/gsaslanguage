@@ -1,0 +1,55 @@
+#!/bin/bash
+# 
+# gsas_disable_dead_histograms - check all histograms for data and disable the ones that have zero data (in case detector died during experiment)
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_disable_dead_histograms 
+#
+# after copying the data files from the template and running a fit with everything fixed
+
+# Check syntax - 
+# no parameters, nothing to do
+
+# check if all banks have data, if some failed, disable them
+n_bank=`gsas_get_number_of_histograms`
+
+# Check if LST file exists
+if test -f "`cat GSAS_EXP`.LST"; then
+  echo "`cat GSAS_EXP`.LST exists."
+else
+  echo -e "\n\n\n\n`cat GSAS_EXP`.LST does not exist."
+  echo "You should change your script and call gsas_disable_dead_histograms AFTER a gsas_refine."
+  read -p "Maybe you want to abort here?"
+fi 
+
+
+echo "Found <$n_bank> histograms."
+echo "Checking data for $n_bank histograms for dead histograms.\newline" >> temp.tex
+
+for (( bank=1; bank<=$n_bank; bank++ )); do
+  echo "Checking bank <$bank>:"
+  grep "Ndata" `cat GSAS_EXP`.LST -A $bank | tail -n 1 | awk '{print $5}' > out.txt
+  ndata=`cat out.txt`
+  echo "- found <$ndata> non-zero data points in bank <$bank>."
+  echo "Found <$ndata> non-zero data points in bank <$bank>." >> temp.tex
+
+  if [ $ndata -lt 10 ];then
+    echo "Less than 10 data points in bank <$bank> => disabling bank <$bank>." >> temp.tex
+    echo "- less than 10 data points in bank <$bank> => disabling bank <$bank>."
+    echo "k p h" > temp.txt
+    echo "u $bank" >> temp.txt
+    echo "n" >> temp.txt
+    echo "x" >> temp.txt
+    echo "x" >> temp.txt
+    echo "x" >> temp.txt
+    
+    expedt `cat GSAS_EXP` < temp.txt > out.txt
+    
+  else
+    echo "- more than 10 data points in bank <$bank> => keeping bank <$bank>."
+    echo "More than 10 data points in bank <$bank> => keeping bank <$bank>." >> temp.tex
+  fi
+done
+  

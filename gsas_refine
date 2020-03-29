@@ -122,6 +122,7 @@ if [ "$NOPLOT" -eq "0" ]; then
 	echo "We have <$NHIST> histograms in this refinement."
 	rm S`echo $STEP`H*.EPS
 	COUNTER=0
+	DISABLED_HIST=0
 	while [ $COUNTER -lt $NHIST ]; do
 		let COUNTER=COUNTER+1 
 	
@@ -140,6 +141,21 @@ if [ "$NOPLOT" -eq "0" ]; then
 			echo "We did not find the search string, so the histogram has no data and is a constraint or so."
 			continue
 		fi
+		
+		# Check if histogram is disabled
+		let column=2+$COUNTER
+		echo "{print \$$column}"> temp.txt
+		grep "EXPR  HTYP1" `cat GSAS_EXP`.EXP | awk -f temp.txt > out.txt
+		hist_flag=`cat out.txt`
+		if [ "${hist_flag:3:1}" == "*" ]; then
+			echo "Histogram is excluded from refinement, skipping the plot."
+			let DISABLED_HIST=DISABLED_HIST+1
+			continue
+		else
+			echo "Histogram is included in the refinement."
+		fi
+# 		read -p "wait..."
+
 
 		echo "Plotting histogram $COUNTER of $NHIST..."
 		echo "Histogram $COUNTER of $NHIST:\newline" >> `cat GSAS_EXP`.tex
@@ -159,36 +175,46 @@ if [ "$NOPLOT" -eq "0" ]; then
 			echo "S`echo $STEP`H$COUNTER" >> temp.txt
 			echo "\includegraphics[width=53mm]{S`echo $STEP`H$COUNTER.EPS}" >> `cat GSAS_EXP`.tex
 		fi
+		
 		echo " " >> temp.txt
-		echo "y" >> temp.txt
-		if [ $COUNTER -lt 10 ]; then
-			echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
-			echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
-			echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+
+		# plot weighted difference curve and probability plot only if there is data in the histogram
+		grep "Ndata" `cat GSAS_EXP`.LST -A $(($COUNTER-$DISABLED_HIST)) | tail -n 1 | awk '{print $5}' > out.txt
+		ndata=`cat out.txt`
+		echo "Found <$ndata> non-zero data points in bank <$COUNTER>."
+
+		if [ $ndata -gt 0 ];then
+			echo "y" >> temp.txt
+			if [ $COUNTER -lt 10 ]; then
+				echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
+				echo "S`echo $STEP`H0`echo $COUNTER`_E" >> temp.txt
+				echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+			else
+				echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
+				echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
+				echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+			fi
+		
+			echo " " >> temp.txt
+			if [ $COUNTER -lt 10 ]; then
+				echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
+				echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
+				echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
+			else
+				echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
+				echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
+				echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
+			fi
+			echo " " >> temp.txt
+			echo "/" >> temp.txt
 		else
-			echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
-			echo "S`echo $STEP`H`echo $COUNTER`_E" >> temp.txt
-			echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_E.EPS}" >> `cat GSAS_EXP`.tex
+			echo "n" >> temp.txt
 		fi
-	
-		echo " " >> temp.txt
-		if [ $COUNTER -lt 10 ]; then
-			echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
-			echo "S`echo $STEP`H0`echo $COUNTER`_P" >> temp.txt
-			echo "\includegraphics[width=53mm]{S`echo $STEP`H0`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
-		else
-			echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
-			echo "S`echo $STEP`H`echo $COUNTER`_P" >> temp.txt
-			echo "\includegraphics[width=53mm]{S`echo $STEP`H`echo $COUNTER`_P.EPS}" >> `cat GSAS_EXP`.tex
-		fi
-		echo " " >> temp.txt
-		echo "/" >> temp.txt
 		echo "x" >> temp.txt
-	
+		
 		nice powplot `cat GSAS_EXP`.EXP < temp.txt > out.txt
 		echo " " >> `cat GSAS_EXP`.tex
 		echo "For histogram $COUNTER, the slope and intercept of the normal probability plot are: `grep "normal probability" out.txt|tail --bytes 20`." >> `cat GSAS_EXP`.tex
 		echo " " >> `cat GSAS_EXP`.tex
-	
 	done
 fi
