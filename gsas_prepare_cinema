@@ -1,6 +1,23 @@
-# #!/bin/bash
+#!/bin/bash
+# 
+# gsas_prepare_cinema - compile content of GSAS generated PVE files into a csv file for the Cinema:Debye-Scherrer web viewer
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_prepare_cinema <optional csv file with data>
+#
+# after analyzing all runs with appropriate scripts.
+
+# Check syntax - 
+# no parameters, nothing to do
+#
 # conditions for this to work:
 # - PNAM entries/phase names have to be defined in input phase files
+# - if provided the additional data csv file has to have comma separated columns with the first column being the filename of the run
+#   without extension (no ".gda"). The first line has column headers. Best produced with Excel or other spreadsheet program
+#
+#
 
 # remove previous files
 rm phase_list.txt
@@ -127,7 +144,7 @@ for file in `ls -1rt *.PVE`; do
   # check if we have extra data
   if [ $extra_data_cols ]; then
     # find the line with the analysis file, search only in the first column
-    cut -f1 -d',' $1 | grep -n $expfile | cut -f1 -d':' > temp.txt 
+    cut -f1 -d',' $1 | grep -n -i $expfile | cut -f1 -d':' > temp.txt 
     if [ -s temp.txt ]; then
       echo "  - Found extra data in $1"
       head -n `cat temp.txt` $1 | tail -n 1 | tr "\n" "," >> cinema_data.csv
@@ -197,7 +214,7 @@ for file in `ls -1rt *.PVE`; do
   # title
   echo "$expfile-B$bank" >> input.txt
   # filename
-  echo "$expfile-B$bank" >> input.txt
+  echo "TEMP" >> input.txt
   # empty line
   echo " " >> input.txt
   # get out
@@ -205,7 +222,11 @@ for file in `ls -1rt *.PVE`; do
   # run the thing
   powpref $expfile > output.txt
   genles $expfile > output.txt
+  # delete previous output EPS
+  rm TEMP.EPS
+  
   powplot $expfile < input.txt > output.txt
+  mv TEMP.EPS $expfile-B$bank.EPS
   # convert EPS to png and delete original file
   convert -density 300 $expfile-B$bank.EPS images/$expfile-B$bank.png 
   rm $expfile-B$bank.EPS 
@@ -219,8 +240,8 @@ for file in `ls -1rt *.PVE`; do
   if [ $? -eq 0 ]; then
     # phase scale was refined, let's add the weight fraction (need to do error bars on another day...
     for ((phase=1;phase<=`gsas_get_number_of_phases`;phase++)); do
-      wtfrac=`gsas_get_current_wtfrac $phase`
-      wtfrac_esd=`gsas_get_current_wtfrac_esd $phase`
+      wtfrac=`gsas_get_current_wtfrac $phase ignore_not_refined`
+      wtfrac_esd=`gsas_get_current_wtfrac_esd $phase ignore_not_refined`
       echo "Outputting phase fraction of phase $phase ($wtfrac +/- $wtfrac_esd) to PVE file..."
       echo "dummy" | awk -v phase=$phase -v val=$wtfrac -v esd=$wtfrac_esd '{printf("  \042%d   WTFR\042    %8.6e    %8.6e\n",phase,val,esd)}'  >> `cat GSAS_EXP`.PVE
     done

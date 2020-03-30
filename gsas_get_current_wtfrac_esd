@@ -19,8 +19,10 @@ fi
 
 grep "Wt." `cat GSAS_EXP`.LST > temp.txt
 if [ $? -ne 0 ]; then
-	echo "Could not find wt. fraction in current LST file - maybe it was not refined yet?"
-	read -p "You should abort here, please hit Ctrl-C."
+	if [ "$2" != "ignore_not_refined" ]; then
+	    echo "Could not find wt. fraction in current LST file - maybe it was not refined yet?"
+	    read -p "You should abort here, please hit Ctrl-C."
+	fi
 	exit 0
 fi
 
