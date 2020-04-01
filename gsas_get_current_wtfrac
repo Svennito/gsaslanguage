@@ -27,8 +27,25 @@ if [ $? -ne 0 ]; then
 fi
 
 grep "EXPR NPHAS" `cat GSAS_EXP`.EXP | awk '{print $3+$4+$5+$6+$7+$8+$9+$10+$11}' > temp.txt
-num_phases=`cat temp.txt`
-grep "Wt." `cat GSAS_EXP`.LST | tail -n $num_phases | head -n $1 | tail -n 1 | awk '{print $3}' > temp.txt
+num_phases=`gsas_get_number_of_phases`
+num_hist=`gsas_get_number_of_histograms`
+let phase=$1
+let lines_per_phase=$num_hist/7+1
+let modulus=$num_hist%7
+if [ $modulus -eq 0 ]; then
+  let lines_per_phase=$lines_per_phase-1
+fi
+let lines_for_this_phase=$lines_per_phase*$phase
+let lines_for_total_block=$lines_per_phase*$num_phases
+
+# echo "Phase requested: <$phase>"
+# echo "Number of phases in refinement: <$num_phases>"
+# echo "Number of histograms in refinement: <$num_hist>"
+# echo "Number of lines with wt. fractions per phase in LST file: <$lines_per_phase>"
+# echo "Modulus: <$modulus>"
+# echo "Lines for block of current weight fractions: <$lines_for_total_block>"
+# echo "Last line for this phase: <$lines_for_this_phase>"
+grep "Wt." `cat GSAS_EXP`.LST | tail -n $lines_for_total_block | head -n $lines_for_this_phase | tail -n 1 | awk '{print $3}' > temp.txt
 # output weight fraction, so the calling process can read it
 awk '{printf("%.5f\n", +$1)  }' <  temp.txt
 
