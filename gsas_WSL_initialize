@@ -1,0 +1,33 @@
+#!/bin/bash
+# 
+# gsas_WSL_initialize - initialize the Windows Subsystem for Linux
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_WSL_initialize
+#
+#
+
+# Check syntax
+# Nothing to do
+
+# save current directory
+cur_dir=`pwd`
+# find the path with the GSAS executables
+gsas_exe_path=`which expedt.exe`
+echo "Found GSAS EXPEDT in <$gsas_exe_path>"
+gsas_exe_path=${gsas_exe_path:0:${#gsas_exe_path}-10}
+echo "Path is <$gsas_exe_path>"
+
+# unfortunately there doesn't seem to be a way to make the symbolic links to also execute the command...
+echo "This will copy all Windows executables to files without .exe extension."
+echo "This is necessary for the Windows executables to be found in the Windows Linux Subsystem."
+read -p "Hit Ctrl-c now if you don't want this copy to happen. Hit Enter to continue."
+cd $gsas_exe_path
+for file in `ls *.exe`; do
+	#echo "cp $file ${file:0:${#file}-4}"
+
+	cp -v $file ${file:0:${#file}-4}
+done
+

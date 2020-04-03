@@ -48,12 +48,21 @@ fi
 
 gsas_path=`which expedt`
 if [ "$gsas_path" = "" ]; then
-	echo "Your environment variable <PATH> is not set to include the GSAS programs!"
-	echo "GSAS will not be able to work at all!"
-	echo "You need to set it to point to the path with the executable files in your GSAS installation, e.g. PATH=...;C:\GSAS\EXE or so."
-	echo "See the GSAS readme.txt file for more details."
-	read -p "Hit Ctrl-c to abort."
-	exit 0
+	gsas_path=`which expedt.exe`
+	if [ "$gsas_path" = "" ]; then
+		echo "Your environment variable <PATH> is not set to include the GSAS programs!"
+		echo "GSAS will not be able to work at all!"
+		echo "You need to set it to point to the path with the executable files in your GSAS installation, e.g. PATH=...;C:\GSAS\EXE or so."
+		echo "See the GSAS readme.txt file for more details."
+		read -p "Hit Ctrl-c to abort."
+		exit 0
+	else
+		# we did not find expedt, but we did find expedt.exe => likely running on a Windows Subsystem Linux (WSL)
+		echo "Looks like we run on a Windows Linux Subsystem (WSL)"
+		echo "Please run gsas_WSL_initialize once, then try this command again..."
+		read -p "Hit Ctrl-c to abort."
+		exit 0
+	fi
 else
 	echo "Path includes GSAS executables. "
 fi
