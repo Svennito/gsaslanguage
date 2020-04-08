@@ -50,4 +50,4 @@ echo "x" >> temp.txt
 expedt `cat GSAS_EXP` < temp.txt > out.txt
 
 # Test the EXP file
-echo "Changed sigma1 refinement flags for histogram $1 and phase $2 to "$flag".\newline" >> temp.tex
+echo "Changed GU, GV, GW refinement flags for histogram $1 and phase $2 to "$flag".\newline" >> temp.tex

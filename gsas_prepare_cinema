@@ -5,22 +5,46 @@
 #
 # call
 #
-# gsas_prepare_cinema <optional csv file with data>
+# gsas_prepare_cinema <optional csv file with data> <no_plots>
 #
 # after analyzing all runs with appropriate scripts.
-
-# Check syntax - 
-# no parameters, nothing to do
 #
 # conditions for this to work:
 # - PNAM entries/phase names have to be defined in input phase files
 # - if provided the additional data csv file has to have comma separated columns with the first column being the filename of the run
 #   without extension (no ".gda"). The first line has column headers. Best produced with Excel or other spreadsheet program
+# - all EXP/gda files should have the same length such that the rm comand after "# remove previous files"  doesn't delete previous files
 #
 #
 
 # remove previous files
 rm phase_list.txt
+
+let opt_no_plots=0
+let opt_extra_data=0
+
+# Check syntax - 
+if [ "$1" == "no_plots" ]; then
+  opt_no_plots=1
+  echo "Will not plot fits to save time."
+fi
+
+if [ "$2" == "no_plots" ]; then
+  opt_no_plots=1
+  echo "Will not plot fits to save time."
+fi
+
+if [ -f $1 ]; then
+  opt_extra_data=1
+  extra_data_file=$1
+  echo "Will use extra data in <extra_data_file>."
+fi
+
+if [ -f $2 ]; then
+  opt_extra_data=1
+  extra_data_file=$1
+  echo "Will use extra data in <extra_data_file>."
+fi
 
 # loop through all PVE files in a folder in the sequence they were created
 for file in `ls -1rt *.PVE`; do
@@ -35,7 +59,7 @@ for file in `ls -1rt *.PVE`; do
     read -p "working on $troublemaker..."
   fi
 
-  # loop thorugh all phases in the corresponding EXP file
+  # loop through all phases in the corresponding EXP file
   expfile=${file:0:${#file}-4}
   expfile=$expfile".EXP"
   echo "- extracting phases from $expfile"
@@ -84,18 +108,18 @@ echo "Assembling CINEMA csv file..."
 rm cinema_data.csv 2>/dev/null
 
 # check if we have extra data
-if [ "$1" != "" ]; then
-  let extra_data_cols=`awk -F ',' '{ print NF; exit;}' $1`
+echo "extra_data_file=<$extra_data_file>"
+if [ "$exra_data_file"!="" ]; then
+  let extra_data_cols=`awk -F ',' '{ print NF; exit;}' $extra_data_file`
   # first column has to be analysis run
   let "extra_data_cols -= 1"
   # make file with place holders for data without extra data
   printf ' NaN %.0s , ' `seq 1 $extra_data_cols` > temp_extra_data.txt
-  echo " - Found $extra_data_cols columns of extra data in $1"
+  echo " - Found $extra_data_cols columns of extra data in $extra_data_file"
 else
   let extra_data_cols=0
-  echo " - No file with extra data given"
+  echo " - No file with extra data given (extra_data_file=<$extra_data_file>)"
 fi
-# read -p "wait..."
 
 
 echo " - Checking number of columns provided for each phase"
@@ -107,7 +131,6 @@ for phase in `cat phase_list.txt`; do
   echo "   - Found a maximum of $data_cols columns for phase $phase."
   printf ' NaN %.0s , ' `seq 1 $data_cols` > temp_cols_$phase.txt
 done
-# read -p "wait..."
 
 # TODO: test if all csv files for a given phase have the same number of parameters...
 
@@ -115,7 +138,7 @@ done
 # extra data file
 if [ $extra_data_cols -gt 0 ]; then
   # use the extra data file as it has to have the file name in the first column
-  head -n 1 $1 | tr "\n" "," > cinema_data.csv
+  head -n 1 $extra_data_file | tr "\n" "," > cinema_data.csv
 else
   # just the file name
   echo -n "File," > cinema_data.csv
@@ -144,12 +167,12 @@ for file in `ls -1rt *.PVE`; do
   # check if we have extra data
   if [ $extra_data_cols ]; then
     # find the line with the analysis file, search only in the first column
-    cut -f1 -d',' $1 | grep -n -i $expfile | cut -f1 -d':' > temp.txt 
+    cut -f1 -d',' $extra_data_file | grep -n -i $expfile | cut -f1 -d':' > temp.txt 
     if [ -s temp.txt ]; then
-      echo "  - Found extra data in $1"
-      head -n `cat temp.txt` $1 | tail -n 1 | tr "\n" "," >> cinema_data.csv
+      echo "  - Found extra data in $extra_data_file"
+      head -n `cat temp.txt` $extra_data_file | tail -n 1 | tr "\n" "," >> cinema_data.csv
     else
-      echo "    - Found no extra data in $1"
+      echo "    - Found no extra data in $extra_data_file"
       echo -n "$expfile,`cat temp_extra_data.txt`">> cinema_data.csv
     fi
   else
@@ -194,45 +217,48 @@ for file in `ls -1rt *.PVE`; do
 #     read -p "wait after phase <$phase>"
   done
   
-  # check if we have a folder for images
-  if [ -d "images" ]; then
-    echo " - image folder exists"
-  else
-    echo " - creating folder for images"
-    mkdir images
+  echo "  - option for plots is <$opt_no_plots>."
+  if [ $opt_no_plots -eq 0 ]; then
+    # check if we have a folder for images
+    if [ -d "images" ]; then
+      echo " - image folder exists"
+    else
+      echo " - creating folder for images"
+      mkdir images
+    fi
+    
+    # generate graphic
+    let bank=2
+    echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
+    echo "z e" > input.txt
+    echo "i b m d t" >> input.txt
+    # select histogram 2 #### THIS IS WHERE WE SELECT ANOTHER HISTOGRAM FOR PLOTTING! #####
+    echo "h $bank" >> input.txt
+    # plot
+    echo "p" >> input.txt
+    # title
+    echo "$expfile-B$bank" >> input.txt
+    # filename
+    echo "TEMP" >> input.txt
+    # empty line
+    echo " " >> input.txt
+    # get out
+    echo "x" >> input.txt
+    # run the thing
+    powpref $expfile > output.txt
+    genles $expfile > output.txt
+    # delete previous output EPS
+    rm TEMP.EPS
+    
+    powplot $expfile < input.txt > output.txt
+    mv TEMP.EPS $expfile-B$bank.EPS
+    # convert EPS to png and delete original file
+    convert -density 300 $expfile-B$bank.EPS images/$expfile-B$bank.png 
+    rm $expfile-B$bank.EPS 
+    
+    # add the file to the output CSV, no comma since this is the last entry
+    echo -n " images/$expfile-B2.png " >> cinema_data.csv
   fi
-  
-  # generate graphic
-  let bank=2
-  echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
-  echo "z e" > input.txt
-  echo "i b m d t" >> input.txt
-  # select histogram 2 #### THIS IS WHERE WE SELECT ANOTHER HISTOGRAM FOR PLOTTING! #####
-  echo "h $bank" >> input.txt
-  # plot
-  echo "p" >> input.txt
-  # title
-  echo "$expfile-B$bank" >> input.txt
-  # filename
-  echo "TEMP" >> input.txt
-  # empty line
-  echo " " >> input.txt
-  # get out
-  echo "x" >> input.txt
-  # run the thing
-  powpref $expfile > output.txt
-  genles $expfile > output.txt
-  # delete previous output EPS
-  rm TEMP.EPS
-  
-  powplot $expfile < input.txt > output.txt
-  mv TEMP.EPS $expfile-B$bank.EPS
-  # convert EPS to png and delete original file
-  convert -density 300 $expfile-B$bank.EPS images/$expfile-B$bank.png 
-  rm $expfile-B$bank.EPS 
-  
-  # add the file to the output CSV, no comma since this is the last entry
-  echo -n " images/$expfile-B2.png " >> cinema_data.csv
 
   # Was a phase fraction refined? If so we need to add it to the new PVE file
   grep "PHFR" $expfile.PVE > temp.txt
@@ -256,10 +282,18 @@ done
 
 # remove columns we don't want
 echo "Deleting unwanted columns..."
-# don't want reciprocal matrix for cell parameters
-echo "_RM" > cinema_exclude.txt
-# don't want PHFR as we compute the WTFR
-echo "PHFR" >> cinema_exclude.txt
+# do we already have an exclude file?
+if test -f "cinema_exclude.txt"; then
+  # file already exists, leave it alone
+  echo "cinema_exclude.txt already exists."
+else
+  # don't want reciprocal matrix for cell parameters
+  echo "_RM" > cinema_exclude.txt
+  # don't want PHFR as we compute the WTFR
+  echo "PHFR" >> cinema_exclude.txt
+fi
+# read -p "After cinema_exclude.txt"
+
 for column in  `cat cinema_exclude.txt`; do
   echo "Searching for <$column> in cinema_data.csv..."
   grep $column cinema_data.csv >> /dev/null
