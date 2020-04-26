@@ -1,0 +1,118 @@
+#!/bin/bash
+# 
+# gsas_export_plot - export the raw data and fit into an ASCII file
+#
+# (C) Sven Vogel, sven@lanl.gov
+#
+# call
+#
+# gsas_export_plot <bank> <d|t|q> <y|n> <lin|sqrt>
+#
+# to plot bank <bank> 
+# with the x-axis set to d-spacing (d), time-of-flight/2theta (t), or q
+# background subtracted yes or no
+# linear or sqrt scale
+
+echo "z" > temp.txt
+echo "e" >> temp.txt
+
+# set the bank
+if [ "$1" == "" ]; then
+  echo "Please provide a valid choice for the bank number to be exported as first parameter"
+  read -p "Please fix and re-run the script..."
+  exit    
+else
+  let bank=$1
+  echo "h $bank" >> temp.txt
+  echo "Exporting bank <$bank>."
+fi
+
+# set the x-axis mode
+case "$2" in 
+  "d")
+    x_axis="d"
+    echo "X-axis mode set to d-spacing."
+    echo "t" >> temp.txt
+    ;;
+  "t")
+    x_axis="t"
+    echo "X-axis mode set to time-of-flight/2theta."
+    ;;
+  "q")
+    x_axis="q"
+    echo "X-axis mode set to q."
+    echo "t" >> temp.txt
+    echo "t" >> temp.txt
+    ;;
+  *)
+    echo "Please provide a valid choice for x-axis as second parameter: d (d-spacing), q (Q), t (time of flight or 2theta)"
+    read -p "Please fix and re-run the script..."
+    exit    
+esac
+
+if [ "$3" == "" ]; then
+  echo "Please provide a valid choice (y or n) for the background subtraction as third parameter"
+  read -p "Please fix and re-run the script..."
+  exit    
+else
+  if [ "$3" == "y" ]; then
+    echo "b" >> temp.txt
+    echo "Subtracting background."
+  else
+    if [ "$3" == "n" ]; then
+      echo "Not subtracting background."
+    else
+      echo "Please provide a valid choice (y or n) for the background subtraction as third parameter"
+      read -p "Please fix and re-run the script..."
+      exit    
+    fi
+  fi
+fi
+
+if [ "$4" == "" ]; then
+  echo "Please provide a valid choice (lin or sqrt) for the intensity scale as fourth parameter"
+  read -p "Please fix and re-run the script..."
+  exit    
+else
+  if [ "$4" == "sqrt" ]; then
+    echo "g" >> temp.txt
+    echo "Plotting sqrt(I)."
+  else
+    if [ "$4" == "lin" ]; then
+      echo "Plotting I, linear."
+    else
+      echo "Please provide a valid choice (lin or sqrt) for the intensity scale as fourth parameter"
+      read -p "Please fix and re-run the script..."
+      exit    
+    fi
+  fi
+fi
+
+if [ "$5" == "" ]; then
+  echo "Please provide a valid choice (y or n) for the intensity normalization as fifth parameter"
+  read -p "Please fix and re-run the script..."
+  exit    
+else
+  if [ "$5" == "y" ]; then
+    echo "i" >> temp.txt
+    echo "Plotting I/I0."
+  else
+    if [ "$5" == "n" ]; then
+      echo "Plotting I."
+    else
+      echo "Please provide a valid choice (y or n) for the intensity normalization as fifth parameter"
+      read -p "Please fix and re-run the script..."
+      exit    
+    fi
+  fi
+fi
+
+# plot
+echo "a" >> temp.txt
+echo "temp" >> temp.txt
+echo "x" >> temp.txt
+
+powplot `cat GSAS_EXP` < temp.txt > out.txt
+
+# rename output
+mv temp.TXT plot_`cat GSAS_EXP`_bank_$bank.dat
