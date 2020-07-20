@@ -6,7 +6,7 @@
 #
 # call
 #
-# gsas_plot_3D  <extra_data>
+# gsas_plot_3D  <extra_data> <bank>
 #
 # use second column in CSV file with first column=filename as 1st axis (first axis is d-spacing or whatever is used in gsas_export_plot)
 
@@ -18,12 +18,18 @@ else
   exit
 fi
 
+if [ "$2" == "" ]; then
+  echo "Please provide bank number as second parameter."
+  read -p "Please change script and call again"
+  exit
+fi
+
 # delete previous 3D data files
 rm plot3d_intensity.dat
 rm plot3d_fit.dat
 
 # get the data
-for file in `ls plot_*.dat`; do
+for file in `ls plot_*_bank_$2.dat`; do
   echo ""
   echo "Processing file <$file>..."
   
@@ -36,7 +42,7 @@ for file in `ls plot_*.dat`; do
   grep -i $exp_file $1 > /dev/null
   if [ $? -eq 0 ]; then
     # we found it
-    first_col_val=`grep -i $exp_file $1 | awk '{ print $2 }'`
+    first_col_val=`grep -i $exp_file $1 | awk -F, '{ print $2 }'`
     if [ "$first_col_val" == "" ]; then
       read -p "Did not find value for first axis in $1 for $exp_file! Cannot work, please fix"
       exit
