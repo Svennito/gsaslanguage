@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# Insert an atom
+# calculate bond lengths and add to LST and PVE files
 #
 # Call with 
 #
-# gsas_add_atom <phase #> <atom string>
+# gsas_calc_bond_length <phase #> 
 #
-# where atom string is the information needed by GSAS to add an atom
+# where phase # is the phase for which to calculate the bond lengths
 #
 
 # echo the call so we can see what's going on
@@ -14,13 +14,25 @@ echo "$0 $1 $2 $3 $4 $5 $6"
 
 # Check syntax
 if [ "$1" = "" ]; then
-	echo "$0 called without phase for which to compute bondlength!"
+	echo "$0 called without phase for which to compute bond length!"
 	exit 0
 fi
 
 # Setup the computation
 echo "k d" > temp.txt
-echo "d $1" >> temp.txt
+# disable calculations for all phases so we only get one phase, max phases is 9
+echo "d 1" >> temp.txt
+echo "n 2 d" >> temp.txt
+echo "n 3 d" >> temp.txt
+echo "n 4 d" >> temp.txt
+echo "n 5 d" >> temp.txt
+echo "n 6 d" >> temp.txt
+echo "n 7 d" >> temp.txt
+echo "n 8 d" >> temp.txt
+echo "n 9 d" >> temp.txt
+# select the phase we want to work with
+echo "$1" >> temp.txt
+# set it up with default values
 echo "c" >> temp.txt
 echo "y" >> temp.txt
 echo "n " >> temp.txt
