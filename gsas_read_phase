@@ -26,16 +26,20 @@ fi
 # Does the phase have atoms?
 natoms=`grep CRS$2 $1 | grep NATOM | awk '{print $3}'`
 if [ "$natoms" == "0" ]; then
-  echo "A problem occured while converting $1!"
-  echo "We did not get any atoms! Possibly the CIF file needs to be modified to get rid of charge states, i.e. convert Bi0+ to Bi as _atom_site_type_symbol?"
+  echo "A problem occured while reading $1!"
+  echo "This phase file does not have any atoms! Possibly the CIF file needs to be modified to get rid of charge states, i.e. convert Bi0+ to Bi as _atom_site_type_symbol?"
   read -p "You should hit Ctrl-c here and check your CIF file."
   exit
 elif [ "$natoms" == "" ]; then
   echo "No atoms found!"
   read -p "Hit ctrl-c and check some things..."
 else
-  echo "We read <$natoms> atoms from the EXP file $1."
+  echo "The phase file <$1> has <$natoms> atoms."
 fi
+
+# run cnvfile just to be sure...
+echo "$1" > temp.txt
+cnvfile < temp.txt > out.txt
 
 # Add the phase
 echo "k p p r" > temp.txt
