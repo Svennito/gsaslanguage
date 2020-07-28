@@ -247,7 +247,14 @@ for file in `ls -1rt *.PVE`; do
     fi
     
     # generate graphic
-    let bank=2
+    
+    # choose bank - if for hippo, choose histogram 2, otherwise 1
+    let bank=1
+    grep hippo $expfile.EXP
+    if [ $? -eq 0 ]; then
+        echo "Found HIPPO in the EXP file, using histogram 2 - typically 90 degree detectors!"
+        let bank = 2
+    fi
     echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
     
     # go into EXP file and turn all print options off, we want to keep PVE file and don't worry about correlation matrix here
@@ -269,7 +276,9 @@ for file in `ls -1rt *.PVE`; do
     echo "$expfile-B$bank" >> input.txt
     # filename
     echo "TEMP" >> input.txt
-    # empty line
+    # empty line for new d-range
+    echo " " >> input.txt
+    # empty line for error plot
     echo " " >> input.txt
     # get out
     echo "x" >> input.txt
@@ -280,14 +289,18 @@ for file in `ls -1rt *.PVE`; do
     rm TEMP.EPS
     
     powplot $expfile < input.txt > output.txt
-    mv TEMP.EPS $expfile-B$bank.EPS
+#     read -p "After plotting..."
+    mv TEMP.EPS "$expfile-B$bank.EPS"
     # convert EPS to png and delete original file
-    convert -density 300 $expfile-B$bank.EPS images/$expfile-B$bank.png 
-    rm $expfile-B$bank.EPS 
+    convert -density 300 "$expfile-B$bank.EPS" "images/$expfile-B$bank.png" 
+#     read -p "After plotting..."
+    rm "$expfile-B$bank.EPS" 
     
     # add the file to the output CSV, no comma since this is the last entry
     echo -n " images/$expfile-B2.png " >> cinema_data.csv
     echo -n " images/$expfile-B2.png " >> cinema_data_esd.csv
+    
+#     read -p "After plotting..."
   fi
 
   # Was a phase fraction refined? If so we need to add it to the new PVE file
