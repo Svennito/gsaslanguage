@@ -369,7 +369,7 @@ done
 # mv temp.txt cinema_data.csv
 
 # read -p "wait before deleting temp files"
-
+echo "Done. The data without error bars is in cinema_data.csv. The file cinema_data_esd.csv has the same information with esd values for each parameter."
 echo "To exclude variables from cinema_data.csv and cinema_data_esd.csv, edit cinema_exclude.txt and rerun gsas_prepare_cinema."
 
 # clean up
