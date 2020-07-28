@@ -35,11 +35,11 @@ fi
 # do we have tcl installed?
 ncnrpack_path=`which ncnrpack`
 if [ "$ncnrpack_path" = "" ]; then
-	echo "You don't have tcl installed! Please install for this function.!"
+	echo "You don't have ncnrpack installed! Please install for this function.!"
 	read -p "You should not continue here! Please hit Ctrl-C until you are out of the script!"
 	exit
 else
-	echo "tcl found."
+	echo "ncnrpack found."
 fi
 
 # do we have expgui files in reach?

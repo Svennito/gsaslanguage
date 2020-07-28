@@ -77,8 +77,26 @@ awk -f extract_bonds.awk -v phase=$1 out.txt > bonds.txt
 sort bonds.txt > bonds_sort.txt
 # remove duplicates (same bond with different esds counts NOT as a duplicate!)
 uniq bonds_sort.txt > bonds.txt
+# massage the file so multiple bonds between same atoms get unique identifiers
+echo "{ if (prev==\"\") { " > make_bond_unique.awk
+echo "    prev=\$3;" >> make_bond_unique.awk
+echo "    n=0;" >> make_bond_unique.awk
+echo "  } else { " >> make_bond_unique.awk
+echo "    if (prev==\$3) { " >> make_bond_unique.awk
+echo "        n=n+1;" >> make_bond_unique.awk
+echo "    } else {" >> make_bond_unique.awk
+echo "        n=0" >> make_bond_unique.awk
+echo "    }" >> make_bond_unique.awk
+echo "    prev=\$3" >> make_bond_unique.awk
+echo "  }" >> make_bond_unique.awk
+# for debugging...
+#echo "  printf \"  \\\"%s  %s.%s\\\"  %s (prev: %s)\n\",\$2,\$3,n,\$4,prev; " >> make_bond_unique.awk
+echo "  printf \"  \\\"%s  %s.%s\\\"  %s\n\",\$2,\$3,n,\$4; " >> make_bond_unique.awk
+echo "};" >> make_bond_unique.awk
+awk -f make_bond_unique.awk -F'"|    ' bonds.txt > unique_bonds.txt
+
 # add it to the PVE file
-cat bonds.txt >> `cat GSAS_EXP`.PVE
+cat unique_bonds.txt >> `cat GSAS_EXP`.PVE
 
 # create an awk script to extract bond lengths
 echo "{" > extract_angles.awk
@@ -96,7 +114,7 @@ echo "      bl=substr(\$2,0,index(\$2,\"(\")-1);" >> extract_angles.awk
 echo "      bl_esd=substr(\$2,index(\$2,\"(\")+1,index(\$2,\")\")-index(\$2,\"(\")-1);" >> extract_angles.awk
 echo "      bl_dec=length(bl)-index(bl,\".\");" >> extract_angles.awk
 echo "      bl_esd_abs=substr(\"0.0000000000000000000\",0,2+bl_dec-length(bl_esd))bl_esd;" >> extract_angles.awk
-echo "      printf \"  \\\"%1s %8s\\\"   %8.6e   %8.6e\n\",phase,bond,bl,bl_esd_abs;" >> extract_angles.awk
+echo "      printf \"  \\\"%1s    %8s\\\"   %8.6e   %8.6e\n\",phase,bond,bl,bl_esd_abs;" >> extract_angles.awk
 echo "    } while (\$1!=\"\" && \$2!=\"\") " >> extract_angles.awk
 echo "  }" >> extract_angles.awk
 echo "}" >> extract_angles.awk
@@ -107,16 +125,21 @@ awk -f extract_angles.awk  -v phase=$1 out.txt > angles.txt
 sort angles.txt > angles_sort.txt
 # remove duplicates (same angle with different esds counts NOT as a duplicate!)
 uniq angles_sort.txt > angles.txt
+
+# massage the file so multiple bonds between same atoms get unique identifiers
+awk -f make_bond_unique.awk -F'"|    ' angles.txt > unique_bonds.txt
+
 # add it to the PVE file
-cat angles.txt >> `cat GSAS_EXP`.PVE
+cat unique_bonds.txt >> `cat GSAS_EXP`.PVE
 
 echo "Computed bond length and angles for phase $1 and added them to the \verb=`cat GSAS_EXP`.LST= and \verb=`cat GSAS_EXP`.PVE= files.\newline" >> `cat GSAS_EXP`.tex
 
 # clean up
 rm extract_angles.awk
 rm extract_bonds.awk
+rm make_bond_unique.awk
 rm bonds.txt
 rm bonds_sort.txt
 rm angles.txt
 rm angles_sort.txt
-
+rm unique_bonds.txt
