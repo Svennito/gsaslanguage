@@ -253,7 +253,7 @@ for file in `ls -1rt *.PVE`; do
     grep hippo $expfile.EXP
     if [ $? -eq 0 ]; then
         echo "Found HIPPO in the EXP file, using histogram 2 - typically 90 degree detectors!"
-        let bank = 2
+        let bank=2
     fi
     echo "  - Generating plot of histogram <$bank> for analysis <$expfile>..."
     

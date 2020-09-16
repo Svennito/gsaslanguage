@@ -92,6 +92,9 @@ echo "Ran hstdmp for $NHIST histograms on `cat GSAS_EXP`_MEM.EXP." >> `cat GSAS_
 # Prepare input alchemy file for each histogram
 COUNTER=0
 cp `cat GSAS_EXP`_MEM.LST `cat GSAS_EXP`_MEM.lst
+
+echo ""
+
 while [ $COUNTER -lt $NHIST ]; do
 	let COUNTER=COUNTER+1 
 	echo -e "Preparing `cat GSAS_EXP`_MEM_$COUNTER.inp..."
@@ -103,7 +106,8 @@ while [ $COUNTER -lt $NHIST ]; do
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "`cat GSAS_EXP`_MEM_$COUNTER.MEM  # Name of *.mem (MEM data set file)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
-	echo "`grep DESCR 100C.EXP | tail -c68 | head -c65` (bank $COUNTER)  # Title" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	grep " DESCR" `cat GSAS_EXP`_MEM.EXP | tail -c65 | head -c63 | tr -d '[:space:]' > temp.txt
+	echo "`cat temp.txt` (bank $COUNTER)  # Title" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "A-$SGNO-1  # (International Tables, Vol.)-(space-group number)-(setting number)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
@@ -112,12 +116,18 @@ while [ $COUNTER -lt $NHIST ]; do
 	echo "128  128  128  # Voxel numbers along a, b, and c axes" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "# IAMP: type of scattering amplitudes" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
-	echo "0 # 0: XRD or ND (only positive b_c values), 1: ND (positive & negative b_c values)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	
+	# to do: Determine if there are negative b_c in this structure
+	echo "1 # 0: XRD or ND (only positive b_c values), 1: ND (positive & negative b_c values)" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	
+	# to do: Determine the total of b_c in the unit cell
 	echo "# If IAMP = 0, the next line is input" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "47.310  # Total number of electrons (XRD) or total of b_c values (ND) in the unit cell" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "# If IAMP = 1, the next line is input" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+
+	# to do: Determine the total of b_c in the unit cell
 	echo "#408.595 -40.225  # Totals of positive and negative b_c values (ND) in the unit cell" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "0.1  # Lagrangian multiplier" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
@@ -127,6 +137,8 @@ while [ $COUNTER -lt $NHIST ]; do
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "$PHASE # phase number" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
+	
+	# to do: Add the angles of the banks used, seems a bug in alchemy if a bank is skipped/not used
 	echo "# The next line is input only in TOF ND" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "144.45 90.0 39.30 /  # 2-theta values of detector banks as well as '/'" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
@@ -134,7 +146,7 @@ while [ $COUNTER -lt $NHIST ]; do
 	echo "# 0.5 0.7998  # u and (cos(2*theta_M))^2 in Eq. (2.69) in RIETAN-FP_manual.pdf" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 	echo "# The next line is input only in TOF ND" >> `cat GSAS_EXP`_MEM_$COUNTER.inp
-	grep " $COUNTER ICONS" `cat GSAS_EXP`_MEM.EXP | tail -c68 | head -c30 > temp.txt
+	grep " $COUNTER ICONR" `cat GSAS_EXP`_MEM.EXP | tail -c68 | head -c30 > temp.txt
 	echo "`cat temp.txt`  # Three parameters, DIFC, DIFA, and ZERO, to calculate TOF from d (GSAS manual, p. 141)." >> `cat GSAS_EXP`_MEM_$COUNTER.inp
 done
 

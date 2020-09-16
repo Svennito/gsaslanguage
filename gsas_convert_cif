@@ -76,16 +76,22 @@ fi
 rc_path=${rc_path:0:${#rc_path}-${#fn}-1}
 
 echo "Searching for rc.tcl in $rc_path"
-#read -p "wait..."
+
+# do we need to change the new "_space_group_name_H-M_alt" to the old "_symmetry_space_group_name_H-M" for the old expgui stuff to work?
+grep "_space_group_name_H-M_alt" $1
+if [ $? == 0 ]; then
+    echo "found the new CIF field for the space group, need to convert!"
+    sed "s/_space_group_name_H-M_alt/_symmetry_space_group_name_H-M/g" $1 > temp_input.cif
+else
+    echo "CIF files has the old CIF field for the space group, no action needed."
+    cp $1 temp_input.cif
+fi
 
 # convert it!
 echo $rc_path
 echo $expgui_path
-#rc_path="c:\gsaslanguage"
-#expgui_path="c:\gsas\expgui"
-#gsas="c:\gsas"
 echo "Call for ncnrpack: <ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas>"
-ncnrpack  $rc_path/rc.tcl $1 TEMP.EXP $expgui_path $gsas
+ncnrpack  $rc_path/rc.tcl temp_input.cif TEMP.EXP $expgui_path $gsas
 
 ncnrpack_exit=$?
 echo "Exit status of ncnrpack: <$ncnrpack_exit>"
@@ -111,3 +117,4 @@ else
 	echo "Left the temporary files for debugging!"
 fi
   
+rm temp_input.cif
